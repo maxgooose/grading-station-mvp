@@ -325,20 +325,51 @@
         <rect x="110" y="55" width="580" height="390" rx="2"
               fill="#050505" stroke="#222222" stroke-width="1"/>
 
-        <!-- LED panels (left, top, right) -->
+        <!-- ========== LIGHTING STACK: LED → DIFFUSER → POLAR FILM ========== -->
         <g id="led-panels" opacity="0.5">
-          <!-- Left LED panel -->
-          <rect x="112" y="70" width="8" height="360" fill="#ffffff" opacity="0.08" rx="1"/>
-          <line x1="116" y1="80" x2="116" y2="420" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,6" opacity="0.2"/>
-          <!-- Right LED panel -->
-          <rect x="680" y="70" width="8" height="360" fill="#ffffff" opacity="0.08" rx="1"/>
-          <line x1="684" y1="80" x2="684" y2="420" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,6" opacity="0.2"/>
-          <!-- Top LED panel -->
-          <rect x="130" y="57" width="540" height="8" fill="#ffffff" opacity="0.08" rx="1"/>
-          <line x1="140" y1="61" x2="660" y2="61" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,6" opacity="0.2"/>
-          <!-- Polarizing film labels -->
-          <text x="100" y="255" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" opacity="0.3" letter-spacing="1.5" transform="rotate(-90,100,255)">POLAR FILM + LEDs</text>
-          <text x="700" y="255" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" opacity="0.3" letter-spacing="1.5" transform="rotate(90,700,255)">POLAR FILM + LEDs</text>
+          <!-- ===== LEFT WALL ===== -->
+          <!-- LED panel (outermost, against enclosure wall) -->
+          <rect x="112" y="70" width="5" height="360" fill="#ffffff" opacity="0.06" rx="1"/>
+          <line x1="114" y1="80" x2="114" y2="420" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.15"/>
+          <!-- Diffuser panel (frosted acrylic) -->
+          <rect x="119" y="70" width="6" height="360" fill="#ffffff" opacity="0.04" rx="1"
+                stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.2"/>
+          <!-- Polarizing film (innermost, facing device) -->
+          <rect x="127" y="70" width="2" height="360" fill="#ffffff" opacity="0.08" rx="0"/>
+
+          <!-- ===== RIGHT WALL ===== -->
+          <!-- LED panel -->
+          <rect x="683" y="70" width="5" height="360" fill="#ffffff" opacity="0.06" rx="1"/>
+          <line x1="686" y1="80" x2="686" y2="420" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.15"/>
+          <!-- Diffuser panel -->
+          <rect x="675" y="70" width="6" height="360" fill="#ffffff" opacity="0.04" rx="1"
+                stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.2"/>
+          <!-- Polarizing film -->
+          <rect x="671" y="70" width="2" height="360" fill="#ffffff" opacity="0.08" rx="0"/>
+
+          <!-- ===== TOP CEILING ===== -->
+          <!-- LED panel -->
+          <rect x="135" y="57" width="530" height="5" fill="#ffffff" opacity="0.06" rx="1"/>
+          <line x1="145" y1="59" x2="655" y2="59" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.15"/>
+          <!-- Diffuser panel -->
+          <rect x="135" y="64" width="530" height="6" fill="#ffffff" opacity="0.04" rx="1"
+                stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.2"/>
+          <!-- Polarizing film -->
+          <rect x="135" y="72" width="530" height="2" fill="#ffffff" opacity="0.08" rx="0"/>
+
+          <!-- Stack labels (left side) -->
+          <text x="92" y="160" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1" transform="rotate(-90,92,160)">LED</text>
+          <text x="100" y="200" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1" transform="rotate(-90,100,200)">DIFFUSER</text>
+          <text x="108" y="195" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1" transform="rotate(-90,108,195)">POLAR FILM</text>
+
+          <!-- Stack labels (right side) -->
+          <text x="708" y="160" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1" transform="rotate(90,708,160)">LED</text>
+          <text x="700" y="200" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1" transform="rotate(90,700,200)">DIFFUSER</text>
+          <text x="692" y="195" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1" transform="rotate(90,692,195)">POLAR FILM</text>
+
+          <!-- Top callout -->
+          <line x1="500" y1="56" x2="500" y2="75" stroke="#ffffff" stroke-width="0.3" opacity="0.2"/>
+          <text x="520" y="50" fill="#ffffff" font-size="5" font-family="Inter, sans-serif" opacity="0.25" letter-spacing="1">LED → DIFFUSER → POLAR FILM</text>
         </g>
 
         <!-- ========== ROTATION ASSEMBLY ========== -->
@@ -556,7 +587,13 @@
         <div class="legend-swatch" style="background:#4a5a6a"></div> Aluminum Plates
       </div>
       <div class="legend-item">
-        <div class="legend-swatch" style="background:#fbbf24;opacity:0.5"></div> LED Panels + Polar Film
+        <div class="legend-swatch" style="background:#ffffff;opacity:0.15;border:1px solid #444"></div> LED Panels
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#ffffff;opacity:0.08;border:1px solid #333"></div> Diffuser Panels
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#ffffff;opacity:0.2"></div> Polar Film
       </div>
       <div class="legend-item">
         <div class="legend-swatch" style="background:#3b82f6"></div> Top Camera
@@ -622,7 +659,7 @@
 const steps = [
   {
     title: "Ready — Station Idle",
-    desc: "Station is empty and waiting. LEDs are on, cameras are powered, pads are in home position. Top pad is raised, bottom pad is flat and ready to receive a device.",
+    desc: "Station is empty and waiting. LEDs emit through <strong>diffuser panels</strong> (frosted acrylic) for uniform light, then through <strong>polarizing film</strong>. Cameras are powered, pads are in home position. Top pad is raised, bottom pad flat and ready.",
     time: "0s",
     photos: 0,
     action: (dir) => {
@@ -649,7 +686,7 @@ const steps = [
   },
   {
     title: "Front Face Capture",
-    desc: "Top camera fires — captures the <strong>front screen</strong> in a clean, direct shot. CPL filter eliminates glare from glass screens. Cross-polarized light reveals scratches invisible under normal lighting.",
+    desc: "Top camera fires — captures the <strong>front screen</strong> in a clean, direct shot. Light path: LEDs → diffuser panels (uniform spread) → polarizing film → device surface → CPL filter on lens (crossed 90°). Kills glare, reveals scratches.",
     time: "~4s",
     photos: 1,
     capture: ['ph-front'],
