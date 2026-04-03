@@ -56,6 +56,14 @@ Worst case: iPad Pro 682g at 90° rotation.
 - Friction from two silicone pads at 20N clamp: ~20N
 - 3x safety margin. It holds.
 
+## Lighting Stack (per wall: left, right, top)
+
+- **Layer 1 (outer):** LED panel (against enclosure wall)
+- **Layer 2:** Diffuser panel — frosted/opal acrylic, spreads LED point sources into uniform wash
+- **Layer 3 (inner, facing device):** Polarizing film
+- Total stack depth per wall: ~15-20mm
+- **Clearance constraint:** flip assembly + pads (300×230mm) must rotate 180° without contacting diffuser panels on left/right walls. Minimum clearance: ~20mm from pad edge to diffuser surface at 90° rotation (worst case).
+
 ## Frame
 
 - Aluminum plates both sides
