@@ -18,15 +18,15 @@ Screen up. Always. Operator loads it naturally, screen gets photographed first b
 ## Capture Sequence
 
 1. Device enters through front opening, sits screen-up on bottom pad
-2. Top camera shoots front face (through aperture hole in top diffuser)
-3. 4 edge cameras shoot all edges simultaneously (through aperture holes in side/back diffusers)
-4. Top pad descends, sandwiches device (~20N force via spring)
+2. Top camera shoots front face (top pad is retracted sideways, out of camera view)
+3. 4 edge cameras shoot all edges simultaneously
+4. Top pad **slides to center** along rail, then **descends** to sandwich device (~20N)
 5. Rotate 180° over ~1.5 seconds
-6. Upper pad lifts (original bottom pad, now on top after flip)
+6. Upper pad **lifts and retracts sideways** (clears camera view)
 7. Top camera shoots back face
 8. Device exits back through the same front opening to sort bins (A/B/C)
 
-Single opening — device enters and exits from the same slot. No second hole needed.
+Single opening — device enters and exits from the same slot. Top pad retracts sideways during capture so it never blocks the top camera.
 
 ~10 seconds per cycle. Budget is 57 seconds. Plenty of margin.
 
@@ -48,9 +48,10 @@ Single opening — device enters and exits from the same slot. No second hole ne
 
 ## Top Pad Actuator
 
-- Lead screw or pneumatic cylinder
-- 50mm travel (handles 6mm thin iPad to 16mm folded Z Flip)
+- **Horizontal slide rail** — top pad retracts sideways (along shaft axis) to clear the top camera's field of view during photography. Slides to center when clamping is needed.
+- **Lead screw** for vertical descent — 50mm travel (handles 6mm thin iPad to 16mm folded Z Flip)
 - Spring between actuator and pad — provides consistent 20N regardless of device thickness
+- **Why the slide**: the top pad (300×230mm) would block the top camera if it were just raised above the device. Retracting sideways completely clears the camera's line of sight.
 
 ## Physics Check
 

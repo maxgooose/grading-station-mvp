@@ -351,31 +351,28 @@
         <text id="dev-label" x="455" y="316" fill="#fff" font-size="6" text-anchor="middle" opacity="0.4" letter-spacing="1.5">DEVICE (SCREEN UP)</text>
       </g>
 
-      <!-- Top silicone pad — STARTS RAISED (near ceiling, out of the way) -->
-      <g id="top-pad-group">
-        <rect id="top-pad" x="312" y="155" width="286" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
-        <rect id="top-plate" x="310" y="146" width="290" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
-        <text x="455" y="142" fill="#3aa898" font-size="5" text-anchor="middle" opacity="0.5" letter-spacing="1">TOP PAD (RAISED)</text>
-      </g>
+      <!-- TOP PAD ASSEMBLY — starts RETRACTED to the right, out of camera view -->
+      <g id="top-pad-assembly">
+        <!-- Horizontal rail (pad slides along this) -->
+        <line x1="310" y1="295" x2="600" y2="295" stroke="#444" stroke-width="1" stroke-dasharray="4,3" opacity="0.25"/>
+        <text x="610" y="298" fill="#444" font-size="4" opacity="0.4" letter-spacing="1">SLIDE RAIL</text>
 
-      <!-- Spring (coil) — attached between actuator and top pad -->
-      <g id="spring-group">
-        <path d="M455,114 Q445,118 455,122 Q465,126 455,130 Q445,134 455,138 Q465,142 455,146"
-              fill="none" stroke="url(#sprG)" stroke-width="2" stroke-linecap="round"/>
-        <text x="472" y="132" fill="#888" font-size="5" opacity="0.5" letter-spacing="1">~20N</text>
-      </g>
-
-      <!-- Lead screw (threaded rod) -->
-      <g id="actuator-group">
-        <rect x="452" y="90" width="6" height="24" rx="1" fill="#777" stroke="#999" stroke-width="0.3"/>
-        <!-- Thread lines -->
-        <g stroke="#555" stroke-width="0.3" opacity="0.6">
-          <line x1="452" y1="93" x2="458" y2="96"/><line x1="452" y1="99" x2="458" y2="102"/>
-          <line x1="452" y1="105" x2="458" y2="108"/>
+        <!-- Top pad group — positioned to the right (retracted) -->
+        <g id="top-pad-group">
+          <rect id="top-pad" x="312" y="286" width="286" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
+          <rect id="top-plate" x="310" y="277" width="290" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
+          <!-- Spring -->
+          <path id="spring-path" d="M455,248 Q445,252 455,256 Q465,260 455,264 Q445,268 455,272 Q465,276 455,278"
+                fill="none" stroke="url(#sprG)" stroke-width="2" stroke-linecap="round"/>
+          <!-- Lead screw -->
+          <rect x="452" y="210" width="6" height="38" rx="1" fill="#777" stroke="#999" stroke-width="0.3"/>
+          <g stroke="#555" stroke-width="0.3" opacity="0.6">
+            <line x1="452" y1="214" x2="458" y2="217"/><line x1="452" y1="221" x2="458" y2="224"/>
+            <line x1="452" y1="228" x2="458" y2="231"/><line x1="452" y1="235" x2="458" y2="238"/>
+          </g>
+          <rect x="448" y="243" width="14" height="5" rx="1" fill="#666" stroke="#888" stroke-width="0.3"/>
+          <text id="top-pad-label" x="455" y="206" fill="#888" font-size="5" text-anchor="middle" opacity="0.4" letter-spacing="1">TOP PAD (RETRACTED →)</text>
         </g>
-        <!-- Nut -->
-        <rect x="448" y="110" width="14" height="5" rx="1" fill="#666" stroke="#888" stroke-width="0.3"/>
-        <text x="455" y="86" fill="#888" font-size="5" text-anchor="middle" opacity="0.4" letter-spacing="1">LEAD SCREW</text>
       </g>
     </g>
   </g>
@@ -687,22 +684,26 @@ const steps=[
     }
   },
   {
-    title:"Top Pad Descends — Sandwich",
-    desc:"Lead screw drives the top <strong>silicone pad</strong> all the way down onto the device. Spring provides consistent <strong>~20N</strong> regardless of thickness. Device is now clamped between two soft pads on aluminum backing plates.",
+    title:"Top Pad Slides In + Descends",
+    desc:"Top pad <strong>slides along rail to center</strong> (was retracted to the side to clear the camera). Then lead screw drives it <strong>down onto the device</strong>. Spring provides consistent ~20N. Device sandwiched between two silicone pads.",
     time:"~6s",photos:5,
     action:()=>{
       hideAllB();
-      // Top pad descends from raised position (y~155) down to sandwich position (y~300)
-      const tpg=el('top-pad-group'),spr=el('spring-group'),act=el('actuator-group');
-      [tpg,spr,act].forEach(e=>e.style.transition='transform 1s cubic-bezier(0.4,0,0.2,1)');
-      tpg.style.transform='translateY(148px)';  // 155 + 148 = 303, right above device at 322
-      spr.style.transform='translateY(130px)';
-      act.style.transform='translateY(110px)';
+      const tpg=el('top-pad-group');
+      // Step 1: slide from retracted (right) to center
+      tpg.style.transition='transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+      tpg.style.transform='translateX(0px) translateY(0px)';
+      el('top-pad-label').textContent='TOP PAD (CENTERED)';
+      // Step 2: after centering, descend to sandwich
+      setTimeout(()=>{
+        tpg.style.transition='transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+        tpg.style.transform='translateX(0px) translateY(28px)';
+      },900);
     }
   },
   {
     title:"180° Rotation — Sandwich Flip",
-    desc:"NEMA 23 stepper + 5:1 planetary gearbox rotates the sandwich <strong>180°</strong> in ~1.5s. Trapezoidal velocity profile. Encoder confirms position. <strong>228mm clearance</strong> to nearest diffuser. Device is now <strong>face-down, back up</strong>.",
+    desc:"NEMA 23 + 5:1 gearbox rotates the sandwich <strong>180°</strong> in ~1.5s. Trapezoidal velocity profile. Encoder confirms position. <strong>228mm clearance</strong> to diffusers. Device now <strong>face-down, back up</strong>.",
     time:"~8s",photos:5,
     action:()=>{
       const fg=el('flip-group');
@@ -717,27 +718,29 @@ const steps=[
       setTimeout(()=>{
         fg.style.transition='none';
         fg.style.transform='none';
-        // Post-flip: original bottom pad is now on TOP (close to device, just flipped)
-        // Original top pad is now on BOTTOM (device rests on it)
-        attr('bot-pad','y','303');attr('bot-plate','y','295');  // original bottom → now above device
-        attr('top-pad','y','339');attr('top-plate','y','348');  // original top → now below device
-        el('top-pad-group').style.transform='none';
+        // Post-flip: original bottom pad now on TOP, original top pad on BOTTOM
+        attr('bot-pad','y','305');attr('bot-plate','y','297');
+        attr('top-pad','y','339');attr('top-plate','y','348');
+        el('top-pad-group').style.transition='none';
+        el('top-pad-group').style.transform='translateX(0px) translateY(0px)';
         el('dev-label').textContent='DEVICE (BACK UP)';
-        el('spring-group').style.transform='none';el('spring-group').style.opacity='0.15';
-        el('actuator-group').style.transform='none';el('actuator-group').style.opacity='0.15';
+        el('top-pad-label').textContent='';
         fg.dataset.flipped='1';
       },1600);
       flash('encoder');
     }
   },
   {
-    title:"Upper Pad Lifts — Back Exposed",
-    desc:"Original bottom pad (now on top) lifts <strong>upward</strong> and out of the way. Device stays on lower pad — held by <strong>gravity</strong>. Back panel fully exposed to the top camera. Interior is uniform diffused light.",
+    title:"Upper Pad Retracts — Back Exposed",
+    desc:"Original bottom pad (now on top) <strong>lifts up and slides sideways</strong> out of the camera's field of view. Device stays on lower pad by <strong>gravity</strong>. Back panel fully exposed to the top camera.",
     time:"~9s",photos:5,
     action:()=>{
-      // Lift the original bottom pad (now above device at y~303) way up out of the way
+      // Lift the original bottom pad (now above device) up and slide it to the side
       const bp=el('bot-pad'),bpl=el('bot-plate');
-      [bp,bpl].forEach(e=>{e.style.transition='transform 1s cubic-bezier(0.4,0,0.2,1)';e.style.transform='translateY(-160px)';});
+      [bp,bpl].forEach(e=>{
+        e.style.transition='transform 1s cubic-bezier(0.4,0,0.2,1)';
+        e.style.transform='translate(200px, -60px)';
+      });
     }
   },
   {
@@ -808,13 +811,18 @@ function prev(){if(cur>0)goTo(cur-1);}
 
 function resetAll(){
   const fg=el('flip-group');fg.style.transition='none';fg.style.transform='none';fg.dataset.flipped='';
-  el('top-pad-group').style.transition='none';el('top-pad-group').style.transform='none';
-  // Top pad starts RAISED near ceiling
-  attr('top-pad','y','155');attr('top-plate','y','146');
+
+  // Top pad starts RETRACTED to the right (out of camera's view)
+  const tpg=el('top-pad-group');
+  tpg.style.transition='none';
+  tpg.style.transform='translateX(200px)';
+  attr('top-pad','y','286');attr('top-plate','y','277');
+  el('top-pad-label').textContent='TOP PAD (RETRACTED →)';
+
   // Bottom pad at device level
   attr('bot-pad','y','339');attr('bot-plate','y','348');
   ['bot-pad','bot-plate'].forEach(id=>{el(id).style.transition='none';el(id).style.transform='none';});
-  ['spring-group','actuator-group'].forEach(id=>{const e=el(id);e.style.transition='none';e.style.transform='none';e.style.opacity='';});
+
   const dev=el('device');dev.style.transition='none';dev.style.transform='none';dev.style.opacity='1';
   hideAllB();
   el('dev-label').textContent='DEVICE (SCREEN UP)';
