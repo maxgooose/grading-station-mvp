@@ -3,580 +3,352 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grading Station — Engineering Visualization</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>Grading Station — C-Bracket Flip</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#000;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
-  h1{font-size:20px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px}
-  .sub{font-size:11px;color:#555;margin-bottom:20px;letter-spacing:2px;text-transform:uppercase}
-  .wrap{display:flex;gap:24px;max-width:1400px;width:100%}
-  .viz{flex:1;min-width:0}
-  .info{width:300px;flex-shrink:0}
-  .svgbox{background:#050505;border:1px solid #1a1a1a;border-radius:2px;overflow:hidden}
-  svg{display:block;width:100%;height:auto}
-  svg text{font-family:'Inter',sans-serif}
-  .card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:2px;padding:20px;margin-bottom:12px}
-  .card .lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:6px;color:#fff}
-  .card .ttl{font-size:16px;font-weight:700;margin-bottom:10px;letter-spacing:.3px;line-height:1.3}
-  .card .dsc{font-size:12px;color:#888;line-height:1.7}
-  .card .dsc strong{color:#fff}
-  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-  .stat{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:2px;padding:10px;text-align:center}
-  .stat .v{font-size:20px;font-weight:700;letter-spacing:1px}
-  .stat .l{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:2px;margin-top:4px;font-weight:500}
-  .ctrls{display:flex;gap:8px;align-items:center;margin-top:12px}
-  .ctrls button{background:0 0;color:#fff;border:1px solid #333;border-radius:2px;padding:8px 18px;font-family:inherit;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:.15s}
-  .ctrls button:hover{background:#fff;color:#000;border-color:#fff}
-  .ctrls button.pri{background:#fff;border-color:#fff;color:#000;font-weight:700}
-  .ctrls button.pri:hover{background:#ccc;border-color:#ccc}
-  .ctrls button:disabled{opacity:.15;cursor:not-allowed;pointer-events:none}
-  .dots{display:flex;gap:6px;margin-left:auto}
-  .dot{width:8px;height:8px;border-radius:50%;background:#111;border:1px solid #333;cursor:pointer;transition:.3s}
-  .dot.a{background:#fff;border-color:#fff}
-  .dot.d{background:#333;border-color:#555}
-  .imgs{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:2px;padding:14px;margin-top:12px}
-  .imgs h3{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;font-weight:600}
-  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-  .pslot{background:#050505;border:1px solid #1a1a1a;border-radius:2px;padding:6px 4px;text-align:center;font-size:9px;color:#333;font-weight:500;transition:.4s}
-  .pslot.cap{border-color:#fff;color:#fff;background:#0a0a0a}
-  .pslot .ic{font-size:14px;margin-bottom:1px}
-  @keyframes pg{0%,100%{opacity:.3}50%{opacity:1}}.ca{animation:pg .5s ease-in-out 3}
-  .vt{display:flex;gap:0;margin-bottom:8px}
-  .vt button{background:0 0;color:#444;border:1px solid #1a1a1a;padding:6px 16px;font-family:inherit;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.15s}
-  .vt button:first-child{border-radius:2px 0 0 2px}
-  .vt button:last-child{border-radius:0 2px 2px 0;border-left:0}
-  .vt button.on{background:#fff;color:#000;border-color:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:'Inter',sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px;min-height:100vh}
+h1{font-size:20px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px}
+.sub{font-size:11px;color:#555;margin-bottom:20px;letter-spacing:2px;text-transform:uppercase}
+.wrap{display:flex;gap:24px;max-width:1400px;width:100%}
+.viz{flex:1;min-width:0}
+.info{width:310px;flex-shrink:0}
+.svgbox{background:#050505;border:1px solid #1a1a1a;border-radius:2px;overflow:hidden}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:'Inter',sans-serif}
+.card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:2px;padding:20px;margin-bottom:12px}
+.card .lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:6px}
+.card .ttl{font-size:16px;font-weight:700;margin-bottom:10px;line-height:1.3}
+.card .dsc{font-size:12px;color:#888;line-height:1.7}.card .dsc strong{color:#fff}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.stat{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:2px;padding:10px;text-align:center}
+.stat .v{font-size:20px;font-weight:700}.stat .l{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.ctrls{display:flex;gap:8px;align-items:center;margin-top:12px}
+.ctrls button{background:0 0;color:#fff;border:1px solid #333;border-radius:2px;padding:8px 18px;font-family:inherit;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:.15s}
+.ctrls button:hover{background:#fff;color:#000;border-color:#fff}
+.ctrls button.pri{background:#fff;border-color:#fff;color:#000;font-weight:700}
+.ctrls button.pri:hover{background:#ccc;border-color:#ccc}
+.ctrls button:disabled{opacity:.15;cursor:not-allowed;pointer-events:none}
+.dots{display:flex;gap:6px;margin-left:auto}
+.dot{width:8px;height:8px;border-radius:50%;background:#111;border:1px solid #333;cursor:pointer;transition:.3s}
+.dot.a{background:#fff;border-color:#fff}.dot.d{background:#333;border-color:#555}
+.imgs{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:2px;padding:14px;margin-top:12px}
+.imgs h3{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;font-weight:600}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.pslot{background:#050505;border:1px solid #1a1a1a;border-radius:2px;padding:6px 4px;text-align:center;font-size:9px;color:#333;font-weight:500;transition:.4s}
+.pslot.cap{border-color:#fff;color:#fff;background:#0a0a0a}
+.pslot .ic{font-size:14px;margin-bottom:1px}
+@keyframes pg{0%,100%{opacity:.3}50%{opacity:1}}.ca{animation:pg .5s ease-in-out 3}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;padding:10px 14px;background:#050505;border:1px solid #1a1a1a;border-radius:2px}
+.legend span{display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 </style>
 </head>
 <body>
 <h1>Automated Device Grading Station</h1>
-<p class="sub">Sandwich Flip &mdash; 32" Lightbox &mdash; Cameras Behind Diffusers</p>
+<p class="sub">C-Bracket Flip &mdash; Single Opening &mdash; Cameras Behind Diffusers</p>
 
 <div class="wrap">
 <div class="viz">
-  <div class="vt">
-    <button class="on" onclick="showV('front',this)">Front Section</button>
-    <button onclick="showV('top',this)">Top-Down</button>
-  </div>
+<div class="svgbox">
+<svg viewBox="0 0 960 740" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8c0c8"/><stop offset="40%" stop-color="#8a929a"/><stop offset="100%" stop-color="#686e76"/></linearGradient>
+  <linearGradient id="sili" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4db8a8"/><stop offset="100%" stop-color="#2a8a7a"/></linearGradient>
+  <linearGradient id="phone" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a3a42"/><stop offset="50%" stop-color="#28282e"/><stop offset="100%" stop-color="#1e1e24"/></linearGradient>
+  <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="40%" stop-color="#0d1f35"/><stop offset="100%" stop-color="#081420"/></linearGradient>
+  <linearGradient id="mtr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#222"/><stop offset="100%" stop-color="#111"/></linearGradient>
+  <linearGradient id="extr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a1a"/><stop offset="100%" stop-color="#151515"/></linearGradient>
+  <radialGradient id="lens" cx="40%" cy="35%"><stop offset="0%" stop-color="#445566"/><stop offset="40%" stop-color="#1a2530"/><stop offset="100%" stop-color="#111822"/></radialGradient>
+  <linearGradient id="sprG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#999"/><stop offset="100%" stop-color="#555"/></linearGradient>
+  <linearGradient id="bracket" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5a5a64"/><stop offset="50%" stop-color="#3a3a42"/><stop offset="100%" stop-color="#5a5a64"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="softG"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
 
-  <!-- ============ FRONT CROSS-SECTION ============ -->
-  <div class="svgbox" id="vf">
-  <svg viewBox="0 0 960 720" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Aluminum brushed metal -->
-    <linearGradient id="alu" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#b0b8c0"/><stop offset="30%" stop-color="#8a929a"/>
-      <stop offset="60%" stop-color="#a0a8b0"/><stop offset="100%" stop-color="#707880"/>
-    </linearGradient>
-    <!-- Silicone pad (soft teal) -->
-    <linearGradient id="sili" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4db8a8"/><stop offset="100%" stop-color="#2a8a7a"/>
-    </linearGradient>
-    <!-- Phone body -->
-    <linearGradient id="phone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3a3a42"/><stop offset="50%" stop-color="#28282e"/>
-      <stop offset="100%" stop-color="#1e1e24"/>
-    </linearGradient>
-    <!-- Phone screen -->
-    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a1628"/><stop offset="40%" stop-color="#0d1f35"/>
-      <stop offset="100%" stop-color="#081420"/>
-    </linearGradient>
-    <!-- Diffuser glow -->
-    <linearGradient id="diff" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
-      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.25"/>
-    </linearGradient>
-    <linearGradient id="diffV" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
-      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.25"/>
-    </linearGradient>
-    <!-- Motor body -->
-    <linearGradient id="mtr" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#222"/><stop offset="50%" stop-color="#1a1a1a"/>
-      <stop offset="100%" stop-color="#111"/>
-    </linearGradient>
-    <!-- LED warm glow -->
-    <radialGradient id="ledG" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#ffdd66" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#ffdd66" stop-opacity="0"/>
-    </radialGradient>
-    <!-- Camera lens -->
-    <radialGradient id="lens" cx="40%" cy="35%">
-      <stop offset="0%" stop-color="#445566"/><stop offset="40%" stop-color="#1a2530"/>
-      <stop offset="70%" stop-color="#0a1018"/><stop offset="90%" stop-color="#223344"/>
-      <stop offset="100%" stop-color="#111822"/>
-    </radialGradient>
-    <!-- Spring steel -->
-    <linearGradient id="sprG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#888"/><stop offset="100%" stop-color="#555"/>
-    </linearGradient>
-    <!-- Extrusion profile -->
-    <linearGradient id="extr" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1a1a1a"/><stop offset="50%" stop-color="#222"/>
-      <stop offset="100%" stop-color="#151515"/>
-    </linearGradient>
-    <!-- Glow filters -->
-    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="ledGlow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="softGlow"><feGaussianBlur stdDeviation="12" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
+<!-- ===== LIGHTBOX ENCLOSURE ===== -->
+<rect x="130" y="30" width="650" height="650" rx="3" fill="#0e0e0e" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="140" y="40" width="630" height="630" rx="2" fill="#050505" stroke="#1a1a1a" stroke-width="0.5"/>
+<text x="455" y="24" fill="#333" font-size="7" text-anchor="middle" letter-spacing="2">32" × 32" × 32" LIGHTBOX</text>
 
-  <!-- ===== LIGHTBOX ENCLOSURE ===== -->
-  <!-- Outer fabric walls -->
-  <rect x="130" y="20" width="650" height="650" rx="3" fill="#0e0e0e" stroke="#2a2a2a" stroke-width="1.5"/>
-  <!-- Fabric texture hint -->
-  <rect x="130" y="20" width="650" height="650" rx="3" fill="url(#fabricPat)" opacity="0.03"/>
-  <!-- Silver reflective interior -->
-  <rect x="140" y="30" width="630" height="630" rx="2" fill="#080808" stroke="#1a1a1a" stroke-width="0.5"/>
-  <text x="455" y="14" fill="#333" font-size="7" text-anchor="middle" letter-spacing="2">32" × 32" × 32" LIGHTBOX ENCLOSURE</text>
+<!-- ===== LED BARS ===== -->
+<g id="leds" opacity="0.6">
+  <rect x="143" y="55" width="8" height="600" rx="2" fill="#1a1800" stroke="#333300" stroke-width="0.5"/>
+  <rect x="759" y="55" width="8" height="600" rx="2" fill="#1a1800" stroke="#333300" stroke-width="0.5"/>
+  <rect x="200" y="43" width="510" height="8" rx="2" fill="#1a1800" stroke="#333300" stroke-width="0.5"/>
+</g>
 
-  <!-- ===== LED BARS (warm yellow strips with individual LEDs) ===== -->
-  <g id="leds" opacity="0.6">
-    <!-- Left LED bar -->
-    <rect x="143" y="60" width="8" height="580" rx="2" fill="#1a1800" stroke="#333300" stroke-width="0.5"/>
-    <g id="left-leds"></g>
-    <!-- Right LED bar -->
-    <rect x="759" y="60" width="8" height="580" rx="2" fill="#1a1800" stroke="#333300" stroke-width="0.5"/>
-    <g id="right-leds"></g>
-    <!-- Top LED bar -->
-    <rect x="200" y="33" width="510" height="8" rx="2" fill="#1a1800" stroke="#333300" stroke-width="0.5"/>
-    <g id="top-leds"></g>
+<!-- ===== DIFFUSER PANELS (frosted acrylic glow) ===== -->
+<g id="diffusers">
+  <rect x="184" y="55" width="6" height="600" rx="1" fill="#fff" opacity="0.06" stroke="#fff" stroke-width="0.3" stroke-opacity="0.15"/>
+  <rect x="720" y="55" width="6" height="600" rx="1" fill="#fff" opacity="0.06" stroke="#fff" stroke-width="0.3" stroke-opacity="0.15"/>
+  <rect x="195" y="68" width="520" height="6" rx="1" fill="#fff" opacity="0.06" stroke="#fff" stroke-width="0.3" stroke-opacity="0.15"/>
+  <!-- Polar film tint -->
+  <line x1="191" y1="55" x2="191" y2="655" stroke="#c4a0ff" stroke-width="0.8" opacity="0.12"/>
+  <line x1="719" y1="55" x2="719" y2="655" stroke="#c4a0ff" stroke-width="0.8" opacity="0.12"/>
+  <line x1="195" y1="75" x2="715" y2="75" stroke="#c4a0ff" stroke-width="0.8" opacity="0.12"/>
+</g>
+<!-- Ambient glow -->
+<g id="diffGlow" opacity="0.3">
+  <rect x="184" y="120" width="30" height="420" rx="4" fill="#fff" opacity="0.03" filter="url(#softG)"/>
+  <rect x="696" y="120" width="30" height="420" rx="4" fill="#fff" opacity="0.03" filter="url(#softG)"/>
+  <rect x="260" y="68" width="390" height="25" rx="4" fill="#fff" opacity="0.03" filter="url(#softG)"/>
+</g>
+
+<!-- ===== 2020 SUBFRAME ===== -->
+<g id="subframe" opacity="0.5">
+  <rect x="194" y="82" width="14" height="565" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
+  <rect x="702" y="82" width="14" height="565" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
+  <rect x="194" y="82" width="522" height="12" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
+  <rect x="194" y="635" width="522" height="12" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
+</g>
+
+<!-- Aperture holes in diffusers -->
+<rect x="448" y="68" width="16" height="6" fill="#030303" stroke="#181818" stroke-width="0.3"/>
+<rect x="184" y="348" width="6" height="14" fill="#030303" stroke="#181818" stroke-width="0.3"/>
+<rect x="720" y="348" width="6" height="14" fill="#030303" stroke="#181818" stroke-width="0.3"/>
+
+<!-- ===== CAMERAS (behind diffusers) ===== -->
+<g id="top-camera">
+  <rect x="440" y="42" width="32" height="24" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="0.8"/>
+  <circle cx="456" cy="54" r="8" fill="url(#lens)" stroke="#555" stroke-width="0.8"/>
+  <circle cx="456" cy="54" r="4" fill="#0a1520" stroke="#334455" stroke-width="0.5"/>
+  <circle cx="454" cy="52" r="1.5" fill="#fff" opacity="0.12"/>
+  <circle cx="456" cy="54" r="9.5" fill="none" stroke="#7755aa" stroke-width="0.6" opacity="0.35"/>
+  <text x="456" y="37" fill="#fff" font-size="7" text-anchor="middle" font-weight="600" letter-spacing="1.5">TOP CAM</text>
+</g>
+<g id="top-cam-beam" opacity="0">
+  <polygon points="450,75 462,75 490,340 422,340" fill="#fff" opacity="0.025"/>
+  <line x1="456" y1="75" x2="456" y2="340" stroke="#fff" stroke-width="0.5" stroke-dasharray="6,4" opacity="0.25"/>
+</g>
+
+<g id="left-camera">
+  <rect x="155" y="342" width="24" height="26" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="0.6"/>
+  <circle cx="167" cy="355" r="6" fill="url(#lens)" stroke="#555" stroke-width="0.6"/>
+  <circle cx="167" cy="355" r="3" fill="#0a1520"/>
+  <text x="150" y="337" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1">L-EDGE</text>
+</g>
+<g id="left-cam-beam" opacity="0">
+  <line x1="191" y1="355" x2="370" y2="355" stroke="#fff" stroke-width="0.5" stroke-dasharray="6,4" opacity="0.2"/>
+</g>
+
+<g id="right-camera">
+  <rect x="731" y="342" width="24" height="26" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="0.6"/>
+  <circle cx="743" cy="355" r="6" fill="url(#lens)" stroke="#555" stroke-width="0.6"/>
+  <circle cx="743" cy="355" r="3" fill="#0a1520"/>
+  <text x="758" y="337" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1">R-EDGE</text>
+</g>
+<g id="right-cam-beam" opacity="0">
+  <line x1="719" y1="355" x2="540" y2="355" stroke="#fff" stroke-width="0.5" stroke-dasharray="6,4" opacity="0.2"/>
+</g>
+
+<g id="top-edge-camera">
+  <rect x="310" y="440" width="22" height="20" rx="2" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+  <circle cx="321" cy="450" r="5" fill="url(#lens)" stroke="#555" stroke-width="0.5"/>
+  <text x="321" y="468" fill="#fff" font-size="5.5" text-anchor="middle" letter-spacing="1">T-EDGE</text>
+</g>
+<g id="top-edge-beam" opacity="0"><line x1="321" y1="440" x2="395" y2="365" stroke="#fff" stroke-width="0.5" stroke-dasharray="5,4" opacity="0.2"/></g>
+
+<g id="bottom-edge-camera">
+  <rect x="578" y="440" width="22" height="20" rx="2" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+  <circle cx="589" cy="450" r="5" fill="url(#lens)" stroke="#555" stroke-width="0.5"/>
+  <text x="589" y="468" fill="#fff" font-size="5.5" text-anchor="middle" letter-spacing="1">B-EDGE</text>
+</g>
+<g id="bottom-edge-beam" opacity="0"><line x1="589" y1="440" x2="515" y2="365" stroke="#fff" stroke-width="0.5" stroke-dasharray="5,4" opacity="0.2"/></g>
+
+<!-- ===== FIXED SUPPORT RAILS (device rests here during photos) ===== -->
+<g id="support-rails">
+  <!-- Two thin horizontal rails spanning the frame -->
+  <rect x="220" y="358" width="470" height="3" rx="1" fill="#555" stroke="#777" stroke-width="0.3"/>
+  <rect x="220" y="366" width="470" height="3" rx="1" fill="#555" stroke="#777" stroke-width="0.3"/>
+  <text x="455" y="382" fill="#777" font-size="5" text-anchor="middle" opacity="0.5" letter-spacing="1.5">FIXED SUPPORT RAILS</text>
+  <!-- Rail mounting to subframe -->
+  <rect x="208" y="356" width="12" height="16" rx="1" fill="#333" stroke="#444" stroke-width="0.3" opacity="0.5"/>
+  <rect x="690" y="356" width="12" height="16" rx="1" fill="#333" stroke="#444" stroke-width="0.3" opacity="0.5"/>
+</g>
+
+<!-- ===== ROTATION ASSEMBLY ===== -->
+<g id="rot-asm">
+  <!-- Bearings -->
+  <g>
+    <rect x="196" y="343" width="18" height="24" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+    <circle cx="205" cy="355" r="7" fill="#1a1a1a" stroke="#555" stroke-width="0.8"/>
+    <circle cx="205" cy="355" r="3" fill="#555"/>
+    <circle cx="200" cy="346" r="1" fill="#444"/><circle cx="210" cy="346" r="1" fill="#444"/>
+    <circle cx="200" cy="364" r="1" fill="#444"/><circle cx="210" cy="364" r="1" fill="#444"/>
   </g>
-
-  <!-- ===== DIFFUSER PANELS (frosted acrylic — glowing white) ===== -->
-  <g id="diffusers">
-    <!-- Left diffuser -->
-    <rect x="184" y="55" width="6" height="590" rx="1" fill="url(#diffV)" stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.2"/>
-    <rect x="184" y="55" width="6" height="590" rx="1" fill="#ffffff" opacity="0.04"/>
-    <!-- Polar film line -->
-    <line x1="191" y1="55" x2="191" y2="645" stroke="#c4a0ff" stroke-width="0.8" opacity="0.15"/>
-
-    <!-- Right diffuser -->
-    <rect x="720" y="55" width="6" height="590" rx="1" fill="url(#diffV)" stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.2"/>
-    <rect x="720" y="55" width="6" height="590" rx="1" fill="#ffffff" opacity="0.04"/>
-    <line x1="719" y1="55" x2="719" y2="645" stroke="#c4a0ff" stroke-width="0.8" opacity="0.15"/>
-
-    <!-- Top diffuser -->
-    <rect x="195" y="70" width="520" height="6" rx="1" fill="url(#diff)" stroke="#ffffff" stroke-width="0.3" stroke-opacity="0.2"/>
-    <rect x="195" y="70" width="520" height="6" rx="1" fill="#ffffff" opacity="0.04"/>
-    <line x1="195" y1="77" x2="715" y2="77" stroke="#c4a0ff" stroke-width="0.8" opacity="0.15"/>
+  <g>
+    <rect x="696" y="343" width="18" height="24" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+    <circle cx="705" cy="355" r="7" fill="#1a1a1a" stroke="#555" stroke-width="0.8"/>
+    <circle cx="705" cy="355" r="3" fill="#555"/>
+    <circle cx="700" cy="346" r="1" fill="#444"/><circle cx="710" cy="346" r="1" fill="#444"/>
+    <circle cx="700" cy="364" r="1" fill="#444"/><circle cx="710" cy="364" r="1" fill="#444"/>
   </g>
+  <text x="205" y="376" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">BEARING</text>
+  <text x="705" y="376" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">BEARING</text>
+  <!-- Shaft -->
+  <line x1="214" y1="355" x2="290" y2="355" stroke="#666" stroke-width="2.5" opacity="0.3"/>
+  <line x1="620" y1="355" x2="696" y2="355" stroke="#666" stroke-width="2.5" opacity="0.3"/>
+</g>
 
-  <!-- Diffuser glow (soft ambient) -->
-  <g id="diffGlow" opacity="0.3">
-    <rect x="184" y="100" width="30" height="500" rx="4" fill="#ffffff" opacity="0.03" filter="url(#softGlow)"/>
-    <rect x="696" y="100" width="30" height="500" rx="4" fill="#ffffff" opacity="0.03" filter="url(#softGlow)"/>
-    <rect x="250" y="70" width="410" height="25" rx="4" fill="#ffffff" opacity="0.03" filter="url(#softGlow)"/>
-  </g>
+<!-- ===== DEVICE (on support rails) ===== -->
+<g id="device">
+  <rect x="395" y="340" width="120" height="16" rx="5" fill="url(#phone)" stroke="#555" stroke-width="0.8"/>
+  <rect x="399" y="341.5" width="112" height="7" rx="3" fill="url(#screen)"/>
+  <rect x="399" y="341.5" width="35" height="2" rx="1" fill="#fff" opacity="0.03"/>
+  <rect x="445" y="342" width="20" height="1.5" rx="0.75" fill="#1a1a20" stroke="#333" stroke-width="0.3"/>
+  <rect x="405" y="353" width="25" height="3" rx="1.5" fill="#111" stroke="#333" stroke-width="0.3"/>
+  <circle cx="412" cy="354.5" r="2" fill="#0a0a12" stroke="#333" stroke-width="0.3"/>
+  <circle cx="420" cy="354.5" r="2" fill="#0a0a12" stroke="#333" stroke-width="0.3"/>
+  <rect x="394" y="346" width="1" height="5" rx="0.5" fill="#555"/>
+  <rect x="516" y="344" width="1" height="3" rx="0.5" fill="#555"/>
+  <text id="dev-label" x="455" y="334" fill="#fff" font-size="6" text-anchor="middle" opacity="0.4" letter-spacing="1.5">DEVICE (SCREEN UP)</text>
+</g>
 
-  <!-- Stack labels -->
-  <g opacity="0.35">
-    <text x="135" y="350" fill="#ffdd66" font-size="5" letter-spacing="1" transform="rotate(-90,135,350)">LED</text>
-    <text x="165" y="350" fill="#fff" font-size="5" letter-spacing="1" transform="rotate(-90,165,350)">CAM</text>
-    <text x="180" y="350" fill="#ddeeff" font-size="5" letter-spacing="1" transform="rotate(-90,180,350)">DIFFUSER</text>
-    <text x="197" y="350" fill="#c4a0ff" font-size="5" letter-spacing="1" transform="rotate(-90,197,350)">POLAR</text>
-  </g>
+<!-- ===== C-BRACKET ASSEMBLY (slides as a unit) ===== -->
+<g id="c-bracket">
+  <!-- Slide rail -->
+  <line x1="290" y1="308" x2="620" y2="308" stroke="#555" stroke-width="1" stroke-dasharray="4,3" opacity="0.2"/>
+  <text id="rail-label" x="625" y="311" fill="#555" font-size="4" opacity="0.4" letter-spacing="1">SLIDE RAIL</text>
 
-  <!-- Aperture holes (dark gaps in diffuser) — shown as breaks -->
-  <g id="apertures">
-    <!-- Top cam aperture in ceiling diffuser -->
-    <rect x="448" y="70" width="16" height="6" fill="#050505" stroke="#222" stroke-width="0.3"/>
-    <!-- Left cam aperture -->
-    <rect x="184" y="333" width="6" height="14" fill="#050505" stroke="#222" stroke-width="0.3"/>
-    <!-- Right cam aperture -->
-    <rect x="720" y="333" width="6" height="14" fill="#050505" stroke="#222" stroke-width="0.3"/>
-  </g>
+  <!-- The bracket group — slides horizontally -->
+  <g id="bracket-group">
+    <!-- Left arm of the C -->
+    <rect x="290" y="296" width="8" height="130" rx="2" fill="url(#bracket)" stroke="#666" stroke-width="0.5"/>
+    <!-- Right arm of the C -->
+    <rect x="612" y="296" width="8" height="130" rx="2" fill="url(#bracket)" stroke="#666" stroke-width="0.5"/>
 
-  <!-- ===== 2020 ALUMINUM SUBFRAME ===== -->
-  <g id="subframe" opacity="0.6">
-    <!-- T-slot profile hint on uprights -->
-    <rect x="194" y="82" width="14" height="560" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
-    <line x1="201" y1="85" x2="201" y2="639" stroke="#1a1a1a" stroke-width="0.5" opacity="0.5"/>
-    <rect x="702" y="82" width="14" height="560" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
-    <line x1="709" y1="85" x2="709" y2="639" stroke="#1a1a1a" stroke-width="0.5" opacity="0.5"/>
-    <!-- Top beam -->
-    <rect x="194" y="82" width="522" height="12" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
-    <!-- Bottom beam -->
-    <rect x="194" y="630" width="522" height="12" rx="1" fill="url(#extr)" stroke="#2a2a2a" stroke-width="0.5"/>
-    <text x="455" y="655" fill="#2a2a2a" font-size="6" text-anchor="middle" letter-spacing="1.5">2020 ALUMINUM SUBFRAME</text>
-  </g>
-
-  <!-- ===== CAMERAS (behind diffusers) ===== -->
-
-  <!-- TOP CAMERA -->
-  <g id="top-camera">
-    <rect x="440" y="44" width="32" height="24" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="0.8"/>
-    <!-- Lens barrel -->
-    <circle cx="456" cy="56" r="8" fill="url(#lens)" stroke="#555" stroke-width="0.8"/>
-    <circle cx="456" cy="56" r="4" fill="#0a1520" stroke="#334455" stroke-width="0.5"/>
-    <circle cx="454" cy="54" r="1.5" fill="#ffffff" opacity="0.15"/>
-    <!-- CPL ring -->
-    <circle cx="456" cy="56" r="9.5" fill="none" stroke="#7755aa" stroke-width="0.6" opacity="0.4"/>
-    <text x="456" y="39" fill="#fff" font-size="7" text-anchor="middle" font-weight="600" letter-spacing="1.5">TOP CAM</text>
-    <text x="480" y="50" fill="#7755aa" font-size="5" letter-spacing="0.5" opacity="0.6">CPL</text>
-    <!-- Pi board hint -->
-    <rect x="443" y="46" width="6" height="3" rx="0.5" fill="#1a6b1a" opacity="0.5"/>
-  </g>
-
-  <!-- Camera beam -->
-  <g id="top-cam-beam" opacity="0">
-    <polygon points="450,77 462,77 490,320 422,320" fill="#ffffff" opacity="0.025"/>
-    <line x1="456" y1="77" x2="456" y2="320" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,4" opacity="0.25"/>
-  </g>
-
-  <!-- LEFT EDGE CAMERA -->
-  <g id="left-camera">
-    <rect x="155" y="327" width="24" height="26" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="0.6"/>
-    <circle cx="167" cy="340" r="6" fill="url(#lens)" stroke="#555" stroke-width="0.6"/>
-    <circle cx="167" cy="340" r="3" fill="#0a1520" stroke="#334455" stroke-width="0.4"/>
-    <circle cx="165" cy="338" r="1" fill="#fff" opacity="0.12"/>
-    <rect x="158" y="329" width="5" height="2.5" rx="0.5" fill="#1a6b1a" opacity="0.4"/>
-    <text x="152" y="322" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1">L-EDGE</text>
-  </g>
-  <g id="left-cam-beam" opacity="0">
-    <polygon points="191,334 191,346 395,348 395,332" fill="#ffffff" opacity="0.02"/>
-    <line x1="191" y1="340" x2="395" y2="340" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,4" opacity="0.2"/>
-  </g>
-
-  <!-- RIGHT EDGE CAMERA -->
-  <g id="right-camera">
-    <rect x="731" y="327" width="24" height="26" rx="3" fill="#1a1a1a" stroke="#444" stroke-width="0.6"/>
-    <circle cx="743" cy="340" r="6" fill="url(#lens)" stroke="#555" stroke-width="0.6"/>
-    <circle cx="743" cy="340" r="3" fill="#0a1520" stroke="#334455" stroke-width="0.4"/>
-    <circle cx="741" cy="338" r="1" fill="#fff" opacity="0.12"/>
-    <rect x="734" y="329" width="5" height="2.5" rx="0.5" fill="#1a6b1a" opacity="0.4"/>
-    <text x="758" y="322" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1">R-EDGE</text>
-  </g>
-  <g id="right-cam-beam" opacity="0">
-    <polygon points="719,334 719,346 515,348 515,332" fill="#ffffff" opacity="0.02"/>
-    <line x1="719" y1="340" x2="515" y2="340" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,4" opacity="0.2"/>
-  </g>
-
-  <!-- TOP EDGE CAMERA (below mechanism, angled up) -->
-  <g id="top-edge-camera">
-    <rect x="315" y="430" width="22" height="20" rx="2" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
-    <circle cx="326" cy="440" r="5" fill="url(#lens)" stroke="#555" stroke-width="0.5"/>
-    <circle cx="326" cy="440" r="2.5" fill="#0a1520"/>
-    <text x="326" y="458" fill="#fff" font-size="5.5" text-anchor="middle" letter-spacing="1">T-EDGE</text>
-  </g>
-  <g id="top-edge-beam" opacity="0">
-    <line x1="326" y1="430" x2="400" y2="350" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="5,4" opacity="0.2"/>
-  </g>
-
-  <!-- BOTTOM EDGE CAMERA -->
-  <g id="bottom-edge-camera">
-    <rect x="573" y="430" width="22" height="20" rx="2" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
-    <circle cx="584" cy="440" r="5" fill="url(#lens)" stroke="#555" stroke-width="0.5"/>
-    <circle cx="584" cy="440" r="2.5" fill="#0a1520"/>
-    <text x="584" y="458" fill="#fff" font-size="5.5" text-anchor="middle" letter-spacing="1">B-EDGE</text>
-  </g>
-  <g id="bottom-edge-beam" opacity="0">
-    <line x1="584" y1="430" x2="510" y2="350" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="5,4" opacity="0.2"/>
-  </g>
-
-  <!-- ===== ROTATION ASSEMBLY ===== -->
-  <g id="rot-asm">
-    <!-- Pillow block bearings -->
-    <g id="bearing-l">
-      <rect x="196" y="328" width="18" height="24" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
-      <circle cx="205" cy="340" r="7" fill="#1a1a1a" stroke="#555" stroke-width="0.8"/>
-      <circle cx="205" cy="340" r="4" fill="#333" stroke="#666" stroke-width="0.5"/>
-      <circle cx="205" cy="340" r="2" fill="#555"/>
-      <!-- Bolt holes -->
-      <circle cx="200" cy="331" r="1" fill="#444"/>
-      <circle cx="210" cy="331" r="1" fill="#444"/>
-      <circle cx="200" cy="349" r="1" fill="#444"/>
-      <circle cx="210" cy="349" r="1" fill="#444"/>
-    </g>
-    <g id="bearing-r">
-      <rect x="696" y="328" width="18" height="24" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
-      <circle cx="705" cy="340" r="7" fill="#1a1a1a" stroke="#555" stroke-width="0.8"/>
-      <circle cx="705" cy="340" r="4" fill="#333" stroke="#666" stroke-width="0.5"/>
-      <circle cx="705" cy="340" r="2" fill="#555"/>
-      <circle cx="700" cy="331" r="1" fill="#444"/>
-      <circle cx="710" cy="331" r="1" fill="#444"/>
-      <circle cx="700" cy="349" r="1" fill="#444"/>
-      <circle cx="710" cy="349" r="1" fill="#444"/>
-    </g>
-    <text x="205" y="362" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">BEARING</text>
-    <text x="705" y="362" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">BEARING</text>
-
-    <!-- Shaft -->
-    <line x1="214" y1="340" x2="310" y2="340" stroke="#666" stroke-width="2.5" opacity="0.4"/>
-    <line x1="600" y1="340" x2="696" y2="340" stroke="#666" stroke-width="2.5" opacity="0.4"/>
-
-    <!-- ===== FLIP GROUP ===== -->
-    <g id="flip-group">
-      <!-- Bottom aluminum plate -->
-      <rect id="bot-plate" x="310" y="348" width="290" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
-      <!-- Bottom silicone pad -->
-      <rect id="bot-pad" x="312" y="339" width="286" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
-      <!-- Pad texture dots -->
-      <g opacity="0.15">
-        <circle cx="340" cy="343" r="0.8" fill="#fff"/><circle cx="360" cy="343" r="0.8" fill="#fff"/>
-        <circle cx="380" cy="343" r="0.8" fill="#fff"/><circle cx="400" cy="343" r="0.8" fill="#fff"/>
-        <circle cx="420" cy="343" r="0.8" fill="#fff"/><circle cx="440" cy="343" r="0.8" fill="#fff"/>
-        <circle cx="460" cy="343" r="0.8" fill="#fff"/><circle cx="480" cy="343" r="0.8" fill="#fff"/>
-        <circle cx="500" cy="343" r="0.8" fill="#fff"/><circle cx="520" cy="343" r="0.8" fill="#fff"/>
-        <circle cx="540" cy="343" r="0.8" fill="#fff"/><circle cx="560" cy="343" r="0.8" fill="#fff"/>
-        <circle cx="580" cy="343" r="0.8" fill="#fff"/>
+    <!-- TOP PAD (attached to bracket top, with lead screw) -->
+    <g id="top-pad-asm">
+      <!-- Aluminum plate -->
+      <rect id="top-plate" x="298" y="296" width="314" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
+      <!-- Silicone pad -->
+      <rect id="top-pad" x="300" y="301" width="310" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
+      <!-- Lead screw (adjusts gap) -->
+      <rect x="452" y="260" width="6" height="36" rx="1" fill="#777" stroke="#999" stroke-width="0.3"/>
+      <g stroke="#555" stroke-width="0.3" opacity="0.5">
+        <line x1="452" y1="264" x2="458" y2="267"/><line x1="452" y1="272" x2="458" y2="275"/>
+        <line x1="452" y1="280" x2="458" y2="283"/><line x1="452" y1="288" x2="458" y2="291"/>
       </g>
-      <text x="455" y="360" fill="#3aa898" font-size="5" text-anchor="middle" opacity="0.5" letter-spacing="1">SILICONE PAD</text>
-
-      <!-- ===== DEVICE (phone) ===== -->
-      <g id="device">
-        <!-- Phone body -->
-        <rect x="390" y="322" width="130" height="16" rx="5" fill="url(#phone)" stroke="#555" stroke-width="0.8"/>
-        <!-- Screen glass -->
-        <rect id="dev-screen" x="394" y="323.5" width="122" height="7" rx="3" fill="url(#screen)"/>
-        <!-- Screen reflection highlight -->
-        <rect x="400" y="324" width="40" height="2" rx="1" fill="#ffffff" opacity="0.04"/>
-        <!-- Earpiece -->
-        <rect x="445" y="324" width="20" height="1.5" rx="0.75" fill="#1a1a20" stroke="#333" stroke-width="0.3"/>
-        <!-- Camera bump (back, sinks into pad) -->
-        <rect id="cam-bump" x="400" y="335" width="28" height="3" rx="1.5" fill="#111" stroke="#333" stroke-width="0.3"/>
-        <circle cx="408" cy="336.5" r="2" fill="#0a0a12" stroke="#333" stroke-width="0.3"/>
-        <circle cx="416" cy="336.5" r="2" fill="#0a0a12" stroke="#333" stroke-width="0.3"/>
-        <circle cx="422" cy="336.5" r="1" fill="#1a1a22" stroke="#333" stroke-width="0.2"/>
-        <!-- Side buttons -->
-        <rect x="389" y="328" width="1" height="5" rx="0.5" fill="#555"/>
-        <rect x="521" y="326" width="1" height="3" rx="0.5" fill="#555"/>
-        <rect x="521" y="331" width="1" height="4" rx="0.5" fill="#555"/>
-
-        <text id="dev-label" x="455" y="316" fill="#fff" font-size="6" text-anchor="middle" opacity="0.4" letter-spacing="1.5">DEVICE (SCREEN UP)</text>
-      </g>
-
-      <!-- TOP PAD ASSEMBLY — starts RETRACTED to the right, out of camera view -->
-      <g id="top-pad-assembly">
-        <!-- Horizontal rail (pad slides along this) -->
-        <line x1="310" y1="295" x2="600" y2="295" stroke="#444" stroke-width="1" stroke-dasharray="4,3" opacity="0.25"/>
-        <text x="610" y="298" fill="#444" font-size="4" opacity="0.4" letter-spacing="1">SLIDE RAIL</text>
-
-        <!-- Top pad group — positioned to the right (retracted) -->
-        <g id="top-pad-group">
-          <rect id="top-pad" x="312" y="286" width="286" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
-          <rect id="top-plate" x="310" y="277" width="290" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
-          <!-- Spring -->
-          <path id="spring-path" d="M455,248 Q445,252 455,256 Q465,260 455,264 Q445,268 455,272 Q465,276 455,278"
-                fill="none" stroke="url(#sprG)" stroke-width="2" stroke-linecap="round"/>
-          <!-- Lead screw -->
-          <rect x="452" y="210" width="6" height="38" rx="1" fill="#777" stroke="#999" stroke-width="0.3"/>
-          <g stroke="#555" stroke-width="0.3" opacity="0.6">
-            <line x1="452" y1="214" x2="458" y2="217"/><line x1="452" y1="221" x2="458" y2="224"/>
-            <line x1="452" y1="228" x2="458" y2="231"/><line x1="452" y1="235" x2="458" y2="238"/>
-          </g>
-          <rect x="448" y="243" width="14" height="5" rx="1" fill="#666" stroke="#888" stroke-width="0.3"/>
-          <text id="top-pad-label" x="455" y="206" fill="#888" font-size="5" text-anchor="middle" opacity="0.4" letter-spacing="1">TOP PAD (RETRACTED →)</text>
-        </g>
-      </g>
+      <rect x="448" y="252" width="14" height="8" rx="1.5" fill="#555" stroke="#777" stroke-width="0.3"/>
+      <text x="455" y="248" fill="#888" font-size="5" text-anchor="middle" opacity="0.35" letter-spacing="1">LEAD SCREW</text>
+      <!-- Spring -->
+      <path d="M455,232 Q446,236 455,240 Q464,244 455,248"
+            fill="none" stroke="url(#sprG)" stroke-width="1.8" stroke-linecap="round"/>
     </g>
-  </g>
 
-  <!-- ===== NEMA 23 STEPPER MOTOR ===== -->
-  <g id="motor">
-    <!-- Motor body (square, typical NEMA 23) -->
-    <rect x="130" y="316" width="48" height="48" rx="2" fill="url(#mtr)" stroke="#444" stroke-width="0.8"/>
-    <!-- Front face plate -->
-    <rect x="130" y="316" width="48" height="48" rx="2" fill="none" stroke="#333" stroke-width="0.5"/>
-    <!-- Center circle (shaft boss) -->
-    <circle cx="154" cy="340" r="10" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
-    <!-- Shaft -->
-    <rect x="164" y="337" width="30" height="6" rx="1" fill="#888" stroke="#aaa" stroke-width="0.3"/>
-    <!-- Mounting holes -->
-    <circle cx="139" cy="325" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
-    <circle cx="169" cy="325" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
-    <circle cx="139" cy="355" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
-    <circle cx="169" cy="355" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
-    <!-- Wires -->
-    <path d="M130,332 L120,328 L115,332" fill="none" stroke="#cc3333" stroke-width="0.8" opacity="0.5"/>
-    <path d="M130,338 L120,335 L115,338" fill="none" stroke="#3366cc" stroke-width="0.8" opacity="0.5"/>
-    <path d="M130,344 L120,342 L115,345" fill="none" stroke="#33aa33" stroke-width="0.8" opacity="0.5"/>
-    <path d="M130,350 L120,348 L115,352" fill="none" stroke="#cc9933" stroke-width="0.8" opacity="0.5"/>
-    <!-- Label -->
-    <text x="154" y="310" fill="#fff" font-size="7" text-anchor="middle" font-weight="600" letter-spacing="1">NEMA 23</text>
-    <!-- Gearbox -->
-    <rect x="165" y="326" width="28" height="28" rx="2" fill="#1a1a1a" stroke="#333" stroke-width="0.5"/>
-    <text x="179" y="344" fill="#666" font-size="6" text-anchor="middle" font-weight="500">5:1</text>
-  </g>
-
-  <!-- ===== ENCODER ===== -->
-  <g id="encoder">
-    <circle cx="718" cy="340" r="12" fill="#1a1a1a" stroke="#444" stroke-width="0.8"/>
-    <circle cx="718" cy="340" r="6" fill="#111" stroke="#555" stroke-width="0.5"/>
-    <!-- Encoder slots -->
-    <g stroke="#333" stroke-width="0.3" opacity="0.5">
-      <line x1="718" y1="330" x2="718" y2="333"/><line x1="726" y1="337" x2="723" y2="337"/>
-      <line x1="718" y1="350" x2="718" y2="347"/><line x1="710" y1="337" x2="713" y2="337"/>
+    <!-- BOTTOM PAD (attached to bracket bottom, fixed) -->
+    <g id="bot-pad-asm">
+      <rect id="bot-pad" x="300" y="400" width="310" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
+      <rect id="bot-plate" x="298" y="409" width="314" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
     </g>
-    <text x="718" y="360" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">ENCODER</text>
-    <text x="718" y="368" fill="#333" font-size="5" text-anchor="middle" letter-spacing="0.5">0° / 180°</text>
+
+    <!-- Bracket label -->
+    <text id="bracket-label" x="455" y="430" fill="#666" font-size="6" text-anchor="middle" opacity="0.5" letter-spacing="1.5">C-BRACKET (RETRACTED →)</text>
   </g>
+</g>
 
-  <!-- ===== SINGLE ENTRY/EXIT (same front opening) ===== -->
-  <g id="entry-arrow" opacity="0.35">
-    <line x1="30" y1="334" x2="125" y2="334" stroke="#fff" stroke-width="1.5" marker-end="url(#aIn)"/>
-    <text x="30" y="326" fill="#fff" font-size="6" font-weight="600" letter-spacing="2">IN</text>
-  </g>
-  <g id="exit-arrow" opacity="0.15">
-    <line x1="125" y1="348" x2="30" y2="348" stroke="#fff" stroke-width="1.5" marker-end="url(#aOut)"/>
-    <text x="30" y="362" fill="#fff" font-size="6" font-weight="600" letter-spacing="2">OUT</text>
-  </g>
-  <defs>
-    <marker id="aIn" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#fff"/></marker>
-    <marker id="aOut" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><polygon points="8,0 0,3 8,6" fill="#fff"/></marker>
-  </defs>
+<!-- ===== MOTOR ===== -->
+<g id="motor">
+  <rect x="130" y="331" width="48" height="48" rx="2" fill="url(#mtr)" stroke="#444" stroke-width="0.8"/>
+  <circle cx="154" cy="355" r="10" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
+  <rect x="164" y="352" width="30" height="6" rx="1" fill="#888" stroke="#aaa" stroke-width="0.3"/>
+  <circle cx="139" cy="340" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
+  <circle cx="169" cy="340" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
+  <circle cx="139" cy="370" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
+  <circle cx="169" cy="370" r="2" fill="none" stroke="#333" stroke-width="0.5"/>
+  <path d="M130,347 L118,343" fill="none" stroke="#c33" stroke-width="0.8" opacity="0.4"/>
+  <path d="M130,353 L118,350" fill="none" stroke="#36c" stroke-width="0.8" opacity="0.4"/>
+  <path d="M130,359 L118,357" fill="none" stroke="#3a3" stroke-width="0.8" opacity="0.4"/>
+  <path d="M130,365 L118,363" fill="none" stroke="#c93" stroke-width="0.8" opacity="0.4"/>
+  <text x="154" y="325" fill="#fff" font-size="7" text-anchor="middle" font-weight="600" letter-spacing="1">NEMA 23</text>
+  <rect x="165" y="341" width="28" height="28" rx="2" fill="#1a1a1a" stroke="#333" stroke-width="0.5"/>
+  <text x="179" y="359" fill="#666" font-size="6" text-anchor="middle">5:1</text>
+</g>
 
-  <!-- ===== SORT BINS (same side — front) ===== -->
-  <g id="sort-bins" opacity="0.15">
-    <rect x="15" y="380" width="45" height="22" rx="2" fill="#0a1a0a" stroke="#22aa44" stroke-width="0.8"/>
-    <text x="37" y="395" fill="#22aa44" font-size="9" text-anchor="middle" font-weight="700">A</text>
-    <rect x="15" y="406" width="45" height="22" rx="2" fill="#1a1a0a" stroke="#aaaa22" stroke-width="0.8"/>
-    <text x="37" y="421" fill="#aaaa22" font-size="9" text-anchor="middle" font-weight="700">B</text>
-    <rect x="15" y="432" width="45" height="22" rx="2" fill="#1a0a0a" stroke="#aa4422" stroke-width="0.8"/>
-    <text x="37" y="447" fill="#aa4422" font-size="9" text-anchor="middle" font-weight="700">C</text>
-    <text x="37" y="462" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">SORT BINS</text>
-  </g>
+<!-- ===== ENCODER ===== -->
+<g id="encoder">
+  <circle cx="718" cy="355" r="12" fill="#1a1a1a" stroke="#444" stroke-width="0.8"/>
+  <circle cx="718" cy="355" r="5" fill="#111" stroke="#555" stroke-width="0.5"/>
+  <text x="718" y="376" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">ENCODER</text>
+</g>
 
-  <!-- Flash overlay -->
-  <rect id="flash-overlay" x="191" y="77" width="528" height="563" rx="1" fill="#ffffff" opacity="0" pointer-events="none"/>
+<!-- ===== IN / OUT (same side) ===== -->
+<g id="entry-arrow" opacity="0.35">
+  <line x1="30" y1="349" x2="125" y2="349" stroke="#fff" stroke-width="1.5" marker-end="url(#aI)"/>
+  <text x="30" y="341" fill="#fff" font-size="6" font-weight="600" letter-spacing="2">IN</text>
+</g>
+<g id="exit-arrow" opacity="0.15">
+  <line x1="125" y1="363" x2="30" y2="363" stroke="#fff" stroke-width="1.5" marker-end="url(#aO)"/>
+  <text x="30" y="377" fill="#fff" font-size="6" font-weight="600" letter-spacing="2">OUT</text>
+</g>
+<defs>
+  <marker id="aI" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#fff"/></marker>
+  <marker id="aO" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><polygon points="8,0 0,3 8,6" fill="#fff"/></marker>
+</defs>
 
-  <!-- Rotation indicator -->
-  <g id="rot-ind" opacity="0">
-    <path d="M455,370 A25,25 0 0,1 455,395" fill="none" stroke="#fff" stroke-width="1.5" marker-end="url(#aRot)"/>
-    <text x="488" y="388" fill="#fff" font-size="7" font-weight="600" letter-spacing="1">180°</text>
-  </g>
-  <defs><marker id="aRot" markerWidth="6" markerHeight="5" refX="3" refY="2.5" orient="auto"><polygon points="0,0 6,2.5 0,5" fill="#fff"/></marker></defs>
+<!-- Sort bins -->
+<g id="sort-bins" opacity="0.15">
+  <rect x="15" y="395" width="45" height="20" rx="2" fill="#0a1a0a" stroke="#2a2" stroke-width="0.8"/>
+  <text x="37" y="409" fill="#2a2" font-size="9" text-anchor="middle" font-weight="700">A</text>
+  <rect x="15" y="419" width="45" height="20" rx="2" fill="#1a1a0a" stroke="#aa2" stroke-width="0.8"/>
+  <text x="37" y="433" fill="#aa2" font-size="9" text-anchor="middle" font-weight="700">B</text>
+  <rect x="15" y="443" width="45" height="20" rx="2" fill="#1a0a0a" stroke="#a42" stroke-width="0.8"/>
+  <text x="37" y="457" fill="#a42" font-size="9" text-anchor="middle" font-weight="700">C</text>
+</g>
 
-  <!-- Dimensions -->
-  <g opacity="0.2">
-    <line x1="310" y1="377" x2="600" y2="377" stroke="#3aa898" stroke-width="0.5"/>
-    <line x1="310" y1="374" x2="310" y2="380" stroke="#3aa898" stroke-width="0.5"/>
-    <line x1="600" y1="374" x2="600" y2="380" stroke="#3aa898" stroke-width="0.5"/>
-    <text x="455" y="386" fill="#3aa898" font-size="5" text-anchor="middle" letter-spacing="1">300mm PADS</text>
+<!-- Flash overlay -->
+<rect id="flash-overlay" x="191" y="75" width="528" height="560" rx="1" fill="#fff" opacity="0" pointer-events="none"/>
 
-    <line x1="191" y1="690" x2="719" y2="690" stroke="#fff" stroke-width="0.4"/>
-    <line x1="191" y1="686" x2="191" y2="694" stroke="#fff" stroke-width="0.4"/>
-    <line x1="719" y1="686" x2="719" y2="694" stroke="#fff" stroke-width="0.4"/>
-    <text x="455" y="702" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1.5">~690mm EFFECTIVE INTERIOR (27")</text>
-  </g>
+<!-- Rotation indicator -->
+<g id="rot-ind" opacity="0">
+  <path d="M455,385 A25,25 0 0,1 455,410" fill="none" stroke="#fff" stroke-width="1.5" marker-end="url(#aR)"/>
+  <text x="488" y="403" fill="#fff" font-size="7" font-weight="600" letter-spacing="1">180°</text>
+</g>
+<defs><marker id="aR" markerWidth="6" markerHeight="5" refX="3" refY="2.5" orient="auto"><polygon points="0,0 6,2.5 0,5" fill="#fff"/></marker></defs>
 
-  </svg>
-  </div>
-
-  <!-- ============ TOP-DOWN VIEW ============ -->
-  <div class="svgbox" id="vt" style="display:none">
-  <svg viewBox="0 0 960 720" xmlns="http://www.w3.org/2000/svg">
-    <text x="480" y="28" fill="#fff" font-size="8" text-anchor="middle" font-weight="600" letter-spacing="3">TOP-DOWN — LOOKING INTO THE BOX</text>
-    <text x="480" y="42" fill="#444" font-size="5" text-anchor="middle" letter-spacing="1">ALL CAMERAS BEHIND DIFFUSER PANELS — INVISIBLE TO DEVICE</text>
-
-    <rect x="130" y="55" width="650" height="610" rx="2" fill="#0a0a0a" stroke="#333" stroke-width="1"/>
-
-    <!-- Left lighting stack -->
-    <rect x="132" y="57" width="58" height="606" fill="#080808" stroke="#1a1a1a" stroke-width="0.5"/>
-    <rect x="184" y="57" width="5" height="606" rx="1" fill="#fff" opacity="0.06" stroke="#fff3" stroke-width="0.3"/>
-    <text x="162" y="360" fill="#333" font-size="6" text-anchor="middle" letter-spacing="1" transform="rotate(-90,162,360)">LED → DIFFUSER → POLAR</text>
-
-    <!-- Right lighting stack -->
-    <rect x="720" y="57" width="58" height="606" fill="#080808" stroke="#1a1a1a" stroke-width="0.5"/>
-    <rect x="721" y="57" width="5" height="606" rx="1" fill="#fff" opacity="0.06" stroke="#fff3" stroke-width="0.3"/>
-    <text x="748" y="360" fill="#333" font-size="6" text-anchor="middle" letter-spacing="1" transform="rotate(90,748,360)">LED → DIFFUSER → POLAR</text>
-
-    <!-- Back lighting stack -->
-    <rect x="192" y="57" width="526" height="50" fill="#080808" stroke="#1a1a1a" stroke-width="0.5"/>
-    <rect x="192" y="102" width="526" height="5" rx="1" fill="#fff" opacity="0.06" stroke="#fff3" stroke-width="0.3"/>
-    <text x="455" y="82" fill="#333" font-size="6" text-anchor="middle" letter-spacing="1">LED → DIFFUSER → POLAR</text>
-
-    <!-- Single front opening (IN + OUT same slot) -->
-    <rect x="310" y="653" width="290" height="10" fill="none" stroke="#fff" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
-    <text x="455" y="678" fill="#fff" font-size="7" text-anchor="middle" opacity="0.25" letter-spacing="1.5">SINGLE OPENING — IN / OUT</text>
-    <!-- Arrows showing bidirectional -->
-    <line x1="400" y1="660" x2="370" y2="680" stroke="#fff" stroke-width="0.5" opacity="0.2" marker-end="url(#aIn)"/>
-    <line x1="510" y1="680" x2="540" y2="660" stroke="#fff" stroke-width="0.5" opacity="0.2" marker-end="url(#aIn)"/>
-
-    <!-- Subframe -->
-    <rect x="194" y="112" width="522" height="535" rx="1" fill="none" stroke="#2a2a2a" stroke-width="2"/>
-
-    <!-- Flip pads (top view = rectangle) -->
-    <rect x="335" y="250" width="240" height="180" rx="3" fill="#2a8a7a" opacity="0.15" stroke="#3aa898" stroke-width="0.8"/>
-    <text x="455" y="345" fill="#3aa898" font-size="7" text-anchor="middle" opacity="0.5" letter-spacing="1.5">FLIP PADS 300 × 230mm</text>
-
-    <!-- Rotation axis -->
-    <line x1="200" y1="340" x2="710" y2="340" stroke="#666" stroke-width="1.5" stroke-dasharray="8,4" opacity="0.25"/>
-    <text x="235" y="333" fill="#666" font-size="5" letter-spacing="1">ROTATION AXIS</text>
-
-    <!-- Device -->
-    <rect x="395" y="295" width="120" height="65" rx="6" fill="url(#phone)" stroke="#555" stroke-width="0.8"/>
-    <text x="455" y="332" fill="#fff" font-size="6" text-anchor="middle" opacity="0.4" letter-spacing="1">DEVICE</text>
-
-    <!-- Camera positions -->
-    <circle cx="455" cy="327" r="12" fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.35"/>
-    <circle cx="455" cy="327" r="4" fill="#fff" opacity="0.15"/>
-    <text x="455" y="310" fill="#fff" font-size="6" text-anchor="middle" opacity="0.45" letter-spacing="1">TOP CAM ↓</text>
-
-    <circle cx="188" cy="340" r="7" fill="#fff" opacity="0.1" stroke="#fff" stroke-width="0.5"/>
-    <text x="188" y="358" fill="#fff" font-size="5" text-anchor="middle" opacity="0.35">L-EDGE →</text>
-
-    <circle cx="722" cy="340" r="7" fill="#fff" opacity="0.1" stroke="#fff" stroke-width="0.5"/>
-    <text x="722" y="358" fill="#fff" font-size="5" text-anchor="middle" opacity="0.35">← R-EDGE</text>
-
-    <circle cx="370" cy="106" r="7" fill="#fff" opacity="0.1" stroke="#fff" stroke-width="0.5"/>
-    <line x1="370" y1="113" x2="425" y2="295" stroke="#fff4" stroke-width="0.5" stroke-dasharray="3,3"/>
-    <text x="370" y="97" fill="#fff" font-size="5" text-anchor="middle" opacity="0.35">T-EDGE ↘</text>
-
-    <circle cx="540" cy="106" r="7" fill="#fff" opacity="0.1" stroke="#fff" stroke-width="0.5"/>
-    <line x1="540" y1="113" x2="490" y2="295" stroke="#fff4" stroke-width="0.5" stroke-dasharray="3,3"/>
-    <text x="540" y="97" fill="#fff" font-size="5" text-anchor="middle" opacity="0.35">B-EDGE ↙</text>
-
-    <!-- Motor -->
-    <rect x="194" y="322" width="35" height="35" rx="2" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
-    <circle cx="211" cy="340" r="6" fill="#111" stroke="#333" stroke-width="0.5"/>
-    <text x="211" y="370" fill="#fff" font-size="5" text-anchor="middle" opacity="0.35">MOTOR</text>
-
-    <!-- Encoder -->
-    <rect x="688" y="328" width="22" height="22" rx="10" fill="#1a1a1a" stroke="#444" stroke-width="0.5"/>
-    <text x="699" y="363" fill="#fff" font-size="5" text-anchor="middle" opacity="0.35">ENC</text>
-
-    <g opacity="0.2">
-      <line x1="130" y1="700" x2="780" y2="700" stroke="#fff" stroke-width="0.4"/>
-      <text x="455" y="712" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1.5">32" (813mm)</text>
-    </g>
-  </svg>
-  </div>
-
-  <!-- Legend -->
-  <div class="legend" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;padding:10px 14px;background:#050505;border:1px solid #1a1a1a;border-radius:2px">
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:#3aa898"></div> Silicone Pads</div>
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:linear-gradient(#b0b8c0,#707880)"></div> Aluminum</div>
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:#332b00;border:1px solid #553"></div> LED Bars</div>
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.12);border:1px solid #fff3"></div> Diffusers</div>
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:#c4a0ff33;border:1px solid #c4a0ff44"></div> Polar Film</div>
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:#1a1a1a;border:1px solid #444"></div> Cameras</div>
-    <div class="legend-item" style="display:flex;align-items:center;gap:5px;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px"><div style="width:10px;height:10px;border-radius:2px;background:#1a1a1a;border:1px solid #2a2a2a"></div> Subframe</div>
-  </div>
-
-  <div class="ctrls">
-    <button id="bp" disabled>← Prev</button>
-    <button id="bn" class="pri">Next →</button>
-    <button id="ba">Auto Play</button>
-    <button id="br">Reset</button>
-    <div class="dots" id="dots"></div>
-  </div>
+<!-- Dimensions -->
+<g opacity="0.2">
+  <line x1="300" y1="423" x2="610" y2="423" stroke="#3aa898" stroke-width="0.5"/>
+  <line x1="300" y1="420" x2="300" y2="426" stroke="#3aa898" stroke-width="0.5"/>
+  <line x1="610" y1="420" x2="610" y2="426" stroke="#3aa898" stroke-width="0.5"/>
+  <text x="455" y="432" fill="#3aa898" font-size="5" text-anchor="middle" letter-spacing="1">310mm PADS</text>
+  <line x1="191" y1="700" x2="719" y2="700" stroke="#fff" stroke-width="0.4"/>
+  <line x1="191" y1="696" x2="191" y2="704" stroke="#fff" stroke-width="0.4"/>
+  <line x1="719" y1="696" x2="719" y2="704" stroke="#fff" stroke-width="0.4"/>
+  <text x="455" y="714" fill="#fff" font-size="6" text-anchor="middle" letter-spacing="1.5">~690mm INTERIOR (27")</text>
+</g>
+</svg>
 </div>
 
-<!-- Info Panel -->
+<div class="legend">
+  <span><i style="background:#3aa898"></i> Silicone Pads</span>
+  <span><i style="background:linear-gradient(#b8c0c8,#686e76)"></i> Aluminum</span>
+  <span><i style="background:linear-gradient(#5a5a64,#3a3a42)"></i> C-Bracket</span>
+  <span><i style="background:#555;border:1px solid #777"></i> Support Rails</span>
+  <span><i style="background:#1a1a1a;border:1px solid #444"></i> Cameras</span>
+  <span><i style="background:#332b00;border:1px solid #553"></i> LEDs</span>
+  <span><i style="background:rgba(255,255,255,0.1);border:1px solid #fff3"></i> Diffusers</span>
+</div>
+
+<div class="ctrls">
+  <button id="bp" disabled>← Prev</button>
+  <button id="bn" class="pri">Next →</button>
+  <button id="ba">Auto Play</button>
+  <button id="br">Reset</button>
+  <div class="dots" id="dots"></div>
+</div>
+</div>
+
+<!-- Info -->
 <div class="info">
   <div class="card">
     <div class="lbl" id="sl">Step 0 of 8</div>
     <div class="ttl" id="st">Ready</div>
-    <div class="dsc" id="sd">Press <strong>Next</strong> to begin the capture sequence.</div>
+    <div class="dsc" id="sd">Press <strong>Next</strong> to step through the capture sequence.</div>
   </div>
   <div class="stats">
-    <div class="stat"><div class="v" id="vt2">0s</div><div class="l">Elapsed</div></div>
+    <div class="stat"><div class="v" id="vt">0s</div><div class="l">Elapsed</div></div>
     <div class="stat"><div class="v" id="vp">0/6</div><div class="l">Photos</div></div>
   </div>
   <div class="imgs">
@@ -594,85 +366,65 @@
 </div>
 
 <script>
-// Generate LED dots
-function makeLEDs(){
-  const sets=[
-    {id:'left-leds',cx:147,startY:70,endY:630,vertical:true},
-    {id:'right-leds',cx:763,startY:70,endY:630,vertical:true},
-    {id:'top-leds',cy:37,startX:220,endX:690,vertical:false}
-  ];
-  sets.forEach(s=>{
-    const g=document.getElementById(s.id);
-    const count=s.vertical?28:24;
-    for(let i=0;i<count;i++){
-      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      if(s.vertical){
-        c.setAttribute('cx',s.cx);
-        c.setAttribute('cy',s.startY+i*(s.endY-s.startY)/count);
-      } else {
-        c.setAttribute('cx',s.startX+i*(s.endX-s.startX)/count);
-        c.setAttribute('cy',s.cy);
-      }
-      c.setAttribute('r','1.5');
-      c.setAttribute('fill','#ffdd66');
-      c.setAttribute('opacity','0.5');
-      g.appendChild(c);
-    }
-  });
-}
-makeLEDs();
+const $=id=>document.getElementById(id);
+const T='transition',TR='transform';
 
-function showV(v,btn){
-  document.getElementById('vf').style.display=v==='front'?'block':'none';
-  document.getElementById('vt').style.display=v==='top'?'block':'none';
-  document.querySelectorAll('.vt button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
+// Bracket starts retracted to the right
+function retractBracket(instant){
+  const bg=$('bracket-group');
+  bg.style[T]=instant?'none':`${TR} 1s cubic-bezier(0.4,0,0.2,1)`;
+  bg.style[TR]='translateX(200px)';
+  $('bracket-label').textContent='C-BRACKET (RETRACTED →)';
+}
+function centerBracket(){
+  const bg=$('bracket-group');
+  bg.style[T]=`${TR} 0.9s cubic-bezier(0.4,0,0.2,1)`;
+  bg.style[TR]='translateX(0)';
+  $('bracket-label').textContent='C-BRACKET (CENTERED)';
+}
+function closePads(){
+  const tp=$('top-pad-asm');
+  tp.style[T]=`${TR} 0.7s cubic-bezier(0.4,0,0.2,1)`;
+  tp.style[TR]='translateY(30px)';
+}
+function openPads(instant){
+  const tp=$('top-pad-asm');
+  tp.style[T]=instant?'none':`${TR} 0.6s cubic-bezier(0.4,0,0.2,1)`;
+  tp.style[TR]='translateY(0)';
 }
 
 const steps=[
   {
     title:"Ready — Station Idle",
-    desc:"Lightbox powered on. LEDs emit warm light through <strong>frosted acrylic diffuser panels</strong> for uniform illumination, then through <strong>polarizing film</strong>. All 5 cameras hidden behind diffusers — <strong>device sees only uniform white light</strong>.",
+    desc:"C-bracket is <strong>retracted to the side</strong> — device area is completely clear. Top camera has an unobstructed view straight down. LEDs → diffusers → polar film providing uniform cross-polarized light.",
     time:"0s",photos:0,
-    action:()=>{resetAll()}
+    action:()=>resetAll()
   },
   {
-    title:"Device Enters — Screen Up",
-    desc:"Device slides in through front opening onto the <strong>teal silicone pad</strong> (Shore 20-30A). Camera bump sinks into the soft silicone. Device screen faces up — sees nothing but uniform diffused light. <strong>Zero reflections of hardware.</strong>",
+    title:"Device Enters on Rails",
+    desc:"Device slides in through the front opening onto <strong>fixed support rails</strong> — two thin metal rods spanning the frame. Device rests screen-up. C-bracket is still retracted. <strong>Nothing above or below the device blocks the cameras.</strong>",
     time:"~3s",photos:0,
     action:()=>{
-      // Slide device in
-      const dev=document.getElementById('device');
-      dev.style.transition='none';
-      dev.style.transform='translateX(-350px)';
-      dev.style.opacity='0';
+      const d=$('device');
+      d.style[T]='none';d.style[TR]='translateX(-350px)';d.style.opacity='0';
       requestAnimationFrame(()=>{
-        dev.style.transition='transform 1.2s cubic-bezier(0.25,0.1,0.25,1), opacity 0.4s';
-        dev.style.transform='translateX(0)';
-        dev.style.opacity='1';
+        d.style[T]=`${TR} 1.2s cubic-bezier(0.25,0.1,0.25,1), opacity 0.4s`;
+        d.style[TR]='translateX(0)';d.style.opacity='1';
       });
-      el('entry-arrow').style.transition='opacity 0.5s';
-      el('entry-arrow').style.opacity='1';
-      // LEDs brighten
-      el('leds').style.transition='opacity 0.5s';
-      el('leds').style.opacity='1';
-      el('diffGlow').style.transition='opacity 0.8s';
-      el('diffGlow').style.opacity='0.6';
+      $('entry-arrow').style[T]='opacity 0.5s';$('entry-arrow').style.opacity='1';
+      $('leds').style[T]='opacity 0.5s';$('leds').style.opacity='1';
+      $('diffGlow').style[T]='opacity 0.8s';$('diffGlow').style.opacity='0.6';
     }
   },
   {
     title:"Front Face Capture",
-    desc:"Top camera fires through <strong>18mm aperture</strong> in ceiling diffuser. Light path: LEDs → diffuser → polar film → screen → CPL on lens (crossed 90°). <strong>Glare killed, scratches revealed.</strong>",
+    desc:"Top camera fires through <strong>aperture in ceiling diffuser</strong>. C-bracket is off to the side — <strong>nothing between camera and device</strong>. Cross-polarization kills glare, reveals scratches.",
     time:"~4s",photos:1,capture:['ph-front'],
-    action:()=>{
-      showB('top-cam-beam');
-      flash('top-camera');
-      doFlash();
-    }
+    action:()=>{showB('top-cam-beam');flash('top-camera');doFlash();}
   },
   {
     title:"All 4 Edges — Simultaneous",
-    desc:"Left, right, top, and bottom edge cameras fire through aperture holes. Captures <strong>charging port, buttons, SIM tray, all edges</strong> in one shot. Each camera invisible behind its diffuser panel.",
+    desc:"Left, right, top, and bottom edge cameras fire through aperture holes in side diffusers. Captures <strong>charging port, buttons, SIM tray, all edges</strong>. C-bracket still retracted — clear shots.",
     time:"~5s",photos:5,capture:['ph-left','ph-right','ph-top','ph-bottom'],
     action:()=>{
       hideB('top-cam-beam');
@@ -684,181 +436,125 @@ const steps=[
     }
   },
   {
-    title:"Top Pad Slides In + Descends",
-    desc:"Top pad <strong>slides along rail to center</strong> (was retracted to the side to clear the camera). Then lead screw drives it <strong>down onto the device</strong>. Spring provides consistent ~20N. Device sandwiched between two silicone pads.",
-    time:"~6s",photos:5,
+    title:"C-Bracket Slides In + Clamps",
+    desc:"C-bracket <strong>slides along rail to center</strong>, framing the device between top and bottom pads. Lead screw closes the gap — spring provides <strong>~20N</strong> clamping force. Device sandwiched.",
+    time:"~7s",photos:5,
     action:()=>{
       hideAllB();
-      const tpg=el('top-pad-group');
-      // Step 1: slide from retracted (right) to center
-      tpg.style.transition='transform 0.8s cubic-bezier(0.4,0,0.2,1)';
-      tpg.style.transform='translateX(0px) translateY(0px)';
-      el('top-pad-label').textContent='TOP PAD (CENTERED)';
-      // Step 2: after centering, descend to sandwich
-      setTimeout(()=>{
-        tpg.style.transition='transform 0.8s cubic-bezier(0.4,0,0.2,1)';
-        tpg.style.transform='translateX(0px) translateY(28px)';
-      },900);
+      centerBracket();
+      setTimeout(()=>closePads(),1000);
     }
   },
   {
-    title:"180° Rotation — Sandwich Flip",
-    desc:"NEMA 23 + 5:1 gearbox rotates the sandwich <strong>180°</strong> in ~1.5s. Trapezoidal velocity profile. Encoder confirms position. <strong>228mm clearance</strong> to diffusers. Device now <strong>face-down, back up</strong>.",
-    time:"~8s",photos:5,
+    title:"180° Rotation — Flip",
+    desc:"NEMA 23 + 5:1 gearbox rotates the <strong>entire C-bracket</strong> (both pads + device) 180°. Encoder confirms position. Device is now <strong>face-down, back up</strong>. Still clamped.",
+    time:"~9s",photos:5,
     action:()=>{
-      const fg=el('flip-group');
-      fg.style.transition='transform 1.5s cubic-bezier(0.4,0,0.2,1)';
-      fg.style.transformOrigin='455px 340px';
-      fg.style.transform='rotate(180deg)';
+      // Rotate the bracket
+      const bg=$('bracket-group');
+      bg.style[T]=`${TR} 1.5s cubic-bezier(0.4,0,0.2,1)`;
+      bg.style.transformOrigin='455px 355px';
+      bg.style[TR]='rotate(180deg)';
 
-      el('rot-ind').style.transition='opacity 0.3s';
-      el('rot-ind').style.opacity='1';
-      setTimeout(()=>el('rot-ind').style.opacity='0',1800);
+      $('rot-ind').style[T]='opacity 0.3s';$('rot-ind').style.opacity='1';
+      setTimeout(()=>$('rot-ind').style.opacity='0',1800);
 
       setTimeout(()=>{
-        fg.style.transition='none';
-        fg.style.transform='none';
-        // Post-flip: original bottom pad now on TOP, original top pad on BOTTOM
-        attr('bot-pad','y','305');attr('bot-plate','y','297');
-        attr('top-pad','y','339');attr('top-plate','y','348');
-        el('top-pad-group').style.transition='none';
-        el('top-pad-group').style.transform='translateX(0px) translateY(0px)';
-        el('dev-label').textContent='DEVICE (BACK UP)';
-        el('top-pad-label').textContent='';
-        fg.dataset.flipped='1';
+        // Snap to post-flip state
+        bg.style[T]='none';
+        bg.style.transformOrigin='';
+        bg.style[TR]='translateX(0)';
+        // Swap visual positions of pads
+        // Top pad asm is now on bottom, bot pad asm is now on top
+        // We just keep it visually as-is since the rotation handled the visual
+        // But we need to reset for the retract step
+        $('dev-label').textContent='DEVICE (BACK UP)';
+        $('bracket-label').textContent='C-BRACKET (FLIPPED)';
+        openPads(true);
       },1600);
       flash('encoder');
     }
   },
   {
-    title:"Upper Pad Retracts — Back Exposed",
-    desc:"Original bottom pad (now on top) <strong>lifts up and slides sideways</strong> out of the camera's field of view. Device stays on lower pad by <strong>gravity</strong>. Back panel fully exposed to the top camera.",
-    time:"~9s",photos:5,
+    title:"C-Bracket Retracts — Back Exposed",
+    desc:"Lead screw opens the gap. C-bracket <strong>slides back to the side</strong>. Device drops onto fixed support rails, back facing up. <strong>Camera has clear view again.</strong> Same mechanism, works every cycle.",
+    time:"~10s",photos:5,
     action:()=>{
-      // Lift the original bottom pad (now above device) up and slide it to the side
-      const bp=el('bot-pad'),bpl=el('bot-plate');
-      [bp,bpl].forEach(e=>{
-        e.style.transition='transform 1s cubic-bezier(0.4,0,0.2,1)';
-        e.style.transform='translate(200px, -60px)';
-      });
+      retractBracket(false);
+      $('bracket-label').textContent='C-BRACKET (RETRACTED →)';
     }
   },
   {
     title:"Back Panel Capture",
-    desc:"Top camera fires again — captures the <strong>back panel</strong>. Cross-polarized light reveals scratches on aluminum and glass backs regardless of device color. Camera still invisible behind ceiling diffuser.",
-    time:"~10s",photos:6,capture:['ph-back'],
-    action:()=>{
-      showB('top-cam-beam');
-      flash('top-camera');
-      doFlash();
-    }
+    desc:"Top camera fires again — <strong>back panel fully exposed</strong>. Cross-polarized light reveals scratches on aluminum and glass regardless of color. No bracket, no pads, no hardware in the shot.",
+    time:"~11s",photos:6,capture:['ph-back'],
+    action:()=>{showB('top-cam-beam');flash('top-camera');doFlash();}
   },
   {
-    title:"Exit to Grade Bins",
-    desc:"Device slides back out the <strong>same front opening</strong> to one of <strong>3 sort bins (A / B / C)</strong>. Single entry/exit — no second hole needed. EfficientNet-B0 ran inference in parallel (~2s GPU). Confidence-weighted voting across all 6 images.",
-    time:"~10s",photos:6,
+    title:"Device Exits → Sort Bins",
+    desc:"Device slides back out the <strong>same front opening</strong> to A/B/C bin. EfficientNet-B0 inference ran in parallel (~2s GPU). Confidence-weighted voting across all 6 photos. ~12 seconds total cycle.",
+    time:"~12s",photos:6,
     action:()=>{
       hideAllB();
-      // Slide device out to the LEFT (same opening it came from)
-      const dev=el('device');
-      dev.style.transition='transform 1.2s cubic-bezier(0.4,0,0.2,1), opacity 0.8s';
-      dev.style.transform='translateX(-350px)';
-      dev.style.opacity='0.2';
-
-      el('exit-arrow').style.transition='opacity 0.5s';
-      el('exit-arrow').style.opacity='1';
-      el('sort-bins').style.transition='opacity 0.5s';
-      el('sort-bins').style.opacity='1';
+      const d=$('device');
+      d.style[T]=`${TR} 1.2s cubic-bezier(0.4,0,0.2,1), opacity 0.8s`;
+      d.style[TR]='translateX(-350px)';d.style.opacity='0.2';
+      $('exit-arrow').style[T]='opacity 0.5s';$('exit-arrow').style.opacity='1';
+      $('sort-bins').style[T]='opacity 0.5s';$('sort-bins').style.opacity='1';
       setTimeout(()=>{
-        const bins=el('sort-bins').querySelectorAll('rect');
-        const pick=bins[Math.floor(Math.random()*3)];
-        pick.style.fill=pick.getAttribute('stroke');
-        pick.style.fillOpacity='0.25';
+        const bins=$('sort-bins').querySelectorAll('rect');
+        const p=bins[Math.floor(Math.random()*3)];
+        p.style.fill=p.getAttribute('stroke');p.style.fillOpacity='0.25';
       },700);
     }
   }
 ];
 
 let cur=0,autoI=null;
-const el=id=>document.getElementById(id);
-const attr=(id,a,v)=>el(id).setAttribute(a,v);
-
-// Init dots
-const dc=el('dots');
+const dc=$('dots');
 steps.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' a':'');d.onclick=()=>goTo(i);dc.appendChild(d);});
 
 function ui(){
   const s=steps[cur];
-  el('sl').textContent=`Step ${cur} of ${steps.length-1}`;
-  el('st').textContent=s.title;
-  el('sd').innerHTML=s.desc;
-  el('vt2').textContent=s.time;
-  el('vp').textContent=`${s.photos}/6`;
+  $('sl').textContent=`Step ${cur} of ${steps.length-1}`;
+  $('st').textContent=s.title;
+  $('sd').innerHTML=s.desc;
+  $('vt').textContent=s.time;
+  $('vp').textContent=`${s.photos}/6`;
   document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot';if(i===cur)d.classList.add('a');else if(i<cur)d.classList.add('d');});
-  if(s.capture)s.capture.forEach(id=>el(id).classList.add('cap'));
-  el('bp').disabled=cur===0;
-  el('bn').disabled=cur===steps.length-1;
+  if(s.capture)s.capture.forEach(id=>$(id).classList.add('cap'));
+  $('bp').disabled=cur===0;$('bn').disabled=cur===steps.length-1;
 }
-
-function goTo(n){
-  if(n<0||n>=steps.length)return;
-  resetAll();
-  for(let i=0;i<=n;i++){cur=i;steps[i].action();if(steps[i].capture)steps[i].capture.forEach(id=>el(id).classList.add('cap'));}
-  ui();
-}
+function goTo(n){if(n<0||n>=steps.length)return;resetAll();for(let i=0;i<=n;i++){cur=i;steps[i].action();if(steps[i].capture)steps[i].capture.forEach(id=>$(id).classList.add('cap'));}ui();}
 function next(){if(cur<steps.length-1){cur++;steps[cur].action();ui();}else stopA();}
 function prev(){if(cur>0)goTo(cur-1);}
 
 function resetAll(){
-  const fg=el('flip-group');fg.style.transition='none';fg.style.transform='none';fg.dataset.flipped='';
-
-  // Top pad starts RETRACTED to the right (out of camera's view)
-  const tpg=el('top-pad-group');
-  tpg.style.transition='none';
-  tpg.style.transform='translateX(200px)';
-  attr('top-pad','y','286');attr('top-plate','y','277');
-  el('top-pad-label').textContent='TOP PAD (RETRACTED →)';
-
-  // Bottom pad at device level
-  attr('bot-pad','y','339');attr('bot-plate','y','348');
-  ['bot-pad','bot-plate'].forEach(id=>{el(id).style.transition='none';el(id).style.transform='none';});
-
-  const dev=el('device');dev.style.transition='none';dev.style.transform='none';dev.style.opacity='1';
+  retractBracket(true);
+  openPads(true);
+  const bg=$('bracket-group');bg.style.transformOrigin='';
+  const d=$('device');d.style[T]='none';d.style[TR]='none';d.style.opacity='1';
+  $('dev-label').textContent='DEVICE (SCREEN UP)';
   hideAllB();
-  el('dev-label').textContent='DEVICE (SCREEN UP)';
-  el('entry-arrow').style.opacity='0.35';el('exit-arrow').style.opacity='0.15';
-  const sb=el('sort-bins');sb.style.opacity='0.15';sb.querySelectorAll('rect').forEach(r=>{r.style.fill='';r.style.fillOpacity='';});
-  el('leds').style.opacity='0.6';el('diffGlow').style.opacity='0.3';
-  el('rot-ind').style.opacity='0';
+  $('entry-arrow').style.opacity='0.35';$('exit-arrow').style.opacity='0.15';
+  const sb=$('sort-bins');sb.style.opacity='0.15';sb.querySelectorAll('rect').forEach(r=>{r.style.fill='';r.style.fillOpacity='';});
+  $('leds').style.opacity='0.6';$('diffGlow').style.opacity='0.3';
+  $('rot-ind').style.opacity='0';
   document.querySelectorAll('.pslot').forEach(e=>e.classList.remove('cap'));
   cur=0;ui();
 }
 
-function showB(id){const e=el(id);e.style.transition='opacity 0.3s';e.style.opacity='1';}
-function hideB(id){const e=el(id);e.style.transition='opacity 0.3s';e.style.opacity='0';}
+function showB(id){const e=$(id);e.style[T]='opacity 0.3s';e.style.opacity='1';}
+function hideB(id){const e=$(id);e.style[T]='opacity 0.3s';e.style.opacity='0';}
 function hideAllB(){['top-cam-beam','left-cam-beam','right-cam-beam','top-edge-beam','bottom-edge-beam'].forEach(hideB);}
-function flash(id){const e=el(id);e.classList.add('ca');setTimeout(()=>e.classList.remove('ca'),1500);}
-function doFlash(){
-  const o=el('flash-overlay');
-  o.style.transition='none';o.style.opacity='0.06';
-  requestAnimationFrame(()=>{o.style.transition='opacity 0.5s ease-out';o.style.opacity='0';});
-}
+function flash(id){const e=$(id);e.classList.add('ca');setTimeout(()=>e.classList.remove('ca'),1500);}
+function doFlash(){const o=$('flash-overlay');o.style[T]='none';o.style.opacity='0.06';requestAnimationFrame(()=>{o.style[T]='opacity 0.5s ease-out';o.style.opacity='0';});}
 
-function toggleA(){
-  if(autoI){stopA();return;}
-  if(cur>=steps.length-1)resetAll();
-  el('ba').textContent='Pause';
-  autoI=setInterval(()=>{next();if(cur>=steps.length-1)stopA();},2800);
-}
-function stopA(){clearInterval(autoI);autoI=null;el('ba').textContent='Auto Play';}
+function toggleA(){if(autoI){stopA();return;}if(cur>=steps.length-1)resetAll();$('ba').textContent='Pause';autoI=setInterval(()=>{next();if(cur>=steps.length-1)stopA();},3000);}
+function stopA(){clearInterval(autoI);autoI=null;$('ba').textContent='Auto Play';}
 
-el('bn').onclick=next;el('bp').onclick=prev;el('ba').onclick=toggleA;
-el('br').onclick=()=>{stopA();resetAll();};
-document.onkeydown=e=>{
-  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}
-  if(e.key==='ArrowLeft'){e.preventDefault();prev();}
-  if(e.key==='r')resetAll();
-};
+$('bn').onclick=next;$('bp').onclick=prev;$('ba').onclick=toggleA;$('br').onclick=()=>{stopA();resetAll();};
+document.onkeydown=e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}if(e.key==='ArrowLeft'){e.preventDefault();prev();}if(e.key==='r')resetAll();};
 ui();
 </script>
 </body>
