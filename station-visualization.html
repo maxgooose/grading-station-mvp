@@ -741,40 +741,80 @@ const steps = [
   },
   {
     title: "180 Rotation — Sandwich Flip",
-    desc: "NEMA 23 stepper + 5:1 planetary gearbox rotates the entire assembly <strong>180 degrees</strong> in ~1.5 seconds. Trapezoidal velocity profile (smooth accel/decel). Rotary encoder confirms the 180 position. Device is now <strong>face-down</strong>.",
+    desc: "NEMA 23 stepper + 5:1 planetary gearbox rotates the entire assembly <strong>180 degrees</strong> in ~1.5 seconds. Trapezoidal velocity profile (smooth accel/decel). Rotary encoder confirms 180° position. Device is now <strong>face-down</strong>.",
     time: "~8s",
     photos: 5,
     action: (dir) => {
-      // Rotate the flip group
+      // Animate the rotation
       const flipGroup = document.getElementById('flip-group');
       flipGroup.style.transition = 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
       flipGroup.style.transformOrigin = '400px 280px';
       flipGroup.style.transform = 'rotate(180deg)';
-      // Show rotation indicator
+
+      // Show rotation indicator during animation
       const rotInd = document.getElementById('rotation-indicator');
       rotInd.style.transition = 'opacity 0.3s';
       rotInd.style.opacity = '1';
       setTimeout(() => { rotInd.style.opacity = '0'; }, 1800);
-      // Update device label after flip
+
+      // After rotation animation completes, snap to post-flip layout
+      // so subsequent steps can move elements correctly
       setTimeout(() => {
-        document.getElementById('device-label').textContent = 'DEVICE (back up)';
-      }, 1500);
-      // Flash encoder
+        flipGroup.style.transition = 'none';
+        flipGroup.style.transform = 'none';
+
+        // Post-flip positions (reconstructed, no rotation):
+        // Original bottom pad+plate → now on TOP (above device)
+        const bottomPad = document.getElementById('bottom-pad');
+        const bottomPlate = document.getElementById('bottom-plate');
+        const bottomPadLabel = document.querySelector('#flip-group > text');
+        bottomPad.setAttribute('y', '210');
+        bottomPlate.setAttribute('y', '200');
+
+        // Original top pad+plate → now on BOTTOM (device rests here)
+        const topPad = document.getElementById('top-pad');
+        const topPlate = document.getElementById('top-plate');
+        topPad.setAttribute('y', '275');
+        topPlate.setAttribute('y', '285');
+
+        // Top pad group: reset its transform, reposition
+        const topPadGroup = document.getElementById('top-pad-group');
+        topPadGroup.style.transform = 'none';
+
+        // Device: stays in middle, now face-down
+        // (screen was on top y=256, now back is on top — same visual position)
+        document.getElementById('device-label').textContent = 'DEVICE (BACK UP)';
+
+        // Spring + actuator: now visually below (they flipped too)
+        const spring = document.getElementById('spring-group');
+        const actuator = document.getElementById('actuator-group');
+        spring.style.transform = 'none';
+        actuator.style.transform = 'none';
+        // Hide spring/actuator — they're on the bottom side now, less relevant
+        spring.style.opacity = '0.2';
+        actuator.style.opacity = '0.2';
+
+        // Mark that we're in post-flip state
+        flipGroup.dataset.flipped = 'true';
+      }, 1600);
+
       flashCamera('encoder');
     }
   },
   {
-    title: "Top Pad Lifts — Device Released",
-    desc: "Top pad (now below after flip) lifts away. Device rests face-down on what was the top pad, now the bottom surface. Back panel is fully exposed for photography.",
+    title: "Upper Pad Lifts — Back Exposed",
+    desc: "After the flip, the original bottom pad is now on <strong>top</strong>. It lifts upward, away from the device. Device rests face-down on the original top pad (now the bottom surface) — held by <strong>gravity</strong>. Back panel fully exposed to the top camera.",
     time: "~9s",
     photos: 5,
     action: (dir) => {
-      // The assembly is flipped, so "top pad" visually is now at the bottom
-      // We lift the pad group away
-      const topPadGroup = document.getElementById('top-pad-group');
-      // Since it's rotated, we need to translate in the rotated frame
-      topPadGroup.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-      topPadGroup.style.transform = 'translateY(-34px)';
+      // The original bottom pad is now at the top (y=210).
+      // Lift it UP (decrease y) to clear the device.
+      const bottomPad = document.getElementById('bottom-pad');
+      const bottomPlate = document.getElementById('bottom-plate');
+      bottomPad.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      bottomPlate.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      bottomPad.style.transform = 'translateY(-40px)';
+      bottomPlate.style.transform = 'translateY(-40px)';
     }
   },
   {
@@ -903,25 +943,42 @@ function resetAll() {
   const flipGroup = document.getElementById('flip-group');
   flipGroup.style.transition = 'none';
   flipGroup.style.transform = 'none';
+  flipGroup.dataset.flipped = '';
 
-  // Reset top pad
+  // Reset top pad group
   const topPadGroup = document.getElementById('top-pad-group');
   topPadGroup.style.transition = 'none';
   topPadGroup.style.transform = 'none';
 
+  // Reset top pad + plate to original positions
+  document.getElementById('top-pad').setAttribute('y', '210');
+  document.getElementById('top-plate').setAttribute('y', '200');
+
+  // Reset bottom pad + plate to original positions
+  const bottomPad = document.getElementById('bottom-pad');
+  const bottomPlate = document.getElementById('bottom-plate');
+  bottomPad.setAttribute('y', '275');
+  bottomPlate.setAttribute('y', '285');
+  bottomPad.style.transition = 'none';
+  bottomPlate.style.transition = 'none';
+  bottomPad.style.transform = 'none';
+  bottomPlate.style.transform = 'none';
+
   const spring = document.getElementById('spring-group');
   spring.style.transition = 'none';
   spring.style.transform = 'none';
+  spring.style.opacity = '';
 
   const actuator = document.getElementById('actuator-group');
   actuator.style.transition = 'none';
   actuator.style.transform = 'none';
+  actuator.style.opacity = '';
 
   // Reset beams
   hideAllBeams();
 
   // Reset device label
-  document.getElementById('device-label').textContent = 'DEVICE (screen up)';
+  document.getElementById('device-label').textContent = 'DEVICE (SCREEN UP)';
 
   // Reset arrows
   document.getElementById('entry-arrow').style.opacity = '0.5';
