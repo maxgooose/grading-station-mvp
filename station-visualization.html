@@ -351,32 +351,31 @@
         <text id="dev-label" x="455" y="316" fill="#fff" font-size="6" text-anchor="middle" opacity="0.4" letter-spacing="1.5">DEVICE (SCREEN UP)</text>
       </g>
 
-      <!-- Top silicone pad -->
+      <!-- Top silicone pad — STARTS RAISED (near ceiling, out of the way) -->
       <g id="top-pad-group">
-        <rect id="top-pad" x="312" y="291" width="286" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
-        <rect id="top-plate" x="310" y="282" width="290" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
-        <text x="455" y="278" fill="#3aa898" font-size="5" text-anchor="middle" opacity="0.5" letter-spacing="1">SILICONE PAD + ALUMINUM</text>
+        <rect id="top-pad" x="312" y="155" width="286" height="9" rx="4" fill="url(#sili)" opacity="0.7" stroke="#3aa898" stroke-width="0.5"/>
+        <rect id="top-plate" x="310" y="146" width="290" height="5" rx="1" fill="url(#alu)" stroke="#8a929a" stroke-width="0.3"/>
+        <text x="455" y="142" fill="#3aa898" font-size="5" text-anchor="middle" opacity="0.5" letter-spacing="1">TOP PAD (RAISED)</text>
       </g>
 
-      <!-- Spring (coil) -->
+      <!-- Spring (coil) — attached between actuator and top pad -->
       <g id="spring-group">
-        <path d="M455,250 Q445,254 455,258 Q465,262 455,266 Q445,270 455,274 Q465,278 455,282"
+        <path d="M455,114 Q445,118 455,122 Q465,126 455,130 Q445,134 455,138 Q465,142 455,146"
               fill="none" stroke="url(#sprG)" stroke-width="2" stroke-linecap="round"/>
-        <text x="472" y="268" fill="#888" font-size="5" opacity="0.5" letter-spacing="1">~20N</text>
+        <text x="472" y="132" fill="#888" font-size="5" opacity="0.5" letter-spacing="1">~20N</text>
       </g>
 
       <!-- Lead screw (threaded rod) -->
       <g id="actuator-group">
-        <rect x="452" y="200" width="6" height="50" rx="1" fill="#777" stroke="#999" stroke-width="0.3"/>
+        <rect x="452" y="90" width="6" height="24" rx="1" fill="#777" stroke="#999" stroke-width="0.3"/>
         <!-- Thread lines -->
         <g stroke="#555" stroke-width="0.3" opacity="0.6">
-          <line x1="452" y1="205" x2="458" y2="208"/><line x1="452" y1="212" x2="458" y2="215"/>
-          <line x1="452" y1="219" x2="458" y2="222"/><line x1="452" y1="226" x2="458" y2="229"/>
-          <line x1="452" y1="233" x2="458" y2="236"/><line x1="452" y1="240" x2="458" y2="243"/>
+          <line x1="452" y1="93" x2="458" y2="96"/><line x1="452" y1="99" x2="458" y2="102"/>
+          <line x1="452" y1="105" x2="458" y2="108"/>
         </g>
         <!-- Nut -->
-        <rect x="448" y="245" width="14" height="5" rx="1" fill="#666" stroke="#888" stroke-width="0.3"/>
-        <text x="455" y="195" fill="#888" font-size="5" text-anchor="middle" opacity="0.4" letter-spacing="1">LEAD SCREW</text>
+        <rect x="448" y="110" width="14" height="5" rx="1" fill="#666" stroke="#888" stroke-width="0.3"/>
+        <text x="455" y="86" fill="#888" font-size="5" text-anchor="middle" opacity="0.4" letter-spacing="1">LEAD SCREW</text>
       </g>
     </g>
   </g>
@@ -689,15 +688,16 @@ const steps=[
   },
   {
     title:"Top Pad Descends — Sandwich",
-    desc:"Lead screw drives the top <strong>silicone pad</strong> down onto the device. Spring provides consistent <strong>~20N</strong> regardless of thickness. Device is now clamped between two soft pads on aluminum backing plates.",
+    desc:"Lead screw drives the top <strong>silicone pad</strong> all the way down onto the device. Spring provides consistent <strong>~20N</strong> regardless of thickness. Device is now clamped between two soft pads on aluminum backing plates.",
     time:"~6s",photos:5,
     action:()=>{
       hideAllB();
+      // Top pad descends from raised position (y~155) down to sandwich position (y~300)
       const tpg=el('top-pad-group'),spr=el('spring-group'),act=el('actuator-group');
-      [tpg,spr,act].forEach(e=>e.style.transition='transform 0.8s cubic-bezier(0.4,0,0.2,1)');
-      tpg.style.transform='translateY(22px)';
-      spr.style.transform='translateY(14px)';
-      act.style.transform='translateY(10px)';
+      [tpg,spr,act].forEach(e=>e.style.transition='transform 1s cubic-bezier(0.4,0,0.2,1)');
+      tpg.style.transform='translateY(148px)';  // 155 + 148 = 303, right above device at 322
+      spr.style.transform='translateY(130px)';
+      act.style.transform='translateY(110px)';
     }
   },
   {
@@ -717,9 +717,10 @@ const steps=[
       setTimeout(()=>{
         fg.style.transition='none';
         fg.style.transform='none';
-        // Swap pads to post-flip positions
-        attr('bot-pad','y','291');attr('bot-plate','y','282');
-        attr('top-pad','y','339');attr('top-plate','y','348');
+        // Post-flip: original bottom pad is now on TOP (close to device, just flipped)
+        // Original top pad is now on BOTTOM (device rests on it)
+        attr('bot-pad','y','303');attr('bot-plate','y','295');  // original bottom → now above device
+        attr('top-pad','y','339');attr('top-plate','y','348');  // original top → now below device
         el('top-pad-group').style.transform='none';
         el('dev-label').textContent='DEVICE (BACK UP)';
         el('spring-group').style.transform='none';el('spring-group').style.opacity='0.15';
@@ -731,11 +732,12 @@ const steps=[
   },
   {
     title:"Upper Pad Lifts — Back Exposed",
-    desc:"Original bottom pad (now on top) lifts <strong>upward</strong>. Device stays on lower pad — held by <strong>gravity</strong>. Back panel fully exposed to the top camera. Interior is uniform diffused light.",
+    desc:"Original bottom pad (now on top) lifts <strong>upward</strong> and out of the way. Device stays on lower pad — held by <strong>gravity</strong>. Back panel fully exposed to the top camera. Interior is uniform diffused light.",
     time:"~9s",photos:5,
     action:()=>{
+      // Lift the original bottom pad (now above device at y~303) way up out of the way
       const bp=el('bot-pad'),bpl=el('bot-plate');
-      [bp,bpl].forEach(e=>{e.style.transition='transform 0.8s cubic-bezier(0.4,0,0.2,1)';e.style.transform='translateY(-45px)';});
+      [bp,bpl].forEach(e=>{e.style.transition='transform 1s cubic-bezier(0.4,0,0.2,1)';e.style.transform='translateY(-160px)';});
     }
   },
   {
@@ -807,7 +809,9 @@ function prev(){if(cur>0)goTo(cur-1);}
 function resetAll(){
   const fg=el('flip-group');fg.style.transition='none';fg.style.transform='none';fg.dataset.flipped='';
   el('top-pad-group').style.transition='none';el('top-pad-group').style.transform='none';
-  attr('top-pad','y','291');attr('top-plate','y','282');
+  // Top pad starts RAISED near ceiling
+  attr('top-pad','y','155');attr('top-plate','y','146');
+  // Bottom pad at device level
   attr('bot-pad','y','339');attr('bot-plate','y','348');
   ['bot-pad','bot-plate'].forEach(id=>{el(id).style.transition='none';el(id).style.transform='none';});
   ['spring-group','actuator-group'].forEach(id=>{const e=el(id);e.style.transition='none';e.style.transform='none';e.style.opacity='';});
