@@ -17,14 +17,16 @@ Screen up. Always. Operator loads it naturally, screen gets photographed first b
 
 ## Capture Sequence
 
-1. Device enters, sits screen-up on bottom pad
+1. Device enters through front opening, sits screen-up on bottom pad
 2. Top camera shoots front face (through aperture hole in top diffuser)
 3. 4 edge cameras shoot all edges simultaneously (through aperture holes in side/back diffusers)
 4. Top pad descends, sandwiches device (~20N force via spring)
 5. Rotate 180° over ~1.5 seconds
 6. Upper pad lifts (original bottom pad, now on top after flip)
 7. Top camera shoots back face
-8. Device exits to sorting
+8. Device exits back through the same front opening to sort bins (A/B/C)
+
+Single opening — device enters and exits from the same slot. No second hole needed.
 
 ~10 seconds per cycle. Budget is 57 seconds. Plenty of margin.
 
