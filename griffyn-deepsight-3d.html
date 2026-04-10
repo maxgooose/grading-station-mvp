@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Griffyn DEEPSIGHT — 3D Model</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+  }
+  #app { position: fixed; inset: 0; }
+  #navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: rgba(8, 12, 20, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+    gap: 8px;
+  }
+  #navbar .home {
+    color: #6db9ff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(109, 185, 255, 0.3);
+    transition: all 0.2s;
+  }
+  #navbar .home:hover { background: rgba(109, 185, 255, 0.15); }
+  #navbar .sep {
+    color: #3a4858;
+    margin: 0 6px;
+  }
+  #navbar a.nav-link {
+    color: #8fa3b8;
+    text-decoration: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  #navbar a.nav-link:hover { color: #e8eef5; background: rgba(255,255,255,0.04); }
+  #navbar a.nav-link.active {
+    color: #2d8a4f;
+    background: rgba(45, 138, 79, 0.12);
+  }
+  #info {
+    position: fixed;
+    top: 68px;
+    left: 20px;
+    max-width: 360px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px;
+    line-height: 1.55;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #info h1 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #6db9ff;
+    letter-spacing: 0.3px;
+  }
+  #info .sub {
+    color: #8fa3b8;
+    font-size: 11px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  #info .row { display: flex; justify-content: space-between; padding: 3px 0; }
+  #info .k { color: #8fa3b8; }
+  #info .v { color: #e8eef5; font-weight: 500; }
+  #info .divider {
+    height: 1px;
+    background: rgba(100, 180, 255, 0.15);
+    margin: 10px 0;
+  }
+  #stage {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 12px;
+    z-index: 10;
+    pointer-events: none;
+    color: #6db9ff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  #controls {
+    position: fixed;
+    top: 68px;
+    right: 20px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 11px;
+    z-index: 10;
+    color: #8fa3b8;
+    line-height: 1.7;
+  }
+  #controls b { color: #e8eef5; }
+  button {
+    background: rgba(109, 185, 255, 0.15);
+    border: 1px solid rgba(109, 185, 255, 0.4);
+    color: #6db9ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 8px;
+    width: 100%;
+  }
+  button:hover { background: rgba(109, 185, 255, 0.25); }
+</style>
+</head>
+<body>
+<div id="navbar">
+  <a href="index.html" class="home">← All Models</a>
+  <span class="sep">|</span>
+  <a href="phonecheck-3d.html" class="nav-link">Phonecheck</a>
+  <a href="griffyn-deepsight-3d.html" class="nav-link active">Griffyn DEEPSIGHT</a>
+</div>
+<div id="app"></div>
+
+<div id="info">
+  <h1>GRIFFYN DEEPSIGHT</h1>
+  <div class="sub">5-Axis Cosmetic Grading Station</div>
+  <div class="row"><span class="k">Architecture</span><span class="v">Single cam + manipulator</span></div>
+  <div class="row"><span class="k">Motion axes</span><span class="v">5 servo axes</span></div>
+  <div class="row"><span class="k">Controller</span><span class="v">Beckhoff C6015</span></div>
+  <div class="row"><span class="k">Drives</span><span class="v">AM81xx + EL7211</span></div>
+  <div class="row"><span class="k">Defect res.</span><span class="v">40μm × 3μm</span></div>
+  <div class="row"><span class="k">Cycle time</span><span class="v">~60 sec / device</span></div>
+  <div class="row"><span class="k">Throughput</span><span class="v">60/hr (200/hr in pod)</span></div>
+  <div class="divider"></div>
+  <div style="font-size: 11px; color: #8fa3b8;">
+    5-DoF manipulator presents all 6 faces of the device to a fixed camera + lighting station. One camera sees everything.
+  </div>
+</div>
+
+<div id="controls">
+  <b>CONTROLS</b><br>
+  Drag — rotate view<br>
+  Scroll — zoom<br>
+  Right-drag — pan<br>
+  <button id="toggleAnim">⏸ Pause Animation</button>
+  <button id="resetView">↺ Reset View</button>
+</div>
+
+<div id="stage">STAGE: INITIALIZING</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ===== Scene =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0e14);
+scene.fog = new THREE.Fog(0x0a0e14, 15, 40);
+
+// ===== Camera =====
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+const initialCamPos = new THREE.Vector3(6, 5, 8);
+camera.position.copy(initialCamPos);
+
+// ===== Renderer =====
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.getElementById('app').appendChild(renderer.domElement);
+
+// ===== Controls =====
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 1.5, 0);
+controls.minDistance = 3;
+controls.maxDistance = 25;
+controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+// ===== Lighting =====
+const ambient = new THREE.AmbientLight(0x6080a0, 0.35);
+scene.add(ambient);
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+keyLight.position.set(8, 12, 6);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.left = -10;
+keyLight.shadow.camera.right = 10;
+keyLight.shadow.camera.top = 10;
+keyLight.shadow.camera.bottom = -10;
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 30;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x4080ff, 0.4);
+fillLight.position.set(-5, 8, -5);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xffa060, 0.3);
+rimLight.position.set(-8, 4, 8);
+scene.add(rimLight);
+
+// ===== Materials =====
+const matMetal = new THREE.MeshStandardMaterial({ color: 0x4a5a6a, metalness: 0.85, roughness: 0.35 });
+const matDark = new THREE.MeshStandardMaterial({ color: 0x1a1f26, metalness: 0.6, roughness: 0.5 });
+const matBeckhoffGreen = new THREE.MeshStandardMaterial({ color: 0x2d8a4f, metalness: 0.4, roughness: 0.4 });
+const matJoint = new THREE.MeshStandardMaterial({ color: 0xe8b020, metalness: 0.7, roughness: 0.3 });
+const matArm = new THREE.MeshStandardMaterial({ color: 0xd8dde3, metalness: 0.8, roughness: 0.25 });
+const matGripper = new THREE.MeshStandardMaterial({ color: 0x2a3440, metalness: 0.7, roughness: 0.4 });
+const matPhone = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.7, roughness: 0.15 });
+const matScreen = new THREE.MeshStandardMaterial({ color: 0x101825, metalness: 0.2, roughness: 0.1, emissive: 0x0a1525, emissiveIntensity: 0.3 });
+const matLight = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.2 });
+const matCameraBody = new THREE.MeshStandardMaterial({ color: 0x181c22, metalness: 0.7, roughness: 0.35 });
+const matCameraLens = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.95, roughness: 0.05 });
+const matGlass = new THREE.MeshStandardMaterial({ color: 0x80a0c0, metalness: 0.1, roughness: 0.05, transparent: true, opacity: 0.2 });
+
+// ===== Ground =====
+const groundGeo = new THREE.PlaneGeometry(40, 40);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x14181e, metalness: 0.3, roughness: 0.8 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const grid = new THREE.GridHelper(40, 40, 0x223344, 0x1a2130);
+grid.position.y = 0.001;
+scene.add(grid);
+
+// ===== Enclosure Frame (2020 aluminum extrusion style) =====
+const enclosure = new THREE.Group();
+scene.add(enclosure);
+
+function makeExtrusion(length, axis = 'y') {
+  const geo = new THREE.BoxGeometry(
+    axis === 'x' ? length : 0.08,
+    axis === 'y' ? length : 0.08,
+    axis === 'z' ? length : 0.08
+  );
+  const mesh = new THREE.Mesh(geo, matMetal);
+  mesh.castShadow = true;
+  return mesh;
+}
+
+const W = 5, D = 4, H = 4; // enclosure dims (m-ish)
+
+// 4 vertical posts
+const posts = [
+  [-W/2, H/2, -D/2],
+  [ W/2, H/2, -D/2],
+  [-W/2, H/2,  D/2],
+  [ W/2, H/2,  D/2],
+];
+posts.forEach(p => {
+  const post = makeExtrusion(H, 'y');
+  post.position.set(...p);
+  enclosure.add(post);
+});
+
+// Top & bottom rails along X
+[0, H].forEach(y => {
+  [-D/2, D/2].forEach(z => {
+    const r = makeExtrusion(W, 'x');
+    r.position.set(0, y, z);
+    enclosure.add(r);
+  });
+});
+// Top & bottom rails along Z
+[0, H].forEach(y => {
+  [-W/2, W/2].forEach(x => {
+    const r = makeExtrusion(D, 'z');
+    r.position.set(x, y, 0);
+    enclosure.add(r);
+  });
+});
+
+// Back panel (dark)
+const backPanel = new THREE.Mesh(
+  new THREE.PlaneGeometry(W - 0.1, H - 0.1),
+  matDark
+);
+backPanel.position.set(0, H/2, -D/2 + 0.05);
+enclosure.add(backPanel);
+
+// Top panel
+const topPanel = new THREE.Mesh(
+  new THREE.PlaneGeometry(W - 0.1, D - 0.1),
+  matDark
+);
+topPanel.rotation.x = Math.PI / 2;
+topPanel.position.set(0, H - 0.05, 0);
+enclosure.add(topPanel);
+
+// Side glass panels (semi-transparent)
+const leftGlass = new THREE.Mesh(new THREE.PlaneGeometry(D - 0.1, H - 0.1), matGlass);
+leftGlass.rotation.y = Math.PI / 2;
+leftGlass.position.set(-W/2 + 0.05, H/2, 0);
+enclosure.add(leftGlass);
+
+const rightGlass = leftGlass.clone();
+rightGlass.position.set(W/2 - 0.05, H/2, 0);
+enclosure.add(rightGlass);
+
+// ===== Base Plate (phone-side platform) =====
+const basePlate = new THREE.Mesh(
+  new THREE.BoxGeometry(1.8, 0.15, 1.4),
+  matDark
+);
+basePlate.position.set(-1.3, 0.8, 0);
+basePlate.castShadow = true;
+basePlate.receiveShadow = true;
+scene.add(basePlate);
+
+// Input tray visible on base plate
+const tray = new THREE.Mesh(
+  new THREE.BoxGeometry(1.2, 0.04, 0.9),
+  matMetal
+);
+tray.position.set(-1.3, 0.9, 0);
+tray.castShadow = true;
+scene.add(tray);
+
+// ===== ROBOT ARM (5-axis articulated) =====
+// Hierarchy: base → J1(yaw) → J2(pitch-shoulder) → J3(pitch-elbow) → J4(pitch-wrist) → J5(roll) → gripper
+const robot = new THREE.Group();
+robot.position.set(1.2, 0, 0);
+scene.add(robot);
+
+// Base cabinet (houses Beckhoff controller)
+const baseCab = new THREE.Mesh(
+  new THREE.BoxGeometry(1.2, 1.0, 1.0),
+  matBeckhoffGreen
+);
+baseCab.position.set(0, 0.5, 0);
+baseCab.castShadow = true;
+baseCab.receiveShadow = true;
+robot.add(baseCab);
+
+// Beckhoff label strip
+const labelStrip = new THREE.Mesh(
+  new THREE.BoxGeometry(0.9, 0.1, 0.02),
+  new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x444444, emissiveIntensity: 0.2 })
+);
+labelStrip.position.set(0, 0.85, 0.51);
+robot.add(labelStrip);
+
+// Cooling vents
+for (let i = -2; i <= 2; i++) {
+  const vent = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, 0.4, 0.01),
+    new THREE.MeshStandardMaterial({ color: 0x0a1a0a })
+  );
+  vent.position.set(i * 0.15, 0.4, 0.51);
+  robot.add(vent);
+}
+
+// J1 — base rotation (yaw around Y)
+const j1 = new THREE.Group();
+j1.position.set(0, 1.0, 0);
+robot.add(j1);
+
+const j1Mount = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.35, 0.4, 0.2, 24),
+  matDark
+);
+j1Mount.position.y = 0.1;
+j1Mount.castShadow = true;
+j1.add(j1Mount);
+
+const j1Joint = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.28, 0.28, 0.25, 24),
+  matJoint
+);
+j1Joint.position.y = 0.32;
+j1Joint.castShadow = true;
+j1.add(j1Joint);
+
+// J2 — shoulder (pitch around X)
+const j2 = new THREE.Group();
+j2.position.set(0, 0.45, 0);
+j1.add(j2);
+
+const j2Housing = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.22, 0.22, 0.4, 20),
+  matJoint
+);
+j2Housing.rotation.z = Math.PI / 2;
+j2Housing.castShadow = true;
+j2.add(j2Housing);
+
+// Upper arm
+const upperArm = new THREE.Mesh(
+  new THREE.BoxGeometry(0.25, 1.4, 0.3),
+  matArm
+);
+upperArm.position.y = 0.7;
+upperArm.castShadow = true;
+j2.add(upperArm);
+
+// J3 — elbow
+const j3 = new THREE.Group();
+j3.position.set(0, 1.4, 0);
+j2.add(j3);
+
+const j3Housing = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.18, 0.18, 0.35, 20),
+  matJoint
+);
+j3Housing.rotation.z = Math.PI / 2;
+j3Housing.castShadow = true;
+j3.add(j3Housing);
+
+// Forearm
+const foreArm = new THREE.Mesh(
+  new THREE.BoxGeometry(0.2, 1.1, 0.24),
+  matArm
+);
+foreArm.position.y = 0.55;
+foreArm.castShadow = true;
+j3.add(foreArm);
+
+// J4 — wrist pitch
+const j4 = new THREE.Group();
+j4.position.set(0, 1.1, 0);
+j3.add(j4);
+
+const j4Housing = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.14, 0.14, 0.28, 20),
+  matJoint
+);
+j4Housing.rotation.z = Math.PI / 2;
+j4Housing.castShadow = true;
+j4.add(j4Housing);
+
+// Wrist arm
+const wristArm = new THREE.Mesh(
+  new THREE.BoxGeometry(0.15, 0.35, 0.18),
+  matArm
+);
+wristArm.position.y = 0.2;
+wristArm.castShadow = true;
+j4.add(wristArm);
+
+// J5 — wrist roll
+const j5 = new THREE.Group();
+j5.position.set(0, 0.4, 0);
+j4.add(j5);
+
+const j5Housing = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.12, 0.12, 0.15, 20),
+  matJoint
+);
+j5Housing.castShadow = true;
+j5.add(j5Housing);
+
+// ===== Gripper (end effector holding phone) =====
+const gripper = new THREE.Group();
+gripper.position.set(0, 0.15, 0);
+j5.add(gripper);
+
+const gripperBody = new THREE.Mesh(
+  new THREE.BoxGeometry(0.25, 0.1, 0.18),
+  matGripper
+);
+gripperBody.position.y = 0.05;
+gripperBody.castShadow = true;
+gripper.add(gripperBody);
+
+// Two fingers
+const fingerGeo = new THREE.BoxGeometry(0.04, 0.25, 0.12);
+const finger1 = new THREE.Mesh(fingerGeo, matGripper);
+finger1.position.set(-0.09, 0.22, 0);
+finger1.castShadow = true;
+gripper.add(finger1);
+
+const finger2 = new THREE.Mesh(fingerGeo, matGripper);
+finger2.position.set(0.09, 0.22, 0);
+finger2.castShadow = true;
+gripper.add(finger2);
+
+// ===== Phone (held by gripper) =====
+const phoneGroup = new THREE.Group();
+phoneGroup.position.set(0, 0.36, 0);
+gripper.add(phoneGroup);
+
+const phoneBody = new THREE.Mesh(
+  new THREE.BoxGeometry(0.15, 0.32, 0.012),
+  matPhone
+);
+phoneBody.castShadow = true;
+phoneGroup.add(phoneBody);
+
+// Phone screen (front)
+const phoneScreen = new THREE.Mesh(
+  new THREE.PlaneGeometry(0.135, 0.29),
+  matScreen
+);
+phoneScreen.position.z = 0.007;
+phoneGroup.add(phoneScreen);
+
+// Camera bump on back
+const cameraBump = new THREE.Mesh(
+  new THREE.BoxGeometry(0.05, 0.05, 0.006),
+  matGripper
+);
+cameraBump.position.set(-0.04, 0.12, -0.009);
+phoneGroup.add(cameraBump);
+
+// ===== Fixed Camera Inspection Station =====
+const inspectionStation = new THREE.Group();
+inspectionStation.position.set(-1.3, 1.8, 0);
+scene.add(inspectionStation);
+
+// Camera mount arm
+const camArm = new THREE.Mesh(
+  new THREE.BoxGeometry(0.1, 1.2, 0.1),
+  matMetal
+);
+camArm.position.set(-0.3, 0.6, 0);
+camArm.castShadow = true;
+inspectionStation.add(camArm);
+
+const camArmH = new THREE.Mesh(
+  new THREE.BoxGeometry(0.6, 0.1, 0.1),
+  matMetal
+);
+camArmH.position.set(0, 1.15, 0);
+camArmH.castShadow = true;
+inspectionStation.add(camArmH);
+
+// Camera body
+const camBody = new THREE.Mesh(
+  new THREE.BoxGeometry(0.3, 0.25, 0.35),
+  matCameraBody
+);
+camBody.position.set(0.2, 1.05, 0);
+camBody.castShadow = true;
+inspectionStation.add(camBody);
+
+// Camera lens
+const camLens = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.09, 0.11, 0.22, 24),
+  matCameraLens
+);
+camLens.rotation.x = Math.PI / 2;
+camLens.position.set(0.2, 1.05, 0.25);
+camLens.castShadow = true;
+inspectionStation.add(camLens);
+
+// Lens glass (blue tint)
+const lensGlass = new THREE.Mesh(
+  new THREE.CircleGeometry(0.075, 24),
+  new THREE.MeshStandardMaterial({ color: 0x2060a0, metalness: 0.9, roughness: 0.1, emissive: 0x103050, emissiveIntensity: 0.4 })
+);
+lensGlass.position.set(0.2, 1.05, 0.36);
+inspectionStation.add(lensGlass);
+
+// Ring light around lens
+const ringLight = new THREE.Mesh(
+  new THREE.TorusGeometry(0.18, 0.04, 12, 32),
+  matLight
+);
+ringLight.rotation.x = Math.PI / 2;
+ringLight.position.set(0.2, 1.05, 0.28);
+inspectionStation.add(ringLight);
+
+// Glow from ring light
+const ringGlow = new THREE.PointLight(0xffffff, 1.5, 5);
+ringGlow.position.set(0.2, 1.05, 0.3);
+inspectionStation.add(ringGlow);
+
+// LED bar lights (side diffusers)
+function makeLEDBar(x, y, z, rotY = 0) {
+  const bar = new THREE.Group();
+  bar.position.set(x, y, z);
+  bar.rotation.y = rotY;
+
+  const housing = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, 0.8, 0.1),
+    matDark
+  );
+  bar.add(housing);
+
+  const led = new THREE.Mesh(
+    new THREE.BoxGeometry(0.04, 0.75, 0.06),
+    matLight
+  );
+  led.position.z = 0.055;
+  bar.add(led);
+
+  const light = new THREE.PointLight(0xfff0e0, 0.8, 4);
+  light.position.z = 0.1;
+  bar.add(light);
+
+  return bar;
+}
+
+inspectionStation.add(makeLEDBar(-0.3, 0.5, 0.5, -Math.PI / 6));
+inspectionStation.add(makeLEDBar(0.7, 0.5, 0.5, Math.PI / 6));
+
+// Diffuser panel behind the inspection zone
+const diffuser = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.0, 1.4),
+  new THREE.MeshStandardMaterial({ color: 0xf0f4ff, emissive: 0xa0b8d0, emissiveIntensity: 0.2, roughness: 1.0 })
+);
+diffuser.position.set(0.2, 0.5, -0.4);
+inspectionStation.add(diffuser);
+
+// Inspection zone marker (where phone goes for photo)
+const inspectZone = new THREE.Mesh(
+  new THREE.RingGeometry(0.28, 0.32, 32),
+  new THREE.MeshBasicMaterial({ color: 0x6db9ff, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
+);
+inspectZone.position.set(0.2, 0.2, 0);
+inspectZone.rotation.x = Math.PI / 2;
+inspectionStation.add(inspectZone);
+
+// ===== Status Indicator LEDs =====
+function makeStatusLED(x, y, z, color) {
+  const led = new THREE.Mesh(
+    new THREE.SphereGeometry(0.04, 12, 12),
+    new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 2 })
+  );
+  led.position.set(x, y, z);
+  return led;
+}
+robot.add(makeStatusLED(-0.5, 0.95, 0.51, 0x00ff60));
+robot.add(makeStatusLED(-0.35, 0.95, 0.51, 0x00ff60));
+
+// ===== Animation State =====
+const anim = {
+  playing: true,
+  t: 0,
+  stage: 0,
+  stageStart: 0,
+};
+
+// Pose definitions for the inspection sequence
+// Each pose: { j1, j2, j3, j4, j5, duration, label }
+const poses = [
+  // Home / pickup position
+  { j1: 0,              j2: -0.3,    j3: -0.5,    j4: 0,        j5: 0,         dur: 1.5, label: 'HOME' },
+  // Move to tray (pick up)
+  { j1: Math.PI,        j2: -0.9,    j3: -0.6,    j4: -0.3,     j5: 0,         dur: 2.0, label: 'PICKUP DEVICE' },
+  // Present FRONT to camera
+  { j1: Math.PI / 2,    j2: -0.5,    j3: -0.6,    j4: -0.2,     j5: 0,         dur: 2.0, label: 'CAPTURE: FRONT' },
+  // Roll 90° for right edge
+  { j1: Math.PI / 2,    j2: -0.5,    j3: -0.6,    j4: -0.2,     j5: Math.PI/2, dur: 1.8, label: 'CAPTURE: RIGHT EDGE' },
+  // Roll to back (180°)
+  { j1: Math.PI / 2,    j2: -0.5,    j3: -0.6,    j4: -0.2,     j5: Math.PI,   dur: 1.8, label: 'CAPTURE: BACK' },
+  // Roll to left edge (270°)
+  { j1: Math.PI / 2,    j2: -0.5,    j3: -0.6,    j4: -0.2,     j5: Math.PI*1.5, dur: 1.8, label: 'CAPTURE: LEFT EDGE' },
+  // Tilt wrist to show top edge
+  { j1: Math.PI / 2,    j2: -0.3,    j3: -0.9,    j4: 0.5,      j5: Math.PI*1.5, dur: 1.8, label: 'CAPTURE: TOP EDGE' },
+  // Tilt wrist opposite for bottom edge
+  { j1: Math.PI / 2,    j2: -0.6,    j3: -0.3,    j4: -0.9,     j5: Math.PI*1.5, dur: 1.8, label: 'CAPTURE: BOTTOM EDGE' },
+  // Return to home
+  { j1: 0,              j2: -0.3,    j3: -0.5,    j4: 0,        j5: 0,         dur: 2.0, label: 'RETURN TO HOME' },
+];
+
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function updateAnimation(dt) {
+  if (!anim.playing) return;
+
+  anim.t += dt;
+  const cur = poses[anim.stage];
+  const next = poses[(anim.stage + 1) % poses.length];
+  const elapsed = anim.t - anim.stageStart;
+  let progress = Math.min(elapsed / cur.dur, 1.0);
+  const eased = easeInOut(progress);
+
+  j1.rotation.y = lerp(cur.j1, next.j1, eased);
+  j2.rotation.x = lerp(cur.j2, next.j2, eased);
+  j3.rotation.x = lerp(cur.j3, next.j3, eased);
+  j4.rotation.x = lerp(cur.j4, next.j4, eased);
+  j5.rotation.y = lerp(cur.j5, next.j5, eased);
+
+  // Pulse ring light when capturing
+  if (cur.label.startsWith('CAPTURE') && progress > 0.7 && progress < 0.9) {
+    ringLight.material.emissiveIntensity = 3.5;
+    ringGlow.intensity = 4;
+  } else {
+    ringLight.material.emissiveIntensity = 1.2;
+    ringGlow.intensity = 1.5;
+  }
+
+  document.getElementById('stage').textContent = `STAGE: ${cur.label}`;
+
+  if (progress >= 1.0) {
+    anim.stage = (anim.stage + 1) % poses.length;
+    anim.stageStart = anim.t;
+  }
+}
+
+// ===== Controls: Buttons =====
+document.getElementById('toggleAnim').addEventListener('click', (e) => {
+  anim.playing = !anim.playing;
+  e.target.textContent = anim.playing ? '⏸ Pause Animation' : '▶ Play Animation';
+});
+
+document.getElementById('resetView').addEventListener('click', () => {
+  camera.position.copy(initialCamPos);
+  controls.target.set(0, 1.5, 0);
+  controls.update();
+});
+
+// ===== Resize =====
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== Render Loop =====
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  updateAnimation(dt);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
