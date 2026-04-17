@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Universal Cellular Grading Station — 3D Prototype</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+  }
+  #app { position: fixed; inset: 0; }
+  #navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: rgba(8, 12, 20, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(232, 176, 32, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+    gap: 8px;
+  }
+  #navbar .home {
+    color: #e8b020;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(232, 176, 32, 0.3);
+    transition: all 0.2s;
+  }
+  #navbar .home:hover { background: rgba(232, 176, 32, 0.15); }
+  #navbar .sep { color: #3a4858; margin: 0 6px; }
+  #navbar a.nav-link {
+    color: #8fa3b8;
+    text-decoration: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  #navbar a.nav-link:hover { color: #e8eef5; background: rgba(255,255,255,0.04); }
+  #navbar a.nav-link.active {
+    color: #e8b020;
+    background: rgba(232, 176, 32, 0.14);
+  }
+  #info {
+    position: fixed;
+    top: 68px;
+    left: 20px;
+    max-width: 360px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 176, 32, 0.28);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px;
+    line-height: 1.55;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #info h1 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #e8b020;
+    letter-spacing: 0.3px;
+  }
+  #info .sub {
+    color: #8fa3b8;
+    font-size: 11px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  #info .row { display: flex; justify-content: space-between; padding: 3px 0; }
+  #info .k { color: #8fa3b8; }
+  #info .v { color: #e8eef5; font-weight: 500; }
+  #info .divider {
+    height: 1px;
+    background: rgba(232, 176, 32, 0.2);
+    margin: 10px 0;
+  }
+  #stage {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 176, 32, 0.28);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 12px;
+    z-index: 10;
+    pointer-events: none;
+    color: #e8b020;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  #controls {
+    position: fixed;
+    top: 68px;
+    right: 20px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 176, 32, 0.28);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 11px;
+    z-index: 10;
+    color: #8fa3b8;
+    line-height: 1.7;
+  }
+  #controls b { color: #e8eef5; }
+  button {
+    background: rgba(232, 176, 32, 0.15);
+    border: 1px solid rgba(232, 176, 32, 0.42);
+    color: #e8b020;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 8px;
+    width: 100%;
+  }
+  button:hover { background: rgba(232, 176, 32, 0.25); }
+  #captureCount {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 176, 32, 0.28);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 11px;
+    z-index: 10;
+    color: #8fa3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+  #captureCount .num {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #e8b020;
+    letter-spacing: 0;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div id="navbar">
+  <a href="index.html" class="home">← All Models</a>
+  <span class="sep">|</span>
+  <a href="universal-cellular-3d.html" class="nav-link active">Universal Cellular</a>
+  <a href="phonecheck-3d.html" class="nav-link">Phonecheck</a>
+  <a href="griffyn-deepsight-3d.html" class="nav-link">Griffyn DEEPSIGHT</a>
+</div>
+
+<div id="app"></div>
+
+<div id="info">
+  <h1>UNIVERSAL CELLULAR STATION</h1>
+  <div class="sub">Prototype — Spin + Flip Dual-Capture</div>
+  <div class="row"><span class="k">Architecture</span><span class="v">Cabinet + turntable</span></div>
+  <div class="row"><span class="k">Footprint</span><span class="v">3 × 3 × 3 ft</span></div>
+  <div class="row"><span class="k">Cameras</span><span class="v">2 (top + side)</span></div>
+  <div class="row"><span class="k">Lighting</span><span class="v">Dark-field + side fill</span></div>
+  <div class="row"><span class="k">Conveyor</span><span class="v">Bidirectional front</span></div>
+  <div class="row"><span class="k">Moving parts</span><span class="v">2 (disk + belt)</span></div>
+  <div class="row"><span class="k">Operator</span><span class="v">Manual flip only</span></div>
+  <div class="divider"></div>
+  <div style="font-size: 11px; color: #8fa3b8;">
+    Device rides conveyor into the box, disk spins in 4 × 90° steps while top + side cameras capture. Operator flips, sequence repeats, belt ejects out the same opening.
+  </div>
+</div>
+
+<div id="controls">
+  <b>CONTROLS</b><br>
+  Drag — rotate view<br>
+  Scroll — zoom<br>
+  Right-drag — pan<br>
+  <button id="toggleAnim">⏸ Pause Animation</button>
+  <button id="toggleCabinet">👁 Hide Cabinet</button>
+  <button id="resetView">↺ Reset View</button>
+</div>
+
+<div id="stage">STAGE: INITIALIZING</div>
+
+<div id="captureCount">
+  Images captured
+  <span class="num" id="captureNum">0</span>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ===== Scene =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0e14);
+scene.fog = new THREE.Fog(0x0a0e14, 12, 35);
+
+// ===== Camera =====
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+const initialCamPos = new THREE.Vector3(5, 3.5, 5.5);
+camera.position.copy(initialCamPos);
+
+// ===== Renderer =====
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.getElementById('app').appendChild(renderer.domElement);
+
+// ===== Controls =====
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 1.3, 0);
+controls.minDistance = 2;
+controls.maxDistance = 18;
+controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+// ===== Lighting =====
+scene.add(new THREE.AmbientLight(0x6080a0, 0.4));
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+keyLight.position.set(8, 12, 6);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.left = -8;
+keyLight.shadow.camera.right = 8;
+keyLight.shadow.camera.top = 8;
+keyLight.shadow.camera.bottom = -8;
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 30;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x4080ff, 0.35);
+fillLight.position.set(-6, 6, -6);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xe8b020, 0.3);
+rimLight.position.set(-6, 3, 6);
+scene.add(rimLight);
+
+// ===== Materials =====
+const matCabinet     = new THREE.MeshStandardMaterial({ color: 0x2a3440, metalness: 0.7, roughness: 0.4 });
+const matCabinetDark = new THREE.MeshStandardMaterial({ color: 0x161c24, metalness: 0.6, roughness: 0.5 });
+const matFrame       = new THREE.MeshStandardMaterial({ color: 0x4a5a6a, metalness: 0.85, roughness: 0.35 });
+const matGlass       = new THREE.MeshPhysicalMaterial({
+  color: 0x80c0d8,
+  metalness: 0.0,
+  roughness: 0.05,
+  transmission: 0.85,
+  transparent: true,
+  opacity: 0.22,
+  ior: 1.5,
+  thickness: 0.3,
+});
+const matTurntable    = new THREE.MeshStandardMaterial({ color: 0x1a2230, metalness: 0.6, roughness: 0.4 });
+const matTurntableTop = new THREE.MeshStandardMaterial({ color: 0x0f1520, metalness: 0.4, roughness: 0.3 });
+const matCamBody      = new THREE.MeshStandardMaterial({ color: 0x101418, metalness: 0.8, roughness: 0.3 });
+const matCamLens      = new THREE.MeshStandardMaterial({ color: 0x050505, metalness: 0.95, roughness: 0.05 });
+const matCamGlass     = new THREE.MeshStandardMaterial({ color: 0xe8b020, metalness: 0.9, roughness: 0.05, emissive: 0x402a05, emissiveIntensity: 0.5 });
+const matRingOff      = new THREE.MeshStandardMaterial({ color: 0xfff4d0, emissive: 0xfff0c0, emissiveIntensity: 0.9, roughness: 0.8 });
+const matDiffuserOff  = new THREE.MeshStandardMaterial({ color: 0xfaf4e0, emissive: 0xffffff, emissiveIntensity: 1.1, roughness: 1.0 });
+const matBelt         = new THREE.MeshStandardMaterial({ color: 0x111419, metalness: 0.2, roughness: 0.8 });
+const matBeltEdge     = new THREE.MeshStandardMaterial({ color: 0x2a3440, metalness: 0.6, roughness: 0.5 });
+const matRoller       = new THREE.MeshStandardMaterial({ color: 0x3a4654, metalness: 0.9, roughness: 0.3 });
+const matPhone        = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.7, roughness: 0.15 });
+const matScreen       = new THREE.MeshStandardMaterial({ color: 0x101825, metalness: 0.2, roughness: 0.1, emissive: 0x0a1525, emissiveIntensity: 0.3 });
+const matAccent       = new THREE.MeshStandardMaterial({ color: 0xe8b020, emissive: 0xe8b020, emissiveIntensity: 1.4 });
+const matStatusGreen  = new THREE.MeshStandardMaterial({ color: 0x00ff60, emissive: 0x00ff60, emissiveIntensity: 1 });
+
+// ===== Ground =====
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(40, 40),
+  new THREE.MeshStandardMaterial({ color: 0x14181e, metalness: 0.3, roughness: 0.8 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const grid = new THREE.GridHelper(40, 40, 0x223344, 0x1a2130);
+grid.position.y = 0.001;
+scene.add(grid);
+
+// ===== CABINET (3 × 3 × 3 ft — compact tabletop unit) =====
+const W = 3, D = 3, H = 3;
+
+const cabinet = new THREE.Group();
+scene.add(cabinet);
+
+function frameBar(length, axis) {
+  const t = 0.08;
+  const geo = new THREE.BoxGeometry(
+    axis === 'x' ? length : t,
+    axis === 'y' ? length : t,
+    axis === 'z' ? length : t
+  );
+  const m = new THREE.Mesh(geo, matFrame);
+  m.castShadow = true;
+  return m;
+}
+
+// 4 vertical posts
+[
+  [-W/2, H/2, -D/2],
+  [ W/2, H/2, -D/2],
+  [-W/2, H/2,  D/2],
+  [ W/2, H/2,  D/2],
+].forEach(p => {
+  const post = frameBar(H, 'y');
+  post.position.set(...p);
+  cabinet.add(post);
+});
+
+// Top & bottom rails (X axis)
+[0.04, H - 0.04].forEach(y => {
+  [-D/2, D/2].forEach(z => {
+    const r = frameBar(W, 'x');
+    r.position.set(0, y, z);
+    cabinet.add(r);
+  });
+});
+// Top & bottom rails (Z axis)
+[0.04, H - 0.04].forEach(y => {
+  [-W/2, W/2].forEach(x => {
+    const r = frameBar(D, 'z');
+    r.position.set(x, y, 0);
+    cabinet.add(r);
+  });
+});
+
+// Back panel
+const backPanel = new THREE.Mesh(
+  new THREE.BoxGeometry(W - 0.1, H - 0.1, 0.06),
+  matCabinet
+);
+backPanel.position.set(0, H/2, -D/2 + 0.03);
+backPanel.castShadow = true;
+backPanel.receiveShadow = true;
+cabinet.add(backPanel);
+
+// Side panels
+const sideL = new THREE.Mesh(
+  new THREE.BoxGeometry(0.06, H - 0.1, D - 0.1),
+  matCabinet
+);
+sideL.position.set(-W/2 + 0.03, H/2, 0);
+sideL.castShadow = true;
+sideL.receiveShadow = true;
+cabinet.add(sideL);
+
+const sideR = sideL.clone();
+sideR.position.set(W/2 - 0.03, H/2, 0);
+cabinet.add(sideR);
+
+// Top panel
+const topPanel = new THREE.Mesh(
+  new THREE.BoxGeometry(W - 0.1, 0.06, D - 0.1),
+  matCabinet
+);
+topPanel.position.set(0, H - 0.03, 0);
+topPanel.castShadow = true;
+cabinet.add(topPanel);
+
+// Floor
+const floorIn = new THREE.Mesh(
+  new THREE.BoxGeometry(W - 0.1, 0.06, D - 0.1),
+  matCabinetDark
+);
+floorIn.position.set(0, 0.03, 0);
+floorIn.receiveShadow = true;
+cabinet.add(floorIn);
+
+// === FRONT FACE ===
+// Bottom strip (below conveyor slot) — solid
+const frontBottom = new THREE.Mesh(
+  new THREE.BoxGeometry(W - 0.1, 1.08, 0.06),
+  matCabinet
+);
+frontBottom.position.set(0, 0.54, D/2 - 0.03);
+frontBottom.castShadow = true;
+cabinet.add(frontBottom);
+
+// Conveyor slot is the gap at y ≈ 1.08..1.4 — no mesh, just empty
+
+// Side strips (above slot, flanking the door)
+const stripCenterY = 1.92;
+const stripHeight = 1.68;
+const frontStripL = new THREE.Mesh(
+  new THREE.BoxGeometry(0.35, stripHeight, 0.06),
+  matCabinet
+);
+frontStripL.position.set(-W/2 + 0.2, stripCenterY, D/2 - 0.03);
+cabinet.add(frontStripL);
+
+const frontStripR = frontStripL.clone();
+frontStripR.position.set(W/2 - 0.2, stripCenterY, D/2 - 0.03);
+cabinet.add(frontStripR);
+
+// Top strip (above door)
+const frontTop = new THREE.Mesh(
+  new THREE.BoxGeometry(W - 0.1, 0.2, 0.06),
+  matCabinet
+);
+frontTop.position.set(0, H - 0.14, D/2 - 0.03);
+cabinet.add(frontTop);
+
+// Universal Cellular logo strip on top
+const logoStrip = new THREE.Mesh(
+  new THREE.BoxGeometry(W - 0.6, 0.12, 0.02),
+  new THREE.MeshStandardMaterial({ color: 0xe8b020, emissive: 0xe8b020, emissiveIntensity: 0.7 })
+);
+logoStrip.position.set(0, H - 0.14, D/2 + 0.002);
+cabinet.add(logoStrip);
+
+// Status LEDs along top strip
+for (let i = 0; i < 5; i++) {
+  const led = new THREE.Mesh(
+    new THREE.SphereGeometry(0.035, 10, 10),
+    matAccent
+  );
+  led.position.set(-0.8 + i * 0.4, H - 0.26, D/2 + 0.002);
+  cabinet.add(led);
+}
+
+// === FRONT DOOR (hinged on top edge, glass, swings up) ===
+const doorGroup = new THREE.Group();
+doorGroup.position.set(0, H - 0.26, D/2 - 0.04);
+cabinet.add(doorGroup);
+
+const doorH = 1.2;
+const doorW = W - 0.8;
+
+const doorGlass = new THREE.Mesh(
+  new THREE.BoxGeometry(doorW, doorH, 0.04),
+  matGlass
+);
+doorGlass.position.set(0, -doorH/2, 0);
+doorGroup.add(doorGlass);
+
+// Door frame bars
+const doorFrameMat = matFrame;
+const dfBottom = new THREE.Mesh(new THREE.BoxGeometry(doorW + 0.04, 0.05, 0.05), doorFrameMat);
+dfBottom.position.set(0, -doorH, 0);
+doorGroup.add(dfBottom);
+
+const dfLeft = new THREE.Mesh(new THREE.BoxGeometry(0.05, doorH + 0.05, 0.05), doorFrameMat);
+dfLeft.position.set(-doorW/2, -doorH/2, 0);
+doorGroup.add(dfLeft);
+
+const dfRight = dfLeft.clone();
+dfRight.position.set(doorW/2, -doorH/2, 0);
+doorGroup.add(dfRight);
+
+// Small handle
+const handle = new THREE.Mesh(
+  new THREE.BoxGeometry(0.3, 0.04, 0.04),
+  matAccent
+);
+handle.position.set(0, -doorH + 0.1, 0.04);
+doorGroup.add(handle);
+
+// === CONTROL PANEL (on front bottom strip) ===
+const touchscreen = new THREE.Mesh(
+  new THREE.BoxGeometry(0.9, 0.5, 0.03),
+  new THREE.MeshStandardMaterial({ color: 0x0a1825, emissive: 0x0a2540, emissiveIntensity: 0.6 })
+);
+touchscreen.position.set(0, 0.58, D/2 + 0.01);
+cabinet.add(touchscreen);
+
+// Touchscreen UI lines
+for (let i = 0; i < 3; i++) {
+  const line = new THREE.Mesh(
+    new THREE.BoxGeometry(0.72, 0.025, 0.004),
+    new THREE.MeshStandardMaterial({ color: 0xe8b020, emissive: 0xe8b020, emissiveIntensity: 0.8 })
+  );
+  line.position.set(-0.05, 0.68 - i * 0.09, D/2 + 0.025);
+  cabinet.add(line);
+}
+
+// ===== INTERIOR =====
+const interior = new THREE.Group();
+scene.add(interior);
+
+// Pedestal under disk
+const pedestal = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.35, 0.42, 1.18, 24),
+  matCabinetDark
+);
+pedestal.position.set(0, 0.65, 0);
+pedestal.castShadow = true;
+pedestal.receiveShadow = true;
+interior.add(pedestal);
+
+// === TURNTABLE (spinning disk) ===
+const turntable = new THREE.Group();
+const diskY = 1.28;
+turntable.position.set(0, diskY, 0);
+interior.add(turntable);
+
+const disk = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.5, 0.52, 0.08, 36),
+  matTurntable
+);
+disk.castShadow = true;
+disk.receiveShadow = true;
+turntable.add(disk);
+
+const diskTop = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.46, 0.46, 0.015, 36),
+  matTurntableTop
+);
+diskTop.position.y = 0.048;
+turntable.add(diskTop);
+
+// Accent groove ring
+const groove = new THREE.Mesh(
+  new THREE.TorusGeometry(0.42, 0.008, 8, 36),
+  matAccent
+);
+groove.rotation.x = Math.PI / 2;
+groove.position.y = 0.056;
+turntable.add(groove);
+
+// Small tick marks at 0/90/180/270
+for (let i = 0; i < 4; i++) {
+  const tick = new THREE.Mesh(
+    new THREE.BoxGeometry(0.04, 0.005, 0.08),
+    matAccent
+  );
+  const angle = i * Math.PI / 2;
+  tick.position.set(Math.cos(angle) * 0.42, 0.057, Math.sin(angle) * 0.42);
+  tick.rotation.y = -angle;
+  turntable.add(tick);
+}
+
+// === PHONE (child of turntable — spins with disk) ===
+const phoneGroup = new THREE.Group();
+phoneGroup.position.set(0, 0.08, 0);
+turntable.add(phoneGroup);
+
+const phoneBody = new THREE.Mesh(
+  new THREE.BoxGeometry(0.34, 0.04, 0.72),
+  matPhone
+);
+phoneBody.castShadow = true;
+phoneGroup.add(phoneBody);
+
+const phoneScreen = new THREE.Mesh(
+  new THREE.PlaneGeometry(0.3, 0.68),
+  matScreen
+);
+phoneScreen.rotation.x = -Math.PI / 2;
+phoneScreen.position.y = 0.021;
+phoneGroup.add(phoneScreen);
+
+const phoneBump = new THREE.Mesh(
+  new THREE.BoxGeometry(0.11, 0.012, 0.11),
+  new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.7, roughness: 0.3 })
+);
+phoneBump.position.set(-0.07, -0.024, 0.25);
+phoneGroup.add(phoneBump);
+
+// ===== CONVEYOR BELT =====
+// Extends through the front slot: from just past the disk (z ≈ -0.1 inside) out through the front (z = D/2 + 1.8 outside)
+const beltStartZ = -0.1;
+const beltEndZ = D/2 + 1.8;
+const beltLen = beltEndZ - beltStartZ;
+const beltCenterZ = (beltStartZ + beltEndZ) / 2;
+const beltY = diskY + 0.04; // top surface matches disk top
+const beltTopY = beltY;
+
+const conveyorGroup = new THREE.Group();
+scene.add(conveyorGroup);
+
+// Belt surface (top)
+const beltTop = new THREE.Mesh(
+  new THREE.BoxGeometry(0.42, 0.02, beltLen),
+  matBelt
+);
+beltTop.position.set(0, beltTopY - 0.01, beltCenterZ);
+beltTop.receiveShadow = true;
+conveyorGroup.add(beltTop);
+
+// Belt lower plate (structural)
+const beltPlate = new THREE.Mesh(
+  new THREE.BoxGeometry(0.48, 0.04, beltLen - 0.2),
+  matBeltEdge
+);
+beltPlate.position.set(0, beltTopY - 0.08, beltCenterZ);
+conveyorGroup.add(beltPlate);
+
+// Belt side rails
+const beltRailL = new THREE.Mesh(
+  new THREE.BoxGeometry(0.02, 0.08, beltLen - 0.2),
+  matFrame
+);
+beltRailL.position.set(-0.22, beltTopY - 0.02, beltCenterZ);
+conveyorGroup.add(beltRailL);
+
+const beltRailR = beltRailL.clone();
+beltRailR.position.set(0.22, beltTopY - 0.02, beltCenterZ);
+conveyorGroup.add(beltRailR);
+
+// Conveyor support legs (outside the cabinet only)
+for (const lz of [D/2 + 0.4, D/2 + 1.55]) {
+  const leg = new THREE.Mesh(
+    new THREE.BoxGeometry(0.05, beltTopY - 0.08, 0.05),
+    matFrame
+  );
+  leg.position.set(-0.2, (beltTopY - 0.08) / 2, lz);
+  leg.castShadow = true;
+  conveyorGroup.add(leg);
+  const legR = leg.clone();
+  legR.position.x = 0.2;
+  conveyorGroup.add(legR);
+}
+
+// Rollers at each end (visible outside the cabinet)
+function makeRoller(z) {
+  const roller = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.06, 0.06, 0.5, 18),
+    matRoller
+  );
+  roller.rotation.z = Math.PI / 2;
+  roller.position.set(0, beltTopY - 0.06, z);
+  roller.castShadow = true;
+  return roller;
+}
+conveyorGroup.add(makeRoller(D/2 + 0.3));
+conveyorGroup.add(makeRoller(D/2 + 1.65));
+
+// Belt surface ridges (visual texture hinting at motion)
+for (let i = 0; i < 8; i++) {
+  const ridge = new THREE.Mesh(
+    new THREE.BoxGeometry(0.4, 0.003, 0.02),
+    new THREE.MeshStandardMaterial({ color: 0x1f252e, metalness: 0.3, roughness: 0.7 })
+  );
+  ridge.position.set(0, beltTopY + 0.001, D/2 + 0.35 + i * 0.18);
+  conveyorGroup.add(ridge);
+}
+
+// ===== CARRIER DEVICE ON BELT =====
+// Separate from the phone on the disk. Visible only during LOAD and EJECT.
+const beltPhone = new THREE.Group();
+beltPhone.position.set(0, beltTopY + 0.025, beltEndZ - 0.3);
+beltPhone.visible = false;
+scene.add(beltPhone);
+
+const beltPhoneBody = new THREE.Mesh(
+  new THREE.BoxGeometry(0.34, 0.04, 0.72),
+  matPhone
+);
+beltPhoneBody.castShadow = true;
+beltPhone.add(beltPhoneBody);
+
+const beltPhoneScreen = new THREE.Mesh(
+  new THREE.PlaneGeometry(0.3, 0.68),
+  matScreen
+);
+beltPhoneScreen.rotation.x = -Math.PI / 2;
+beltPhoneScreen.position.y = 0.021;
+beltPhone.add(beltPhoneScreen);
+
+const beltPhoneBump = new THREE.Mesh(
+  new THREE.BoxGeometry(0.11, 0.012, 0.11),
+  new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.7, roughness: 0.3 })
+);
+beltPhoneBump.position.set(-0.07, -0.024, 0.25);
+beltPhone.add(beltPhoneBump);
+
+// ===== TOP CAMERA + DARK-FIELD RING =====
+function makeFixedCamera(position, lookAt) {
+  const cam = new THREE.Group();
+  cam.position.copy(position);
+
+  const bracket = new THREE.Mesh(
+    new THREE.BoxGeometry(0.12, 0.12, 0.2),
+    matFrame
+  );
+  bracket.castShadow = true;
+  cam.add(bracket);
+
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.18, 0.15, 0.18),
+    matCamBody
+  );
+  body.position.z = 0.14;
+  body.castShadow = true;
+  cam.add(body);
+
+  const lens = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.055, 0.065, 0.14, 20),
+    matCamLens
+  );
+  lens.rotation.x = Math.PI / 2;
+  lens.position.z = 0.29;
+  lens.castShadow = true;
+  cam.add(lens);
+
+  const lensGlass = new THREE.Mesh(
+    new THREE.CircleGeometry(0.05, 20),
+    matCamGlass
+  );
+  lensGlass.position.z = 0.365;
+  cam.add(lensGlass);
+
+  const statusLED = new THREE.Mesh(
+    new THREE.SphereGeometry(0.018, 8, 8),
+    matStatusGreen.clone()
+  );
+  statusLED.position.set(0.07, 0.07, 0.15);
+  cam.add(statusLED);
+  cam.userData.statusLED = statusLED;
+
+  cam.lookAt(lookAt);
+  return cam;
+}
+
+const diskCenter = new THREE.Vector3(0, diskY + 0.1, 0);
+
+// Top camera: ceiling-mounted, pointing down
+const topCam = makeFixedCamera(new THREE.Vector3(0, H - 0.35, 0), diskCenter);
+topCam.userData.label = 'TOP CAM';
+scene.add(topCam);
+
+// Top camera cable/arm into ceiling
+const topCamArm = new THREE.Mesh(
+  new THREE.BoxGeometry(0.08, 0.3, 0.08),
+  matFrame
+);
+topCamArm.position.set(0, H - 0.2, 0);
+cabinet.add(topCamArm);
+
+// === DARK-FIELD RING (around top camera, positioned BELOW it, between cam and device) ===
+const darkFieldRing = new THREE.Group();
+darkFieldRing.position.set(0, H - 0.75, 0);
+scene.add(darkFieldRing);
+
+// Main emissive torus
+const ringTorus = new THREE.Mesh(
+  new THREE.TorusGeometry(0.38, 0.035, 12, 40),
+  matRingOff.clone()
+);
+ringTorus.rotation.x = Math.PI / 2;
+darkFieldRing.add(ringTorus);
+darkFieldRing.userData.torus = ringTorus;
+
+// Ring body / housing
+const ringBody = new THREE.Mesh(
+  new THREE.TorusGeometry(0.38, 0.05, 12, 40),
+  matCamBody
+);
+ringBody.rotation.x = Math.PI / 2;
+ringBody.position.y = 0.015;
+darkFieldRing.add(ringBody);
+
+// Grazing-angle skirt (implies light pointing inward at low angle)
+const ringSkirt = new THREE.Mesh(
+  new THREE.RingGeometry(0.32, 0.42, 36),
+  new THREE.MeshStandardMaterial({
+    color: 0xfff0c0,
+    emissive: 0xfff0c0,
+    emissiveIntensity: 0.6,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.45,
+  })
+);
+ringSkirt.rotation.x = -Math.PI / 2;
+ringSkirt.position.y = -0.02;
+darkFieldRing.add(ringSkirt);
+darkFieldRing.userData.skirt = ringSkirt;
+
+// Subtle point light for glow (not shadow-casting — just visual)
+const ringPointLight = new THREE.PointLight(0xfff0c0, 0.9, 3.5);
+ringPointLight.position.set(0, -0.1, 0);
+darkFieldRing.add(ringPointLight);
+darkFieldRing.userData.light = ringPointLight;
+
+// Mounting stems from ring to ceiling
+for (let i = 0; i < 3; i++) {
+  const a = i * (Math.PI * 2 / 3);
+  const stem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.015, 0.015, 0.45, 8),
+    matFrame
+  );
+  stem.position.set(Math.cos(a) * 0.38, H - 0.52, Math.sin(a) * 0.38);
+  scene.add(stem);
+}
+
+// ===== SIDE CAMERA + SIDE-FILL DIFFUSER =====
+// Side cam on LEFT wall, aimed right toward disk center
+const sideCam = makeFixedCamera(new THREE.Vector3(-W/2 + 0.25, diskY + 0.08, 0), diskCenter);
+sideCam.userData.label = 'SIDE CAM';
+scene.add(sideCam);
+
+// Bracket attaching side cam to wall
+const sideCamBracket = new THREE.Mesh(
+  new THREE.BoxGeometry(0.15, 0.08, 0.08),
+  matFrame
+);
+sideCamBracket.position.set(-W/2 + 0.1, diskY + 0.08, 0);
+cabinet.add(sideCamBracket);
+
+// Ring-light around side camera lens (contributes to shadowless side illumination)
+const sideRing = new THREE.Mesh(
+  new THREE.TorusGeometry(0.11, 0.015, 10, 28),
+  matRingOff.clone()
+);
+sideRing.position.set(-W/2 + 0.52, diskY + 0.08, 0);
+sideRing.rotation.y = Math.PI / 2;
+scene.add(sideRing);
+
+// === SIDE-FILL DIFFUSER PANEL (right wall, opposite the side cam) ===
+const diffuserGroup = new THREE.Group();
+diffuserGroup.position.set(W/2 - 0.08, diskY + 0.05, 0);
+scene.add(diffuserGroup);
+
+// Frame
+const diffuserFrame = new THREE.Mesh(
+  new THREE.BoxGeometry(0.06, 1.2, 1.5),
+  matFrame
+);
+diffuserGroup.add(diffuserFrame);
+
+// Emissive face
+const diffuserFace = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.1, 1.4),
+  matDiffuserOff.clone()
+);
+diffuserFace.rotation.y = -Math.PI / 2;
+diffuserFace.position.x = -0.04;
+diffuserGroup.add(diffuserFace);
+diffuserGroup.userData.face = diffuserFace;
+
+// Softbox effect — a wide point light
+const diffuserLight = new THREE.PointLight(0xffffff, 1.2, 5);
+diffuserLight.position.set(-0.3, 0, 0);
+diffuserGroup.add(diffuserLight);
+diffuserGroup.userData.light = diffuserLight;
+
+// Small mounting strip
+const diffuserStrip = new THREE.Mesh(
+  new THREE.BoxGeometry(0.04, 0.04, 1.5),
+  matAccent
+);
+diffuserStrip.position.set(-0.06, 0.6, 0);
+diffuserGroup.add(diffuserStrip);
+
+// ===== Animation State =====
+const anim = {
+  playing: true,
+  t: 0,
+  stage: 0,
+  stageStart: 0,
+  captureCount: 0,
+  lastCaptureStage: -1,
+  // Captured "at start of stage" values so each stage lerps from wherever the scene actually is
+  startDisk: 0,
+  startDoor: 0,
+  startFlip: 0,
+  startBeltZ: beltEndZ - 0.3,
+};
+
+// Each stage: duration, label, disk target angle (radians), door open fraction 0..1,
+// belt phone z (world), belt phone visible, disk phone visible, capture flag, face flip fraction
+const stages = [
+  // FACE A
+  { dur: 2.2, label: 'LOAD — CONVEYOR IN', disk: 0, door: 0, beltZ0: beltEndZ - 0.3, beltZ1: 0, beltVis: true, diskVis: false, capture: false, flipFrac: 0 },
+  { dur: 0.6, label: 'HAND-OFF TO DISK',   disk: 0, door: 0, beltZ0: 0, beltZ1: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 0 },
+  { dur: 1.3, label: 'CAPTURE — FACE A, POS 1 (0°)',   disk: 0,            door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 0 },
+  { dur: 1.2, label: 'ROTATING TO 90°',                 disk: Math.PI / 2,   door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 0 },
+  { dur: 1.3, label: 'CAPTURE — FACE A, POS 2 (90°)',  disk: Math.PI / 2,   door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 0 },
+  { dur: 1.2, label: 'ROTATING TO 180°',                disk: Math.PI,       door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 0 },
+  { dur: 1.3, label: 'CAPTURE — FACE A, POS 3 (180°)', disk: Math.PI,       door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 0 },
+  { dur: 1.2, label: 'ROTATING TO 270°',                disk: 3*Math.PI / 2, door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 0 },
+  { dur: 1.3, label: 'CAPTURE — FACE A, POS 4 (270°)', disk: 3*Math.PI / 2, door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 0 },
+  { dur: 1.2, label: 'RETURN TO 0°',                    disk: 2*Math.PI,     door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 0 },
+
+  // MANUAL FLIP
+  { dur: 1.4, label: 'DOOR OPENING',            disk: 2*Math.PI, door: 1, beltVis: false, diskVis: true, capture: false, flipFrac: 0 },
+  { dur: 2.2, label: 'MANUAL FLIP (OPERATOR)',  disk: 2*Math.PI, door: 1, beltVis: false, diskVis: true, capture: false, flipFrac: 1 },
+  { dur: 1.2, label: 'DOOR CLOSING',            disk: 2*Math.PI, door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 1 },
+
+  // FACE B — same capture cycle, phone stays flipped
+  { dur: 1.3, label: 'CAPTURE — FACE B, POS 1 (0°)',   disk: 2*Math.PI,            door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 1 },
+  { dur: 1.2, label: 'ROTATING TO 90°',                 disk: 2*Math.PI + Math.PI/2, door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 1 },
+  { dur: 1.3, label: 'CAPTURE — FACE B, POS 2 (90°)',  disk: 2*Math.PI + Math.PI/2, door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 1 },
+  { dur: 1.2, label: 'ROTATING TO 180°',                disk: 2*Math.PI + Math.PI,   door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 1 },
+  { dur: 1.3, label: 'CAPTURE — FACE B, POS 3 (180°)', disk: 2*Math.PI + Math.PI,   door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 1 },
+  { dur: 1.2, label: 'ROTATING TO 270°',                disk: 2*Math.PI + 3*Math.PI/2, door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 1 },
+  { dur: 1.3, label: 'CAPTURE — FACE B, POS 4 (270°)', disk: 2*Math.PI + 3*Math.PI/2, door: 0, beltVis: false, diskVis: true, capture: true,  flipFrac: 1 },
+  { dur: 1.2, label: 'RETURN TO 0°',                    disk: 4*Math.PI,             door: 0, beltVis: false, diskVis: true, capture: false, flipFrac: 1 },
+
+  // EJECT
+  { dur: 0.6, label: 'HAND-OFF TO CONVEYOR', disk: 4*Math.PI, door: 0, beltZ0: 0, beltZ1: 0, beltVis: true, diskVis: false, capture: false, flipFrac: 1 },
+  { dur: 2.2, label: 'EJECT — CONVEYOR OUT', disk: 4*Math.PI, door: 0, beltZ0: 0, beltZ1: beltEndZ - 0.3, beltVis: true, diskVis: false, capture: false, flipFrac: 1 },
+  { dur: 1.4, label: 'CYCLE COMPLETE',        disk: 4*Math.PI, door: 0, beltVis: false, diskVis: false, capture: false, flipFrac: 0 },
+];
+
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+// Capture-flash collections
+const captureCams = [topCam, sideCam];
+const captureLights = [
+  { face: darkFieldRing.userData.torus, baseIntensity: 0.9, burstIntensity: 2.8, light: darkFieldRing.userData.light, baseLight: 0.9, burstLight: 2.6 },
+  { face: diffuserGroup.userData.face,  baseIntensity: 1.1, burstIntensity: 2.8, light: diffuserGroup.userData.light, baseLight: 1.2, burstLight: 3.0 },
+];
+
+const DOOR_OPEN_ANGLE = -Math.PI / 2 * 0.95;
+
+function captureStageStart() {
+  anim.startDisk = turntable.rotation.y;
+  anim.startDoor = doorGroup.rotation.x / DOOR_OPEN_ANGLE; // back to 0..1
+  anim.startFlip = phoneGroup.rotation.z / Math.PI;        // back to 0..1
+  anim.startBeltZ = beltPhone.position.z;
+}
+
+function updateAnimation(dt) {
+  if (!anim.playing) return;
+
+  anim.t += dt;
+  const cur = stages[anim.stage];
+  const elapsed = anim.t - anim.stageStart;
+  const progress = Math.min(elapsed / cur.dur, 1.0);
+  const eased = easeInOut(progress);
+
+  // --- Disk rotation ---
+  turntable.rotation.y = lerp(anim.startDisk, cur.disk, eased);
+
+  // --- Door rotation ---
+  const doorFrac = lerp(anim.startDoor, cur.door, eased);
+  doorGroup.rotation.x = doorFrac * DOOR_OPEN_ANGLE;
+
+  // --- Phone flip (rotation around long axis) ---
+  phoneGroup.rotation.z = lerp(anim.startFlip, cur.flipFrac, eased) * Math.PI;
+
+  // --- Disk phone visibility ---
+  phoneGroup.visible = cur.diskVis;
+
+  // --- Belt phone ---
+  beltPhone.visible = cur.beltVis;
+  if (cur.beltVis && cur.beltZ0 !== undefined && cur.beltZ1 !== undefined) {
+    beltPhone.position.z = lerp(cur.beltZ0, cur.beltZ1, eased);
+  }
+
+  // --- Capture burst visual ---
+  if (cur.capture && progress > 0.3 && progress < 0.75) {
+    captureCams.forEach(c => {
+      if (c.userData.statusLED) {
+        c.userData.statusLED.material.emissive.setHex(0xffffff);
+        c.userData.statusLED.material.emissiveIntensity = 3.5;
+      }
+    });
+    captureLights.forEach(l => {
+      l.face.material.emissiveIntensity = l.burstIntensity;
+      l.light.intensity = l.burstLight;
+    });
+    // Increment once per stage (top + side = 2 images)
+    if (anim.lastCaptureStage !== anim.stage) {
+      anim.captureCount += 2;
+      document.getElementById('captureNum').textContent = anim.captureCount;
+      anim.lastCaptureStage = anim.stage;
+    }
+  } else {
+    captureCams.forEach(c => {
+      if (c.userData.statusLED) {
+        c.userData.statusLED.material.emissive.setHex(0x00ff60);
+        c.userData.statusLED.material.emissiveIntensity = 1;
+      }
+    });
+    captureLights.forEach(l => {
+      l.face.material.emissiveIntensity = l.baseIntensity;
+      l.light.intensity = l.baseLight;
+    });
+  }
+
+  // --- Reset counter at start of cycle ---
+  if (cur.label === 'LOAD — CONVEYOR IN' && progress < 0.05) {
+    anim.captureCount = 0;
+    anim.lastCaptureStage = -1;
+    document.getElementById('captureNum').textContent = '0';
+  }
+
+  document.getElementById('stage').textContent = `STAGE: ${cur.label}`;
+
+  if (progress >= 1.0) {
+    anim.stage = (anim.stage + 1) % stages.length;
+    anim.stageStart = anim.t;
+    // Snap disk + flip at cycle boundary so we don't unwind 4π backwards
+    if (anim.stage === 0) {
+      turntable.rotation.y = 0;
+      phoneGroup.rotation.z = 0;
+    }
+    captureStageStart();
+  }
+}
+
+// Initialize at stage 0
+captureStageStart();
+
+// ===== Buttons =====
+document.getElementById('toggleAnim').addEventListener('click', (e) => {
+  anim.playing = !anim.playing;
+  e.target.textContent = anim.playing ? '⏸ Pause Animation' : '▶ Play Animation';
+});
+
+let cabinetVisible = true;
+document.getElementById('toggleCabinet').addEventListener('click', (e) => {
+  cabinetVisible = !cabinetVisible;
+  cabinet.visible = cabinetVisible;
+  e.target.textContent = cabinetVisible ? '👁 Hide Cabinet' : '👁 Show Cabinet';
+});
+
+document.getElementById('resetView').addEventListener('click', () => {
+  camera.position.copy(initialCamPos);
+  controls.target.set(0, 1.3, 0);
+  controls.update();
+});
+
+// ===== Resize =====
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== Render Loop =====
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  updateAnimation(dt);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

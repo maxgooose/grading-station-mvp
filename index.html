@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Competitor Hardware Reference — Grading Station</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+  header {
+    margin-bottom: 50px;
+  }
+  .eyebrow {
+    color: #6db9ff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  h1 {
+    margin: 0 0 12px 0;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #e8eef5 0%, #6db9ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    color: #8fa3b8;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 700px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .card {
+    background: linear-gradient(135deg, rgba(15, 22, 33, 0.9) 0%, rgba(20, 30, 45, 0.6) 100%);
+    border: 1px solid rgba(100, 180, 255, 0.15);
+    border-radius: 16px;
+    padding: 28px 26px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+  .card.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .card:not(.disabled):hover {
+    transform: translateY(-3px);
+    border-color: rgba(109, 185, 255, 0.5);
+    box-shadow: 0 10px 30px rgba(109, 185, 255, 0.1);
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent, #6db9ff), transparent);
+  }
+  .card[data-accent="green"]  { --accent: #2d8a4f; }
+  .card[data-accent="orange"] { --accent: #e8b020; }
+  .card[data-accent="purple"] { --accent: #a86dff; }
+  .card[data-accent="red"]    { --accent: #e85070; }
+  .card[data-accent="cyan"]   { --accent: #20c0c0; }
+  .card .name {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: #e8eef5;
+  }
+  .card .vendor {
+    font-size: 11px;
+    color: var(--accent, #6db9ff);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .card .desc {
+    font-size: 13px;
+    color: #8fa3b8;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    min-height: 60px;
+  }
+  .card .specs {
+    border-top: 1px solid rgba(100, 180, 255, 0.1);
+    padding-top: 14px;
+    font-size: 12px;
+  }
+  .card .spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+  }
+  .card .spec-k { color: #8fa3b8; }
+  .card .spec-v { color: #e8eef5; font-weight: 500; }
+  .card .status {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8fa3b8;
+    background: rgba(255,255,255,0.05);
+    padding: 4px 8px;
+    border-radius: 10px;
+  }
+  .card .status.live {
+    color: #6dffa0;
+    background: rgba(109, 255, 160, 0.1);
+  }
+  footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(100, 180, 255, 0.1);
+    color: #5a6d80;
+    font-size: 11px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="eyebrow">Universal Cellular — Hardware Reference</div>
+      <h1>Competitor Grading Stations</h1>
+      <p class="subtitle">
+        Interactive 3D models of commercial automated phone cosmetic grading systems.
+        Used as reference architecture for our own grading station design.
+      </p>
+    </header>
+
+    <div class="grid">
+      <a href="universal-cellular-3d.html" class="card" data-accent="orange" style="border-color: rgba(232,176,32,0.45);">
+        <div class="status live" style="color:#e8b020; background: rgba(232,176,32,0.14);">★ OURS</div>
+        <div class="vendor">Universal Cellular</div>
+        <div class="name">Grading Station (Prototype)</div>
+        <div class="desc">
+          Compact tabletop cabinet with bidirectional conveyor, spinning disk, and dual-capture optics
+          (dark-field top + diffuse side fill). Single manual step: operator flips device between faces.
+        </div>
+        <div class="specs">
+          <div class="spec-row"><span class="spec-k">Architecture</span><span class="spec-v">Cabinet + turntable</span></div>
+          <div class="spec-row"><span class="spec-k">Footprint</span><span class="spec-v">3 × 3 × 3 ft</span></div>
+          <div class="spec-row"><span class="spec-k">Cameras</span><span class="spec-v">2 (top + side)</span></div>
+          <div class="spec-row"><span class="spec-k">Operator</span><span class="spec-v">Manual flip only</span></div>
+        </div>
+      </a>
+
+      <a href="phonecheck-3d.html" class="card" data-accent="cyan">
+        <div class="status live">● Live</div>
+        <div class="vendor">Phonecheck</div>
+        <div class="name">Phonecheck Robot</div>
+        <div class="desc">
+          Static walk-up cabinet with multi-camera array and turntable.
+          No robot arm — fixed cameras capture all angles as the device rotates.
+        </div>
+        <div class="specs">
+          <div class="spec-row"><span class="spec-k">Architecture</span><span class="spec-v">Cabinet + turntable</span></div>
+          <div class="spec-row"><span class="spec-k">Footprint</span><span class="spec-v">6 × 6 × 7 ft</span></div>
+          <div class="spec-row"><span class="spec-k">Throughput</span><span class="spec-v">55 / hr</span></div>
+          <div class="spec-row"><span class="spec-k">Feasibility for us</span><span class="spec-v" style="color:#6dffa0">★★★ HIGH</span></div>
+        </div>
+      </a>
+
+      <a href="griffyn-deepsight-3d.html" class="card" data-accent="green">
+        <div class="status live">● Live</div>
+        <div class="vendor">Griffyn Robotech</div>
+        <div class="name">DEEPSIGHT</div>
+        <div class="desc">
+          5-axis Beckhoff servo manipulator that flips the device through 6 sides
+          in front of a single fixed camera. Industry benchmark: 40μm defect detection.
+        </div>
+        <div class="specs">
+          <div class="spec-row"><span class="spec-k">Architecture</span><span class="spec-v">Robot arm + 1 cam</span></div>
+          <div class="spec-row"><span class="spec-k">Defect res.</span><span class="spec-v">40μm × 3μm</span></div>
+          <div class="spec-row"><span class="spec-k">Throughput</span><span class="spec-v">60 / hr</span></div>
+          <div class="spec-row"><span class="spec-k">Feasibility for us</span><span class="spec-v" style="color:#e85070">★ LOW</span></div>
+        </div>
+      </a>
+
+      <div class="card disabled" data-accent="orange">
+        <div class="status">Planned</div>
+        <div class="vendor">Ingram Micro</div>
+        <div class="name">REV Racetrack</div>
+        <div class="desc">
+          20×4 ft oval conveyor with 256 device positions in continuous motion.
+          Photometric scanning at fixed inspection stations. Highest throughput in industry.
+        </div>
+        <div class="specs">
+          <div class="spec-row"><span class="spec-k">Architecture</span><span class="spec-v">Conveyor racetrack</span></div>
+          <div class="spec-row"><span class="spec-k">Footprint</span><span class="spec-v">20 × 4 ft</span></div>
+          <div class="spec-row"><span class="spec-k">Throughput</span><span class="spec-v">480 / hr</span></div>
+          <div class="spec-row"><span class="spec-k">Feasibility for us</span><span class="spec-v" style="color:#e8b020">★★ MEDIUM</span></div>
+        </div>
+      </div>
+
+      <div class="card disabled" data-accent="purple">
+        <div class="status">Planned</div>
+        <div class="vendor">Apkudo</div>
+        <div class="name">Full Automation Line</div>
+        <div class="desc">
+          Modular processing cells linked by conveyors. 8+ stages including
+          cosmetic inspection, functional test, data erasure. Door-width units.
+        </div>
+        <div class="specs">
+          <div class="spec-row"><span class="spec-k">Architecture</span><span class="spec-v">Modular cells</span></div>
+          <div class="spec-row"><span class="spec-k">Stages</span><span class="spec-v">8+ inline</span></div>
+          <div class="spec-row"><span class="spec-k">Throughput</span><span class="spec-v">250–300 / hr</span></div>
+          <div class="spec-row"><span class="spec-k">Feasibility for us</span><span class="spec-v" style="color:#e85070">★ LOW</span></div>
+        </div>
+      </div>
+
+      <div class="card disabled" data-accent="red">
+        <div class="status">Planned</div>
+        <div class="vendor">NSYS Group</div>
+        <div class="name">Reeva Nova</div>
+        <div class="desc">
+          Compact tray-based unit. Operator places device, lid closes, fully automated test.
+          Lowest throughput, lowest price ($4,990). Closest spiritual cousin to our station.
+        </div>
+        <div class="specs">
+          <div class="spec-row"><span class="spec-k">Architecture</span><span class="spec-v">Closed tray unit</span></div>
+          <div class="spec-row"><span class="spec-k">Price</span><span class="spec-v">$4,990</span></div>
+          <div class="spec-row"><span class="spec-k">Throughput</span><span class="spec-v">14 / hr</span></div>
+          <div class="spec-row"><span class="spec-k">Feasibility for us</span><span class="spec-v" style="color:#6dffa0">★★★ HIGH</span></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Competitor research compiled from public sources, patents, and trade press.
+      Models are stylized representations — not engineering replicas.
+    </footer>
+  </div>
+</body>
+</html>

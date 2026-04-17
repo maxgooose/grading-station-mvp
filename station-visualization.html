@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grading Station — Step-by-Step Visualization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #666666;
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  /* Main layout */
+  .main-container {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    max-width: 1300px;
+    width: 100%;
+  }
+  .viz-panel {
+    flex: 1;
+    min-width: 0;
+  }
+  .info-panel {
+    width: 320px;
+    flex-shrink: 0;
+  }
+
+  /* SVG canvas */
+  .svg-wrap {
+    background: #0a0a0a;
+    border: 1px solid #222222;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  svg { display: block; width: 100%; height: auto; }
+
+  /* Step info card */
+  .step-card {
+    background: #0a0a0a;
+    border: 1px solid #222222;
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .step-label {
+    font-size: 11px;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .step-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: #999999;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  .step-desc strong { color: #ffffff; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .stat-box {
+    background: #0a0a0a;
+    border: 1px solid #222222;
+    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+  }
+  .stat-label {
+    font-size: 9px;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .controls button {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid #333333;
+    border-radius: 2px;
+    padding: 10px 22px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .controls button:hover {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+  }
+  .controls button.primary {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
+    font-weight: 700;
+  }
+  .controls button.primary:hover { background: #cccccc; border-color: #cccccc; }
+  .controls button:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
+
+  /* Step dots */
+  .step-dots {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #111111;
+    border: 1px solid #333333;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .dot.active {
+    background: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 0 6px rgba(255,255,255,0.3);
+  }
+  .dot.done { background: #444444; border-color: #666666; }
+
+  /* Photo indicators */
+  .photos-taken {
+    background: #0a0a0a;
+    border: 1px solid #222222;
+    border-radius: 4px;
+    padding: 16px;
+  }
+  .photos-taken h3 {
+    font-size: 10px;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .photo-slot {
+    background: #050505;
+    border: 1px solid #222222;
+    border-radius: 2px;
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 10px;
+    color: #444444;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.4s;
+  }
+  .photo-slot.captured {
+    border-color: #ffffff;
+    color: #ffffff;
+    background: #111111;
+  }
+  .photo-slot .icon { font-size: 16px; margin-bottom: 2px; }
+
+  /* Camera flash animation */
+  @keyframes flash {
+    0% { opacity: 0; }
+    15% { opacity: 0.6; }
+    100% { opacity: 0; }
+  }
+  .camera-flash {
+    animation: flash 0.8s ease-out;
+  }
+
+  /* Smooth transitions on SVG elements */
+  .animated {
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.6s ease;
+  }
+
+  /* Glow effect for active cameras */
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  .cam-active {
+    animation: pulse-glow 0.6s ease-in-out 3;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #0a0a0a;
+    border: 1px solid #222222;
+    border-radius: 2px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+  .legend-swatch {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Automated Device Grading Station</h1>
+<p class="subtitle">Sandwich Flip Capture Sequence &mdash; Cross-Section View</p>
+
+<div class="main-container">
+  <!-- SVG Visualization -->
+  <div class="viz-panel">
+    <div class="svg-wrap">
+      <svg id="station" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="enclosureGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a1a1a"/>
+            <stop offset="100%" stop-color="#111111"/>
+          </linearGradient>
+          <linearGradient id="padGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+          </linearGradient>
+          <linearGradient id="aluminumGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#888888"/>
+            <stop offset="100%" stop-color="#555555"/>
+          </linearGradient>
+          <linearGradient id="deviceGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#333333"/>
+            <stop offset="100%" stop-color="#1a1a1a"/>
+          </linearGradient>
+          <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#222222"/>
+            <stop offset="100%" stop-color="#111111"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="bigGlow">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- LED strip pattern -->
+          <pattern id="ledStrip" x="0" y="0" width="16" height="4" patternUnits="userSpaceOnUse">
+            <rect width="10" height="3" rx="1" fill="#fbbf24" opacity="0.6"/>
+          </pattern>
+        </defs>
+
+        <!-- ========== ENCLOSURE ========== -->
+        <!-- Outer box -->
+        <rect x="80" y="30" width="640" height="440" rx="2"
+              fill="url(#enclosureGrad)" stroke="#333333" stroke-width="1"/>
+        <!-- Inner cavity -->
+        <rect x="110" y="55" width="580" height="390" rx="2"
+              fill="#050505" stroke="#222222" stroke-width="1"/>
+
+        <!-- LED panels (left, top, right) -->
+        <g id="led-panels" opacity="0.5">
+          <!-- Left LED panel -->
+          <rect x="112" y="70" width="8" height="360" fill="#ffffff" opacity="0.08" rx="1"/>
+          <line x1="116" y1="80" x2="116" y2="420" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,6" opacity="0.2"/>
+          <!-- Right LED panel -->
+          <rect x="680" y="70" width="8" height="360" fill="#ffffff" opacity="0.08" rx="1"/>
+          <line x1="684" y1="80" x2="684" y2="420" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,6" opacity="0.2"/>
+          <!-- Top LED panel -->
+          <rect x="130" y="57" width="540" height="8" fill="#ffffff" opacity="0.08" rx="1"/>
+          <line x1="140" y1="61" x2="660" y2="61" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="6,6" opacity="0.2"/>
+          <!-- Polarizing film labels -->
+          <text x="100" y="255" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" opacity="0.3" letter-spacing="1.5" transform="rotate(-90,100,255)">POLAR FILM + LEDs</text>
+          <text x="700" y="255" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" opacity="0.3" letter-spacing="1.5" transform="rotate(90,700,255)">POLAR FILM + LEDs</text>
+        </g>
+
+        <!-- ========== ROTATION ASSEMBLY ========== -->
+        <g id="rotation-assembly">
+          <!-- Rotation axis (bearings) -->
+          <circle cx="140" cy="280" r="10" fill="#111111" stroke="#444444" stroke-width="1"/>
+          <circle cx="140" cy="280" r="4" fill="#666666"/>
+          <circle cx="660" cy="280" r="10" fill="#111111" stroke="#444444" stroke-width="1"/>
+          <circle cx="660" cy="280" r="4" fill="#666666"/>
+          <!-- Axis labels -->
+          <text x="140" y="305" fill="#555555" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1">BEARING</text>
+          <text x="660" y="305" fill="#555555" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1">BEARING</text>
+
+          <!-- Shaft line (behind assembly) -->
+          <line x1="150" y1="280" x2="250" y2="280" stroke="#444444" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4"/>
+          <line x1="550" y1="280" x2="650" y2="280" stroke="#444444" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4"/>
+
+          <!-- ========== FLIP GROUP (this rotates) ========== -->
+          <g id="flip-group">
+            <!-- Bottom aluminum plate -->
+            <rect id="bottom-plate" x="250" y="285" width="300" height="6" rx="1"
+                  fill="url(#aluminumGrad)" stroke="#666666" stroke-width="0.5"/>
+            <!-- Bottom silicone pad -->
+            <rect id="bottom-pad" x="250" y="275" width="300" height="10" rx="2"
+                  fill="#ffffff" opacity="0.1" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.3"/>
+            <text x="400" y="300" fill="#ffffff" font-size="6" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.35" letter-spacing="1">SILICONE PAD — SHORE 20-30A</text>
+
+            <!-- ===== DEVICE ===== -->
+            <g id="device">
+              <!-- Phone body -->
+              <rect x="340" y="255" width="120" height="18" rx="3"
+                    fill="url(#deviceGrad)" stroke="#555555" stroke-width="1"/>
+              <!-- Screen (face up) -->
+              <rect id="device-screen" x="343" y="256" width="114" height="8" rx="2"
+                    fill="url(#screenGrad)" stroke="#444444" stroke-width="0.5"/>
+              <!-- Camera bump (bottom, sinks into pad) -->
+              <rect id="camera-bump" x="355" y="269" width="30" height="4" rx="2"
+                    fill="#0a0a0a" stroke="#333333" stroke-width="0.5"/>
+              <!-- Device label -->
+              <text id="device-label" x="400" y="250" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.5" letter-spacing="1">DEVICE (SCREEN UP)</text>
+            </g>
+
+            <!-- Top silicone pad -->
+            <g id="top-pad-group">
+              <rect id="top-pad" x="250" y="210" width="300" height="10" rx="2"
+                    fill="#ffffff" opacity="0.1" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.3"/>
+              <!-- Top aluminum plate -->
+              <rect id="top-plate" x="250" y="200" width="300" height="6" rx="1"
+                    fill="url(#aluminumGrad)" stroke="#666666" stroke-width="0.5"/>
+              <text x="400" y="196" fill="#ffffff" font-size="6" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.35" letter-spacing="1">SILICONE PAD + ALUMINUM</text>
+            </g>
+
+            <!-- Spring between actuator and top pad -->
+            <g id="spring-group">
+              <path id="spring" d="M400,165 L395,170 L405,177 L395,184 L405,191 L400,196"
+                    fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.4"/>
+              <text x="415" y="182" fill="#ffffff" font-size="6" font-family="Inter, sans-serif" opacity="0.35" letter-spacing="1">SPRING ~20N</text>
+            </g>
+
+            <!-- Lead screw actuator -->
+            <g id="actuator-group">
+              <rect x="395" y="130" width="10" height="35" rx="1"
+                    fill="#555555" stroke="#777777" stroke-width="0.5"/>
+              <text x="400" y="125" fill="#ffffff" font-size="6" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.4" letter-spacing="1">LEAD SCREW</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- ========== CAMERAS ========== -->
+        <!-- Top camera -->
+        <g id="top-camera">
+          <rect x="385" y="70" width="30" height="24" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="1"/>
+          <circle cx="400" cy="82" r="7" fill="#050505" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="400" cy="82" r="3" fill="#ffffff" opacity="0.3"/>
+          <text x="400" y="65" fill="#ffffff" font-size="8" font-family="Inter, sans-serif" text-anchor="middle" font-weight="600" letter-spacing="1.5">TOP CAM</text>
+          <!-- CPL filter label -->
+          <text x="425" y="80" fill="#888888" font-size="6" font-family="Inter, sans-serif" letter-spacing="1">CPL</text>
+        </g>
+        <!-- Top camera beam -->
+        <g id="top-cam-beam" opacity="0">
+          <polygon points="393,94 407,94 430,245 370,245" fill="#ffffff" opacity="0.04"/>
+          <line x1="400" y1="94" x2="400" y2="250" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/>
+        </g>
+
+        <!-- Left edge camera -->
+        <g id="left-camera">
+          <rect x="155" y="255" width="24" height="20" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="167" cy="265" r="5" fill="#050505" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="145" y="250" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1">L-EDGE</text>
+        </g>
+        <g id="left-cam-beam" opacity="0">
+          <polygon points="179,258 179,272 335,273 335,255" fill="#ffffff" opacity="0.04"/>
+          <line x1="179" y1="265" x2="338" y2="265" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.3"/>
+        </g>
+
+        <!-- Right edge camera -->
+        <g id="right-camera">
+          <rect x="621" y="255" width="24" height="20" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="633" cy="265" r="5" fill="#050505" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="655" y="250" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1">R-EDGE</text>
+        </g>
+        <g id="right-cam-beam" opacity="0">
+          <polygon points="621,258 621,272 465,273 465,255" fill="#ffffff" opacity="0.04"/>
+          <line x1="621" y1="265" x2="462" y2="265" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.3"/>
+        </g>
+
+        <!-- Top edge camera (shoots toward device top edge) -->
+        <g id="top-edge-camera">
+          <rect x="280" y="340" width="20" height="24" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="290" cy="352" r="5" fill="#050505" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="290" y="375" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1">T-EDGE</text>
+        </g>
+        <g id="top-edge-beam" opacity="0">
+          <line x1="290" y1="340" x2="345" y2="273" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.3"/>
+        </g>
+
+        <!-- Bottom edge camera (shoots toward device bottom edge) -->
+        <g id="bottom-edge-camera">
+          <rect x="500" y="340" width="20" height="24" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="510" cy="352" r="5" fill="#050505" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="510" y="375" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1">B-EDGE</text>
+        </g>
+        <g id="bottom-edge-beam" opacity="0">
+          <line x1="510" y1="340" x2="455" y2="273" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.3"/>
+        </g>
+
+        <!-- ========== MOTOR (left side) ========== -->
+        <g id="motor">
+          <rect x="85" y="260" width="40" height="40" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="105" y="277" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" font-weight="600" letter-spacing="0.5">NEMA</text>
+          <text x="105" y="287" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" font-weight="600">23</text>
+          <!-- Gearbox -->
+          <rect x="95" y="300" width="20" height="14" rx="1"
+                fill="#111111" stroke="#ffffff" stroke-width="0.5"/>
+          <text x="105" y="310" fill="#ffffff" font-size="6" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.7">5:1</text>
+        </g>
+
+        <!-- ========== ENCODER (right side) ========== -->
+        <g id="encoder">
+          <rect x="668" y="268" width="28" height="24" rx="2"
+                fill="#111111" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="682" y="283" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" text-anchor="middle" font-weight="500" letter-spacing="0.5">ENC</text>
+          <text x="682" y="303" fill="#666666" font-size="6" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="0.5">0 / 180</text>
+        </g>
+
+        <!-- ========== ENTRY/EXIT ARROWS ========== -->
+        <g id="entry-arrow" opacity="0.5">
+          <line x1="20" y1="270" x2="75" y2="270" stroke="#ffffff" stroke-width="1.5" marker-end="url(#arrowIn)"/>
+          <text x="10" y="260" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" font-weight="600" letter-spacing="2">IN</text>
+        </g>
+        <g id="exit-arrow" opacity="0.3">
+          <line x1="725" y1="270" x2="780" y2="270" stroke="#ffffff" stroke-width="1.5" marker-end="url(#arrowOut)"/>
+          <text x="762" y="260" fill="#ffffff" font-size="7" font-family="Inter, sans-serif" font-weight="600" letter-spacing="2">OUT</text>
+        </g>
+
+        <!-- Arrow markers -->
+        <defs>
+          <marker id="arrowIn" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0,0 8,3 0,6" fill="#ffffff"/>
+          </marker>
+          <marker id="arrowOut" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0,0 8,3 0,6" fill="#ffffff"/>
+          </marker>
+        </defs>
+
+        <!-- ========== SORT BINS (shown at exit side) ========== -->
+        <g id="sort-bins" opacity="0.3">
+          <rect x="740" y="230" width="40" height="24" rx="1" fill="none" stroke="#ffffff" stroke-width="0.8"/>
+          <text x="760" y="245" fill="#ffffff" font-size="10" font-family="Inter, sans-serif" text-anchor="middle" font-weight="700">A</text>
+          <rect x="740" y="258" width="40" height="24" rx="1" fill="none" stroke="#888888" stroke-width="0.8"/>
+          <text x="760" y="273" fill="#888888" font-size="10" font-family="Inter, sans-serif" text-anchor="middle" font-weight="700">B</text>
+          <rect x="740" y="286" width="40" height="24" rx="1" fill="none" stroke="#555555" stroke-width="0.8"/>
+          <text x="760" y="301" fill="#555555" font-size="10" font-family="Inter, sans-serif" text-anchor="middle" font-weight="700">C</text>
+        </g>
+
+        <!-- ========== CAMERA FLASH OVERLAY ========== -->
+        <rect id="flash-overlay" x="110" y="55" width="580" height="390" rx="2"
+              fill="#ffffff" opacity="0" pointer-events="none"/>
+
+        <!-- ========== ROTATION ARROW INDICATOR ========== -->
+        <g id="rotation-indicator" opacity="0">
+          <path d="M400,310 A30,30 0 0,1 400,340" fill="none" stroke="#ffffff" stroke-width="1.5"
+                marker-end="url(#arrowRotate)"/>
+          <text x="440" y="330" fill="#ffffff" font-size="8" font-family="Inter, sans-serif" font-weight="600" letter-spacing="1">180</text>
+        </g>
+        <defs>
+          <marker id="arrowRotate" markerWidth="8" markerHeight="6" refX="4" refY="3" orient="auto">
+            <polygon points="0,0 8,3 0,6" fill="#ffffff"/>
+          </marker>
+        </defs>
+
+        <!-- ========== DIMENSION LABELS ========== -->
+        <g opacity="0.3">
+          <text x="400" y="480" fill="#ffffff" font-size="8" font-family="Inter, sans-serif" text-anchor="middle" letter-spacing="1.5">300mm PAD WIDTH — COVERS iPAD PRO 12.9" WITH MARGIN</text>
+          <!-- Pad dimension line -->
+          <line x1="250" y1="472" x2="550" y2="472" stroke="#ffffff" stroke-width="0.5" opacity="0.4"/>
+          <line x1="250" y1="468" x2="250" y2="476" stroke="#ffffff" stroke-width="0.5" opacity="0.4"/>
+          <line x1="550" y1="468" x2="550" y2="476" stroke="#ffffff" stroke-width="0.5" opacity="0.4"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#3b82f6"></div> Silicone Pads
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#4a5a6a"></div> Aluminum Plates
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#fbbf24;opacity:0.5"></div> LED Panels + Polar Film
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#3b82f6"></div> Top Camera
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#10b981"></div> Edge Cameras
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#f59e0b"></div> T/B Edge Cameras
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+      <div class="controls">
+        <button id="btn-prev" disabled>&larr; Prev</button>
+        <button id="btn-next" class="primary">Next &rarr;</button>
+        <button id="btn-auto">Auto Play</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+      <div class="step-dots" id="step-dots"></div>
+    </div>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="info-panel">
+    <div class="step-card">
+      <div class="step-label" id="step-label">Step 0 of 8</div>
+      <div class="step-title" id="step-title">Ready</div>
+      <div class="step-desc" id="step-desc">
+        Press <strong>Next</strong> to begin the capture sequence. Each step shows how the device moves through the station.
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" id="stat-time">0s</div>
+        <div class="stat-label">Elapsed</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="stat-photos">0/7</div>
+        <div class="stat-label">Photos</div>
+      </div>
+    </div>
+
+    <div style="height:16px"></div>
+
+    <div class="photos-taken">
+      <h3>Captured Images</h3>
+      <div class="photo-grid">
+        <div class="photo-slot" id="ph-front"><div class="icon">&#9634;</div>Front</div>
+        <div class="photo-slot" id="ph-left"><div class="icon">&#9664;</div>L Edge</div>
+        <div class="photo-slot" id="ph-right"><div class="icon">&#9654;</div>R Edge</div>
+        <div class="photo-slot" id="ph-top"><div class="icon">&#9650;</div>T Edge</div>
+        <div class="photo-slot" id="ph-bottom"><div class="icon">&#9660;</div>B Edge</div>
+        <div class="photo-slot" id="ph-back"><div class="icon">&#9635;</div>Back</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    title: "Ready — Station Idle",
+    desc: "Station is empty and waiting. LEDs are on, cameras are powered, pads are in home position. Top pad is raised, bottom pad is flat and ready to receive a device.",
+    time: "0s",
+    photos: 0,
+    action: (dir) => {
+      resetAll();
+    }
+  },
+  {
+    title: "Device Enters — Screen Up",
+    desc: "Device slides in on a tray and rests <strong>screen-up</strong> on the bottom silicone pad. Camera bump sinks into the soft silicone (Shore 20-30A). Nothing touches or obstructs any surface.",
+    time: "~3s",
+    photos: 0,
+    action: (dir) => {
+      // Device slides in from left
+      const device = document.getElementById('device');
+      const entryArrow = document.getElementById('entry-arrow');
+      entryArrow.style.transition = 'opacity 0.5s';
+      entryArrow.style.opacity = '1';
+      // Highlight device
+      highlightElement('device', true);
+      // Flash LEDs brighter
+      document.getElementById('led-panels').style.transition = 'opacity 0.5s';
+      document.getElementById('led-panels').style.opacity = '0.8';
+    }
+  },
+  {
+    title: "Front Face Capture",
+    desc: "Top camera fires — captures the <strong>front screen</strong> in a clean, direct shot. CPL filter eliminates glare from glass screens. Cross-polarized light reveals scratches invisible under normal lighting.",
+    time: "~4s",
+    photos: 1,
+    capture: ['ph-front'],
+    action: (dir) => {
+      showBeam('top-cam-beam');
+      flashCamera('top-camera');
+      triggerFlash();
+    }
+  },
+  {
+    title: "Edge Capture — All 4 Simultaneous",
+    desc: "All <strong>4 edge cameras fire simultaneously</strong> — left, right, top edge, bottom edge. Captures charging port area, button sides, and all edges in one shot. Total capture time: ~1 second.",
+    time: "~5s",
+    photos: 5,
+    capture: ['ph-left', 'ph-right', 'ph-top', 'ph-bottom'],
+    action: (dir) => {
+      hideBeam('top-cam-beam');
+      showBeam('left-cam-beam');
+      showBeam('right-cam-beam');
+      showBeam('top-edge-beam');
+      showBeam('bottom-edge-beam');
+      flashCamera('left-camera');
+      flashCamera('right-camera');
+      flashCamera('top-edge-camera');
+      flashCamera('bottom-edge-camera');
+      triggerFlash();
+    }
+  },
+  {
+    title: "Top Pad Descends — Sandwich Clamp",
+    desc: "Lead screw actuator drives the top pad down. Spring provides consistent <strong>~20N clamping force</strong> regardless of device thickness (handles 6mm iPad to 16mm folded Z Flip). Device is now sandwiched between two silicone pads.",
+    time: "~6s",
+    photos: 5,
+    action: (dir) => {
+      hideAllBeams();
+      // Move top pad down to sandwich device
+      const topPadGroup = document.getElementById('top-pad-group');
+      const spring = document.getElementById('spring-group');
+      const actuator = document.getElementById('actuator-group');
+      topPadGroup.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      topPadGroup.style.transform = 'translateY(34px)';
+      spring.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      spring.style.transform = 'translateY(20px)';
+      actuator.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      actuator.style.transform = 'translateY(15px)';
+      // Show clamping indicator
+      setTimeout(() => {
+        highlightElement('top-pad-group', true);
+        highlightElement('bottom-pad', true);
+      }, 800);
+    }
+  },
+  {
+    title: "180 Rotation — Sandwich Flip",
+    desc: "NEMA 23 stepper + 5:1 planetary gearbox rotates the entire assembly <strong>180 degrees</strong> in ~1.5 seconds. Trapezoidal velocity profile (smooth accel/decel). Rotary encoder confirms the 180 position. Device is now <strong>face-down</strong>.",
+    time: "~8s",
+    photos: 5,
+    action: (dir) => {
+      // Rotate the flip group
+      const flipGroup = document.getElementById('flip-group');
+      flipGroup.style.transition = 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+      flipGroup.style.transformOrigin = '400px 280px';
+      flipGroup.style.transform = 'rotate(180deg)';
+      // Show rotation indicator
+      const rotInd = document.getElementById('rotation-indicator');
+      rotInd.style.transition = 'opacity 0.3s';
+      rotInd.style.opacity = '1';
+      setTimeout(() => { rotInd.style.opacity = '0'; }, 1800);
+      // Update device label after flip
+      setTimeout(() => {
+        document.getElementById('device-label').textContent = 'DEVICE (back up)';
+      }, 1500);
+      // Flash encoder
+      flashCamera('encoder');
+    }
+  },
+  {
+    title: "Top Pad Lifts — Device Released",
+    desc: "Top pad (now below after flip) lifts away. Device rests face-down on what was the top pad, now the bottom surface. Back panel is fully exposed for photography.",
+    time: "~9s",
+    photos: 5,
+    action: (dir) => {
+      // The assembly is flipped, so "top pad" visually is now at the bottom
+      // We lift the pad group away
+      const topPadGroup = document.getElementById('top-pad-group');
+      // Since it's rotated, we need to translate in the rotated frame
+      topPadGroup.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      topPadGroup.style.transform = 'translateY(-34px)';
+    }
+  },
+  {
+    title: "Back Panel Capture",
+    desc: "Top camera fires again — captures the <strong>back panel</strong>. Clean direct shot, no obstruction. Cross-polarized lighting reveals scratches on aluminum and glass backs regardless of device color.",
+    time: "~10s",
+    photos: 6,
+    capture: ['ph-back'],
+    action: (dir) => {
+      showBeam('top-cam-beam');
+      flashCamera('top-camera');
+      triggerFlash();
+    }
+  },
+  {
+    title: "Device Exits to Sort Bins",
+    desc: "Device slides out to one of <strong>3 sort bins (A/B/C)</strong> based on the AI model's prediction. EfficientNet-B0 inference ran in parallel during capture (~2s on GPU). Confidence-weighted voting across all 6 images determines final grade.",
+    time: "~10s total",
+    photos: 6,
+    action: (dir) => {
+      hideAllBeams();
+      const exitArrow = document.getElementById('exit-arrow');
+      exitArrow.style.transition = 'opacity 0.5s';
+      exitArrow.style.opacity = '1';
+      const sortBins = document.getElementById('sort-bins');
+      sortBins.style.transition = 'opacity 0.5s';
+      sortBins.style.opacity = '1';
+      // Highlight a random bin
+      setTimeout(() => {
+        const bins = sortBins.querySelectorAll('rect');
+        const pick = bins[Math.floor(Math.random() * 3)];
+        pick.style.fill = pick.getAttribute('stroke');
+        pick.style.fillOpacity = '0.2';
+      }, 600);
+    }
+  }
+];
+
+let currentStep = 0;
+let autoPlayInterval = null;
+const totalPhotos = 6;
+
+// Init dots
+const dotsContainer = document.getElementById('step-dots');
+steps.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => goToStep(i));
+  dotsContainer.appendChild(dot);
+});
+
+function updateUI() {
+  const step = steps[currentStep];
+  document.getElementById('step-label').textContent = `Step ${currentStep} of ${steps.length - 1}`;
+  document.getElementById('step-title').textContent = step.title;
+  document.getElementById('step-desc').innerHTML = step.desc;
+  document.getElementById('stat-time').textContent = step.time;
+  document.getElementById('stat-photos').textContent = `${step.photos}/${totalPhotos}`;
+
+  // Update dots
+  document.querySelectorAll('.dot').forEach((dot, i) => {
+    dot.className = 'dot';
+    if (i === currentStep) dot.classList.add('active');
+    else if (i < currentStep) dot.classList.add('done');
+  });
+
+  // Update photo slots
+  if (step.capture) {
+    step.capture.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('captured');
+    });
+  }
+
+  // Update buttons
+  document.getElementById('btn-prev').disabled = currentStep === 0;
+  document.getElementById('btn-next').disabled = currentStep === steps.length - 1;
+}
+
+function goToStep(n) {
+  if (n < 0 || n >= steps.length) return;
+  // Reset visual state if going backward
+  if (n < currentStep) {
+    resetAll();
+    currentStep = 0;
+    // Replay all steps up to n
+    for (let i = 0; i <= n; i++) {
+      currentStep = i;
+      steps[i].action('forward');
+      // Mark captures
+      if (steps[i].capture) {
+        steps[i].capture.forEach(id => document.getElementById(id).classList.add('captured'));
+      }
+    }
+  } else {
+    // Play forward
+    for (let i = currentStep; i <= n; i++) {
+      currentStep = i;
+      steps[i].action('forward');
+      if (steps[i].capture) {
+        steps[i].capture.forEach(id => document.getElementById(id).classList.add('captured'));
+      }
+    }
+  }
+  updateUI();
+}
+
+function nextStep() {
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    steps[currentStep].action('forward');
+    updateUI();
+  } else {
+    stopAutoPlay();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    goToStep(currentStep - 1);
+  }
+}
+
+function resetAll() {
+  // Reset flip group
+  const flipGroup = document.getElementById('flip-group');
+  flipGroup.style.transition = 'none';
+  flipGroup.style.transform = 'none';
+
+  // Reset top pad
+  const topPadGroup = document.getElementById('top-pad-group');
+  topPadGroup.style.transition = 'none';
+  topPadGroup.style.transform = 'none';
+
+  const spring = document.getElementById('spring-group');
+  spring.style.transition = 'none';
+  spring.style.transform = 'none';
+
+  const actuator = document.getElementById('actuator-group');
+  actuator.style.transition = 'none';
+  actuator.style.transform = 'none';
+
+  // Reset beams
+  hideAllBeams();
+
+  // Reset device label
+  document.getElementById('device-label').textContent = 'DEVICE (screen up)';
+
+  // Reset arrows
+  document.getElementById('entry-arrow').style.opacity = '0.5';
+  document.getElementById('exit-arrow').style.opacity = '0.3';
+
+  // Reset sort bins
+  const sortBins = document.getElementById('sort-bins');
+  sortBins.style.opacity = '0.3';
+  sortBins.querySelectorAll('rect').forEach(r => { r.style.fill = 'none'; r.style.fillOpacity = ''; });
+
+  // Reset LEDs
+  document.getElementById('led-panels').style.opacity = '0.5';
+
+  // Reset rotation indicator
+  document.getElementById('rotation-indicator').style.opacity = '0';
+
+  // Reset photo slots
+  document.querySelectorAll('.photo-slot').forEach(el => el.classList.remove('captured'));
+
+  // Reset current step
+  currentStep = 0;
+  updateUI();
+}
+
+function highlightElement(id, on) {
+  const el = document.getElementById(id);
+  if (on) {
+    el.style.filter = 'url(#glow)';
+    setTimeout(() => { el.style.filter = ''; }, 1500);
+  }
+}
+
+function showBeam(id) {
+  const el = document.getElementById(id);
+  el.style.transition = 'opacity 0.3s';
+  el.style.opacity = '1';
+}
+
+function hideBeam(id) {
+  const el = document.getElementById(id);
+  el.style.transition = 'opacity 0.3s';
+  el.style.opacity = '0';
+}
+
+function hideAllBeams() {
+  ['top-cam-beam', 'left-cam-beam', 'right-cam-beam', 'top-edge-beam', 'bottom-edge-beam'].forEach(hideBeam);
+}
+
+function flashCamera(id) {
+  const el = document.getElementById(id);
+  el.classList.add('cam-active');
+  setTimeout(() => el.classList.remove('cam-active'), 2000);
+}
+
+function triggerFlash() {
+  const overlay = document.getElementById('flash-overlay');
+  overlay.style.transition = 'none';
+  overlay.style.opacity = '0.15';
+  requestAnimationFrame(() => {
+    overlay.style.transition = 'opacity 0.6s ease-out';
+    overlay.style.opacity = '0';
+  });
+}
+
+function toggleAutoPlay() {
+  if (autoPlayInterval) {
+    stopAutoPlay();
+  } else {
+    if (currentStep >= steps.length - 1) resetAll();
+    document.getElementById('btn-auto').textContent = 'Pause';
+    autoPlayInterval = setInterval(() => {
+      nextStep();
+      if (currentStep >= steps.length - 1) stopAutoPlay();
+    }, 2500);
+  }
+}
+
+function stopAutoPlay() {
+  clearInterval(autoPlayInterval);
+  autoPlayInterval = null;
+  document.getElementById('btn-auto').textContent = 'Auto Play';
+}
+
+// Event listeners
+document.getElementById('btn-next').addEventListener('click', nextStep);
+document.getElementById('btn-prev').addEventListener('click', prevStep);
+document.getElementById('btn-auto').addEventListener('click', toggleAutoPlay);
+document.getElementById('btn-reset').addEventListener('click', () => { stopAutoPlay(); resetAll(); });
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextStep(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevStep(); }
+  if (e.key === 'r') resetAll();
+});
+
+// Initial state
+updateUI();
+</script>
+</body>
+</html>
