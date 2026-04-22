@@ -53,7 +53,7 @@ Has documented hardware evolution:
 
 The SCORE's linear mover concept is an alternative to our rotation-based flip:
 - Phone slides through a scanning tunnel instead of being flipped in place
-- Spring-loaded clamping is similar to our sandwich concept
+- Spring-loaded clamping is conceptually similar to our U-cradle (spring-loaded sliding arm)
 - Benchtop form factor (~35" wide) proves you don't need a huge enclosure
 
 The Assurant acquisition (Oct 2025) may affect what information becomes public.

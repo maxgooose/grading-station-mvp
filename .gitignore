@@ -1,9 +1,6 @@
 # Training data & outputs — too big for git, store externally
-grading-model/data/
-grading-model/runs/
-
-# Reference material (someone else's repo)
-references/
+software/grading-model/data/
+software/grading-model/runs/
 
 # OS / editor / local tooling
 .DS_Store

@@ -54,5 +54,5 @@ Arm 108 is telescoping. Both have tilt/rotate joints to present device at arbitr
 
 1. **Transparent base** is a viable alternative to flipping — cameras below capture the back without any mechanical flip
 2. **Swiveling base** is simpler than a robot arm for changing the angle
-3. **Multiple gripper types** listed — but our silicone sandwich pads achieve the same universal grip more simply
+3. **Multiple gripper types** listed — but our U-cradle (edge-grip arms with silicone-padded grooves) achieves the same universal grip more simply, and leaves both device faces fully exposed to cameras
 4. This patent is from a logistics/3PL company, not a grading equipment vendor — shows that the problem has been studied by people outside the usual suspects

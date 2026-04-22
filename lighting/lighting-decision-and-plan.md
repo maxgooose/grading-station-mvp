@@ -34,7 +34,7 @@ Neither regime is "better". They capture different defects. A real grading stati
 
 ## The dual-capture plan
 
-Two captures per device, same fixture, same position. Mechanically free because the device is stationary in the sandwich-flip.
+Two captures per device, same fixture, same position. Mechanically free because the device is stationary in the U-cradle at each rotation angle.
 
 | Capture | Lighting | Purpose | Defect classes detected |
 |---|---|---|---|

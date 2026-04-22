@@ -25,13 +25,13 @@ This is the **most unconventional approach** — no flip mechanism at all. Uses 
 
 ## Implications For Our Design
 
-This is a fundamentally different approach from our sandwich flip:
+This is a fundamentally different approach from our U-cradle flip:
 
-| | Our Sandwich Flip | GDT Mirror Approach |
+| | Our U-Cradle Flip | GDT Mirror Approach |
 |---|---|---|
 | Moving parts | 1 (rotation axis) | 0 |
 | Complexity | Low mechanical | Low mechanical, high optical |
-| Drawbacks | Needs motor + bearings + pads | Mirror distortion, calibration, cleaning |
+| Drawbacks | Needs bearings + spring + arms | Mirror distortion, calibration, cleaning |
 | Image quality | Direct camera view | Reflected view (potential degradation) |
 | Maintenance | Pad replacement | Mirror cleaning + alignment |
 
