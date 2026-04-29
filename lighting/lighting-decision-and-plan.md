@@ -34,7 +34,10 @@ Neither regime is "better". They capture different defects. A real grading stati
 
 ## The dual-capture plan
 
-Two captures per device, same fixture, same position. Mechanically free because the device is stationary in the U-cradle at each rotation angle.
+Two captures per device per face, same fixture, same position. The bright-field → dark-field switch is mechanically free at each face — only the LED bank changes.
+
+- **MVP v1:** operator manually flips the device between the front-face and back-face capture pairs.
+- **MVP v2 (deferred):** the U-cradle handles the 180° flip without the operator touching the device. See [`../hardware/README.md`](../hardware/README.md).
 
 | Capture | Lighting | Purpose | Defect classes detected |
 |---|---|---|---|

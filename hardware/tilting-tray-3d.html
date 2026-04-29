@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tilting Tray Mechanism — Phone-Only v1</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; overflow: hidden;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+  }
+  #app { position: fixed; inset: 0; }
+  #navbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(8, 12, 20, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+    display: flex; align-items: center;
+    padding: 0 20px; z-index: 100; gap: 8px;
+  }
+  #navbar .home {
+    color: #6db9ff; text-decoration: none;
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid rgba(109, 185, 255, 0.3);
+    transition: all 0.2s;
+  }
+  #navbar .home:hover { background: rgba(109, 185, 255, 0.15); }
+  #navbar a.nav-link {
+    color: #8fa3b8; text-decoration: none;
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.8px; padding: 8px 12px;
+    border-radius: 6px; transition: all 0.2s;
+  }
+  #navbar a.nav-link:hover { color: #e8eef5; background: rgba(255,255,255,0.04); }
+  #navbar .title {
+    color: #4dc06e;
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 8px 12px; border-radius: 6px;
+    background: rgba(45, 138, 79, 0.18);
+    margin-left: 8px;
+  }
+  #info {
+    position: fixed; top: 68px; left: 20px;
+    max-width: 320px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px; line-height: 1.55;
+    z-index: 10; pointer-events: none;
+  }
+  #info h1 {
+    margin: 0 0 4px 0; font-size: 16px; font-weight: 600;
+    color: #6db9ff; letter-spacing: 0.3px;
+  }
+  #info .sub {
+    color: #8fa3b8; font-size: 11px;
+    margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  #info .row { display: flex; justify-content: space-between; padding: 3px 0; }
+  #info .k { color: #8fa3b8; }
+  #info .v { color: #e8eef5; font-weight: 500; }
+  #info .divider { height: 1px; background: rgba(100, 180, 255, 0.15); margin: 10px 0; }
+  #info .blurb { font-size: 11px; color: #8fa3b8; line-height: 1.5; }
+  #stage {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 22, 33, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.25);
+    border-radius: 10px; padding: 12px 22px;
+    font-size: 13px; z-index: 10; pointer-events: none;
+    color: #6db9ff;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    font-weight: 600; text-align: center; min-width: 320px;
+  }
+  #stage .pose { color: #4dc06e; font-size: 17px; margin-top: 4px; letter-spacing: 1px; }
+  #stage .caps { color: #8fa3b8; font-size: 10px; margin-top: 4px; font-weight: 500; }
+  #controls {
+    position: fixed; top: 68px; right: 20px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 11px; z-index: 10;
+    color: #8fa3b8; line-height: 1.7; width: 220px;
+  }
+  #controls b { color: #e8eef5; }
+  #controls .hint { font-size: 10px; color: #5a6b7d; margin-bottom: 8px; }
+  button {
+    background: rgba(109, 185, 255, 0.15);
+    border: 1px solid rgba(109, 185, 255, 0.4);
+    color: #6db9ff; padding: 7px 12px; border-radius: 6px;
+    font-size: 11px; cursor: pointer; font-family: inherit;
+    margin-top: 6px; width: 100%;
+    text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    transition: all 0.15s;
+  }
+  button:hover { background: rgba(109, 185, 255, 0.25); }
+  button.active {
+    background: rgba(45, 138, 79, 0.25);
+    border-color: rgba(45, 138, 79, 0.6);
+    color: #4dc06e;
+  }
+  .label {
+    position: fixed; pointer-events: none;
+    font-size: 10px; font-weight: 600;
+    color: #6db9ff;
+    background: rgba(15, 22, 33, 0.85);
+    border: 1px solid rgba(109, 185, 255, 0.35);
+    border-radius: 4px; padding: 3px 7px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    z-index: 5; transform: translate(-50%, -50%);
+    white-space: nowrap; transition: opacity 0.2s;
+  }
+  .label.cam {
+    color: #ffaa55;
+    border-color: rgba(255, 170, 85, 0.45);
+  }
+  .label.cam.firing {
+    background: rgba(255, 170, 85, 0.85);
+    color: #1a1208;
+    border-color: #ffaa55;
+  }
+  .label.hidden { opacity: 0; }
+  #connectors { position: fixed; inset: 0; pointer-events: none; z-index: 4; }
+</style>
+</head>
+<body>
+<div id="navbar">
+  <a href="README.md" class="home">← Hardware</a>
+  <span class="sep">|</span>
+  <a href="u-cradle-3d.html" class="nav-link">U-Cradle (deprecated)</a>
+  <span class="title">Tilting Tray — Phone v1 (current)</span>
+</div>
+
+<div id="app"></div>
+<svg id="connectors"></svg>
+
+<div id="info">
+  <h1>TILTING TRAY MECHANISM</h1>
+  <div class="sub">v1 — phone-only, all-side capture</div>
+  <div class="row"><span class="k">Phone size</span><span class="v">15 × 7 × 0.8 cm</span></div>
+  <div class="row"><span class="k">Tray size</span><span class="v">20 × 9 cm</span></div>
+  <div class="row"><span class="k">Hinge</span><span class="v">center, X-axis</span></div>
+  <div class="row"><span class="k">Tilt range</span><span class="v">−110° → 0° → +110°</span></div>
+  <div class="row"><span class="k">Drive</span><span class="v">NEMA 17 + TMC2209</span></div>
+  <div class="row"><span class="k">Bearings</span><span class="v">2× 608ZZ skate</span></div>
+  <div class="row"><span class="k">Cameras</span><span class="v">5 (N, S, E, W, Top)</span></div>
+  <div class="row"><span class="k">Capture poses</span><span class="v">2 (±110° tilt)</span></div>
+  <div class="row"><span class="k">Loading</span><span class="v">Drop flat onto tray</span></div>
+  <div class="row"><span class="k">BOM</span><span class="v">~$53</span></div>
+  <div class="divider"></div>
+  <div class="blurb">
+    Operator drops phone <b>flat</b> onto the tray. Stepper tilts tray to <b>+110°</b> — phone slides south, lands in slot-lip, vertical. Cameras fire (front, back, sides, top). Tray returns to <b>0°</b>, then to <b>−110°</b> — phone slides north, vertical the other way. Cameras fire again (back, front, swapped sides, bottom). <b>All 6 surfaces captured. No flip needed.</b>
+  </div>
+</div>
+
+<div id="controls">
+  <b>VIEW CONTROLS</b><br>
+  <div class="hint">Drag — rotate · Scroll — zoom · Right-drag — pan</div>
+  <button id="btnAnim" class="active">⏸ Pause Sequence</button>
+  <button id="btnExploded">⤢ Exploded View</button>
+  <button id="btnCameras" class="active">📷 Hide Cameras</button>
+  <button id="btnLabels" class="active">🏷 Hide Labels</button>
+  <button id="btnReset">↺ Reset Camera</button>
+</div>
+
+<div id="stage">
+  <div>Capture Sequence</div>
+  <div class="pose" id="poseDisplay">FLAT — LOADING POSITION</div>
+  <div class="caps" id="capsDisplay">Operator drops phone, closes lid</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ===== Scene =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0e14);
+scene.fog = new THREE.Fog(0x0a0e14, 70, 160);
+
+// Coordinate system (cm units):
+// X = east (right), Y = NORTH, Z = UP
+// (Note: we use Three.js default Y-up, so we set Y = up here for THREE,
+//  and treat what we're calling "north" as +Z. Let's redo:)
+// THREE: Y is up. So:
+// X = east, Y = up, Z = south (away from north)
+// We'll call NORTH = -Z, SOUTH = +Z (just to match camera defaults).
+// To keep code readable: NORTH side has -Z coordinate.
+
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 500);
+const initialCamPos = new THREE.Vector3(28, 22, 32);
+camera.position.copy(initialCamPos);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+document.getElementById('app').appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 11, 0);
+controls.minDistance = 14;
+controls.maxDistance = 100;
+controls.maxPolarAngle = Math.PI / 2 - 0.02;
+
+// ===== Lighting =====
+scene.add(new THREE.AmbientLight(0x6080a0, 0.40));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+keyLight.position.set(20, 35, 25);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.left = -25;
+keyLight.shadow.camera.right = 25;
+keyLight.shadow.camera.top = 25;
+keyLight.shadow.camera.bottom = -25;
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 80;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0x4080ff, 0.45);
+fillLight.position.set(-15, 18, -12);
+scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffa060, 0.35);
+rimLight.position.set(-20, 8, 18);
+scene.add(rimLight);
+
+// ===== Materials =====
+const matExtrusion = new THREE.MeshStandardMaterial({ color: 0x2a3038, metalness: 0.7, roughness: 0.45 });
+const matSteel    = new THREE.MeshStandardMaterial({ color: 0xb0bcc8, metalness: 0.92, roughness: 0.18 });
+const matAluminum = new THREE.MeshStandardMaterial({ color: 0x8a96a4, metalness: 0.85, roughness: 0.30 });
+const matBearing  = new THREE.MeshStandardMaterial({ color: 0x3a4250, metalness: 0.85, roughness: 0.35 });
+const matSilicone = new THREE.MeshStandardMaterial({ color: 0x101418, metalness: 0.05, roughness: 0.85 });
+const matStepper  = new THREE.MeshStandardMaterial({ color: 0x1a1f26, metalness: 0.6, roughness: 0.55 });
+const matStepperTrim = new THREE.MeshStandardMaterial({ color: 0x4a5260, metalness: 0.8, roughness: 0.4 });
+const matFloor    = new THREE.MeshStandardMaterial({ color: 0x14181e, metalness: 0.3, roughness: 0.85 });
+const matTray     = new THREE.MeshStandardMaterial({ color: 0x232932, metalness: 0.3, roughness: 0.7 });
+const matTrayLip  = new THREE.MeshStandardMaterial({ color: 0x2a3038, metalness: 0.4, roughness: 0.6 });
+const matLipPad   = new THREE.MeshStandardMaterial({ color: 0x0a0c10, metalness: 0.05, roughness: 0.9 });
+const matPhoneBack= new THREE.MeshStandardMaterial({ color: 0x4a5260, metalness: 0.85, roughness: 0.30 });
+const matPhoneSide= new THREE.MeshStandardMaterial({ color: 0x6a7280, metalness: 0.9, roughness: 0.25 });
+const matScreen   = new THREE.MeshStandardMaterial({
+  color: 0x0a1422, metalness: 0.1, roughness: 0.08,
+  emissive: 0x1a3050, emissiveIntensity: 0.45
+});
+const matCameraBump = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.95, roughness: 0.05 });
+const matCamBody = new THREE.MeshStandardMaterial({ color: 0x1c1c20, metalness: 0.7, roughness: 0.4 });
+const matCamLens = new THREE.MeshStandardMaterial({ color: 0x2a4060, metalness: 0.95, roughness: 0.05, emissive: 0x102030, emissiveIntensity: 0.3 });
+const matCamFiring = new THREE.MeshStandardMaterial({ color: 0xffaa55, metalness: 0.5, roughness: 0.3, emissive: 0xff8030, emissiveIntensity: 0.9 });
+const matBoxWire = new THREE.LineBasicMaterial({ color: 0x2a4258, transparent: true, opacity: 0.35 });
+
+// ===== Floor + grid =====
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), matFloor);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+const grid = new THREE.GridHelper(120, 60, 0x223344, 0x1a2130);
+grid.position.y = 0.01;
+scene.add(grid);
+
+// ===== DIMENSIONS (units = cm) =====
+const PHONE_L = 15;
+const PHONE_W = 7;
+const PHONE_T = 0.8;
+
+const TRAY_L = 20;     // along Z (north-south)
+const TRAY_W = 9;      // along X
+const TRAY_T = 0.5;
+const LIP_H  = 1.4;    // height of lip above tray surface
+const LIP_THICK = 0.6;
+
+const HINGE_Y = 11;    // tray hinge height above floor
+const POST_X = 13;
+const POST_H = 22;
+const POST_T = 2;
+
+const BOX_W = 24, BOX_D = 24, BOX_H = 24;  // interior box dimensions
+
+// Phone slide range: phone slides toward whichever lip is lower
+const SLIDE_MAX = (TRAY_L / 2) - (PHONE_L / 2) - LIP_THICK - 0.1; // ~1.6 cm
+
+// ===== ENCLOSURE WIREFRAME (subtle) =====
+const boxGeo = new THREE.BoxGeometry(BOX_W, BOX_H, BOX_D);
+const boxEdges = new THREE.EdgesGeometry(boxGeo);
+const boxWire = new THREE.LineSegments(boxEdges, matBoxWire);
+boxWire.position.set(0, BOX_H / 2, 0);
+scene.add(boxWire);
+
+// ===== POSTS + BEARINGS =====
+const fixedGroup = new THREE.Group();
+scene.add(fixedGroup);
+
+function makePost(xPos) {
+  const post = new THREE.Mesh(new THREE.BoxGeometry(POST_T, POST_H, POST_T), matExtrusion);
+  post.position.set(xPos, POST_H / 2, 0);
+  post.castShadow = true;
+  post.receiveShadow = true;
+  return post;
+}
+const postWest = makePost(-POST_X);
+const postEast = makePost(+POST_X);
+fixedGroup.add(postWest, postEast);
+
+function makeFoot(xPos) {
+  const foot = new THREE.Mesh(new THREE.BoxGeometry(POST_T * 2.5, 0.4, POST_T * 2.5), matExtrusion);
+  foot.position.set(xPos, 0.2, 0);
+  foot.castShadow = true;
+  foot.receiveShadow = true;
+  return foot;
+}
+fixedGroup.add(makeFoot(-POST_X), makeFoot(+POST_X));
+
+function makeBearing(xPos) {
+  const grp = new THREE.Group();
+  grp.position.set(xPos, HINGE_Y, 0);
+  const outer = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.8, 32), matBearing);
+  outer.rotation.z = Math.PI / 2;
+  outer.castShadow = true;
+  grp.add(outer);
+  const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.82, 24), matSteel);
+  inner.rotation.z = Math.PI / 2;
+  grp.add(inner);
+  return grp;
+}
+const bearingWest = makeBearing(-POST_X + POST_T / 2 + 0.5);
+const bearingEast = makeBearing(+POST_X - POST_T / 2 - 0.5);
+fixedGroup.add(bearingWest, bearingEast);
+
+// ===== TRAY GROUP (tilts about X axis through hinge point) =====
+const trayPivot = new THREE.Group();   // this rotates
+trayPivot.position.set(0, HINGE_Y, 0);
+scene.add(trayPivot);
+
+// Hinge axle (rotates with tray)
+const axleLen = (POST_X * 2) - POST_T - 1.5;
+const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, axleLen, 24), matSteel);
+axle.rotation.z = Math.PI / 2;
+axle.castShadow = true;
+trayPivot.add(axle);
+
+// Tray surface (in tray-local coords: at Y = -TRAY_T/2 below hinge so phone rests on top)
+const tray = new THREE.Mesh(new THREE.BoxGeometry(TRAY_W, TRAY_T, TRAY_L), matTray);
+tray.position.set(0, -TRAY_T / 2, 0);
+tray.castShadow = true;
+tray.receiveShadow = true;
+trayPivot.add(tray);
+
+// North lip (at Z = -TRAY_L/2)
+const lipNorth = new THREE.Mesh(new THREE.BoxGeometry(TRAY_W, LIP_H, LIP_THICK), matTrayLip);
+lipNorth.position.set(0, LIP_H / 2 - TRAY_T, -TRAY_L / 2 + LIP_THICK / 2);
+lipNorth.castShadow = true;
+trayPivot.add(lipNorth);
+
+// South lip (at Z = +TRAY_L/2)
+const lipSouth = new THREE.Mesh(new THREE.BoxGeometry(TRAY_W, LIP_H, LIP_THICK), matTrayLip);
+lipSouth.position.set(0, LIP_H / 2 - TRAY_T, +TRAY_L / 2 - LIP_THICK / 2);
+lipSouth.castShadow = true;
+trayPivot.add(lipSouth);
+
+// Silicone pad inside each lip (where phone edge rests)
+const padN = new THREE.Mesh(new THREE.BoxGeometry(PHONE_W + 1, 0.3, 0.3), matLipPad);
+padN.position.set(0, 0.15, -TRAY_L / 2 + LIP_THICK + 0.15);
+trayPivot.add(padN);
+
+const padS = new THREE.Mesh(new THREE.BoxGeometry(PHONE_W + 1, 0.3, 0.3), matLipPad);
+padS.position.set(0, 0.15, +TRAY_L / 2 - LIP_THICK - 0.15);
+trayPivot.add(padS);
+
+// Tray center marker (small dot on surface)
+const trayMark = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.02, 12), matSilicone);
+trayMark.position.set(0, 0.01, 0);
+trayPivot.add(trayMark);
+
+// ===== PHONE (parented to tray, slides along Z based on tilt) =====
+const phoneGroup = new THREE.Group();
+// Resting position: centered on tray, Y = phone_thickness/2 above tray surface
+phoneGroup.position.set(0, PHONE_T / 2, 0);
+trayPivot.add(phoneGroup);
+
+const phoneCore = new THREE.Mesh(new THREE.BoxGeometry(PHONE_W, PHONE_T, PHONE_L), matPhoneSide);
+phoneCore.castShadow = true;
+phoneCore.receiveShadow = true;
+phoneGroup.add(phoneCore);
+
+// Screen face (top surface when phone is screen-up on tray)
+const screenGeo = new THREE.PlaneGeometry(PHONE_W * 0.86, PHONE_L * 0.92);
+const screen = new THREE.Mesh(screenGeo, matScreen);
+screen.rotation.x = -Math.PI / 2;
+screen.position.y = PHONE_T / 2 + 0.005;
+phoneGroup.add(screen);
+
+// Back face
+const back = new THREE.Mesh(new THREE.PlaneGeometry(PHONE_W * 0.92, PHONE_L * 0.96), matPhoneBack);
+back.rotation.x = Math.PI / 2;
+back.position.y = -PHONE_T / 2 - 0.005;
+phoneGroup.add(back);
+
+// Camera bump on back
+const camBump = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.12, 2.2), matCameraBump);
+camBump.position.set(-PHONE_W * 0.25, -PHONE_T / 2 - 0.06, -PHONE_L * 0.36);
+phoneGroup.add(camBump);
+for (let i = 0; i < 3; i++) {
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.08, 18), matCameraBump);
+  lens.rotation.x = Math.PI / 2;
+  lens.position.set(camBump.position.x - 0.6 + i * 0.6, camBump.position.y - 0.06, camBump.position.z);
+  phoneGroup.add(lens);
+}
+
+// ===== STEPPER MOTOR (east end, fixed) =====
+const stepperGroup = new THREE.Group();
+const stepperX = +POST_X + POST_T / 2 + 3.0;
+stepperGroup.position.set(stepperX, HINGE_Y, 0);
+fixedGroup.add(stepperGroup);
+
+const stepperBody = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.4, 4.4), matStepper);
+stepperBody.castShadow = true;
+stepperGroup.add(stepperBody);
+const stepperEndW = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4.6, 4.6), matStepperTrim);
+stepperEndW.position.x = -2.1;
+stepperGroup.add(stepperEndW);
+const stepperEndE = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4.6, 4.6), matStepperTrim);
+stepperEndE.position.x = +2.1;
+stepperGroup.add(stepperEndE);
+
+const motorShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 2.2, 20), matSteel);
+motorShaft.rotation.z = Math.PI / 2;
+motorShaft.position.x = -3.2;
+stepperGroup.add(motorShaft);
+
+const coupling = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 1.6, 20), matAluminum);
+coupling.rotation.z = Math.PI / 2;
+coupling.position.set(POST_X + POST_T / 2 + 0.5, HINGE_Y, 0);
+fixedGroup.add(coupling);
+
+// ===== CAMERAS (5 total: N, S, E, W, Top) =====
+// Cameras live around the BOX, looking inward toward the center (where the phone lives in capture poses).
+// Phone center in capture poses: roughly (0, HINGE_Y, ~+/- 1.6) but we point cameras at (0, HINGE_Y, 0) for simplicity.
+const camGroup = new THREE.Group();
+scene.add(camGroup);
+
+function makeCamera(name, position, lookAt) {
+  const grp = new THREE.Group();
+  grp.position.copy(position);
+  grp.userData.name = name;
+  grp.userData.firing = false;
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 2.6), matCamBody);
+  body.castShadow = true;
+  grp.add(body);
+  grp.userData.body = body;
+
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.85, 0.9, 24), matCamLens);
+  lens.rotation.x = Math.PI / 2;
+  lens.position.z = -1.5; // forward face of the camera
+  grp.add(lens);
+  grp.userData.lens = lens;
+
+  // Mount post connecting camera to box wall
+  const mount = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 1.2), matExtrusion);
+  mount.position.z = 1.0;
+  grp.add(mount);
+
+  grp.lookAt(lookAt);
+  return grp;
+}
+
+const CAM_DIST = 11; // distance from center to each side camera
+const cameras = {
+  N:   makeCamera('N',   new THREE.Vector3(0, HINGE_Y, -CAM_DIST), new THREE.Vector3(0, HINGE_Y, 0)),
+  S:   makeCamera('S',   new THREE.Vector3(0, HINGE_Y, +CAM_DIST), new THREE.Vector3(0, HINGE_Y, 0)),
+  E:   makeCamera('E',   new THREE.Vector3(+CAM_DIST, HINGE_Y, 0), new THREE.Vector3(0, HINGE_Y, 0)),
+  W:   makeCamera('W',   new THREE.Vector3(-CAM_DIST, HINGE_Y, 0), new THREE.Vector3(0, HINGE_Y, 0)),
+  TOP: makeCamera('TOP', new THREE.Vector3(0, BOX_H - 2, 0),       new THREE.Vector3(0, HINGE_Y, 0)),
+};
+Object.values(cameras).forEach(c => camGroup.add(c));
+
+// ===== LABELS =====
+const labelDefs = [
+  { id: 'lbl-tray',    text: 'Tray',                anchor: () => trayPivot.localToWorld(new THREE.Vector3(0, 0, 0)),                offset: { x: 0,  y: 30 } },
+  { id: 'lbl-hinge',   text: 'Hinge axle (6mm)',    anchor: () => new THREE.Vector3(POST_X - 1, HINGE_Y + 0.5, 0),                   offset: { x: 60, y: -25 } },
+  { id: 'lbl-bearing', text: 'Bearing 608ZZ',       anchor: () => new THREE.Vector3(-POST_X + 1, HINGE_Y + 0.7, 0),                  offset: { x: -75, y: -25 } },
+  { id: 'lbl-postW',   text: 'Post (2020 ext.)',    anchor: () => new THREE.Vector3(-POST_X, POST_H * 0.75, 0),                      offset: { x: -75, y: 0 } },
+  { id: 'lbl-stepper', text: 'NEMA 17 Stepper',     anchor: () => new THREE.Vector3(stepperX, HINGE_Y + 3.0, 0),                     offset: { x: 60, y: -45 } },
+  { id: 'lbl-coup',    text: 'Coupling',            anchor: () => new THREE.Vector3(POST_X + 0.6, HINGE_Y + 1.0, 0),                 offset: { x: 35, y: -40 } },
+  { id: 'lbl-lipN',    text: 'North slot-lip',      anchor: () => trayPivot.localToWorld(new THREE.Vector3(0, LIP_H, -TRAY_L / 2)),  offset: { x: -55, y: 0 } },
+  { id: 'lbl-lipS',    text: 'South slot-lip',      anchor: () => trayPivot.localToWorld(new THREE.Vector3(0, LIP_H, +TRAY_L / 2)),  offset: { x: 55, y: 0 } },
+  { id: 'lbl-phone',   text: 'Phone',               anchor: () => phoneGroup.localToWorld(new THREE.Vector3(PHONE_W / 2, PHONE_T / 2, 0)).applyMatrix4(trayPivot.matrixWorld), offset: { x: 50, y: 25 } },
+  { id: 'lbl-box',     text: 'Box (interior)',      anchor: () => new THREE.Vector3(BOX_W / 2, BOX_H - 1, BOX_D / 2),                offset: { x: 60, y: -10 } },
+];
+
+const camLabelDefs = [
+  { id: 'cam-N',   camKey: 'N',   text: 'N CAM' },
+  { id: 'cam-S',   camKey: 'S',   text: 'S CAM' },
+  { id: 'cam-E',   camKey: 'E',   text: 'E CAM' },
+  { id: 'cam-W',   camKey: 'W',   text: 'W CAM' },
+  { id: 'cam-TOP', camKey: 'TOP', text: 'TOP CAM' },
+];
+
+const labelEls = {};
+const connectorsSvg = document.getElementById('connectors');
+
+[...labelDefs, ...camLabelDefs].forEach(def => {
+  const el = document.createElement('div');
+  el.className = 'label' + (def.camKey ? ' cam' : '');
+  el.textContent = def.text;
+  el.id = def.id;
+  document.body.appendChild(el);
+  labelEls[def.id] = el;
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('stroke', def.camKey ? 'rgba(255, 170, 85, 0.45)' : 'rgba(109, 185, 255, 0.45)');
+  line.setAttribute('stroke-width', '1');
+  line.setAttribute('id', def.id + '-line');
+  connectorsSvg.appendChild(line);
+});
+
+function updateLabels() {
+  const showLabels = !document.getElementById('btnLabels').dataset.hidden;
+  const showCameras = !document.getElementById('btnCameras').dataset.hidden;
+
+  labelDefs.forEach(def => {
+    const worldPos = def.anchor();
+    project(worldPos, def, labelEls[def.id], showLabels);
+  });
+  camLabelDefs.forEach(def => {
+    const cam = cameras[def.camKey];
+    const worldPos = new THREE.Vector3();
+    cam.getWorldPosition(worldPos);
+    worldPos.y += 1.6;
+    project(worldPos, { id: def.id, offset: { x: 0, y: -25 } }, labelEls[def.id], showLabels && showCameras);
+    labelEls[def.id].classList.toggle('firing', cam.userData.firing);
+  });
+}
+
+function project(worldPos, def, el, visible) {
+  const screenPos = worldPos.clone().project(camera);
+  const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+  const lblX = x + def.offset.x;
+  const lblY = y + def.offset.y;
+  el.style.left = lblX + 'px';
+  el.style.top = lblY + 'px';
+  el.classList.toggle('hidden', !visible || screenPos.z > 1);
+  const line = document.getElementById(def.id + '-line');
+  line.setAttribute('x1', x);
+  line.setAttribute('y1', y);
+  line.setAttribute('x2', lblX);
+  line.setAttribute('y2', lblY);
+  line.style.opacity = (!visible || screenPos.z > 1) ? '0' : '1';
+}
+
+// ===== SEQUENCE STATE =====
+// Phases: LOADING (flat) → TILT_TO_S (0 → +110) → CAPTURE_S → TILT_BACK (+110 → 0) → TILT_TO_N (0 → -110) → CAPTURE_N → TILT_BACK_N → loop
+const PHASES = [
+  { name: 'LOADING',     duration: 1.6, fromAngle:    0, toAngle:    0, label: 'FLAT — LOADING POSITION',          caps: 'Operator drops phone, closes lid' },
+  { name: 'TILT_TO_S',   duration: 1.8, fromAngle:    0, toAngle: +110, label: 'TILTING +110° (south lip down)',    caps: 'Phone slides south to lip' },
+  { name: 'CAPTURE_S',   duration: 2.0, fromAngle: +110, toAngle: +110, label: 'POSE A — +110° TILT',               caps: 'N=screen · S=back · E=right · W=left · Top=NORTH edge' },
+  { name: 'TILT_TO_MID', duration: 1.4, fromAngle: +110, toAngle:    0, label: 'TILTING TO 0°',                     caps: 'Phone slides back to center' },
+  { name: 'TILT_TO_N',   duration: 1.8, fromAngle:    0, toAngle: -110, label: 'TILTING −110° (north lip down)',    caps: 'Phone slides north to lip' },
+  { name: 'CAPTURE_N',   duration: 2.0, fromAngle: -110, toAngle: -110, label: 'POSE B — −110° TILT',               caps: 'N=back · S=screen · E=left · W=right · Top=SOUTH edge' },
+  { name: 'TILT_TO_END', duration: 1.4, fromAngle: -110, toAngle:    0, label: 'TILTING TO 0°',                     caps: 'Returning to flat for unload' },
+];
+
+const STATE = {
+  running: true,
+  phaseIdx: 0,
+  phaseT: 0,
+  exploded: 0, // 0..1
+  showCameras: true,
+  flashTimer: 0,
+  cameraFireGroup: null, // which group to flash
+};
+
+const explodeTargets = {
+  postWest:    { obj: postWest,     rest: postWest.position.clone(),     delta: new THREE.Vector3(-5, 0, 0) },
+  postEast:    { obj: postEast,     rest: postEast.position.clone(),     delta: new THREE.Vector3(+5, 0, 0) },
+  bearingWest: { obj: bearingWest,  rest: bearingWest.position.clone(),  delta: new THREE.Vector3(-2.5, 0, 0) },
+  bearingEast: { obj: bearingEast,  rest: bearingEast.position.clone(),  delta: new THREE.Vector3(+2.5, 0, 0) },
+  stepper:     { obj: stepperGroup, rest: stepperGroup.position.clone(), delta: new THREE.Vector3(+5, 0, 0) },
+  coupling:    { obj: coupling,     rest: coupling.position.clone(),     delta: new THREE.Vector3(+2, 0, 0) },
+  lipN:        { obj: lipNorth,     rest: lipNorth.position.clone(),     delta: new THREE.Vector3(0, +2, -2), local: true },
+  lipS:        { obj: lipSouth,     rest: lipSouth.position.clone(),     delta: new THREE.Vector3(0, +2, +2), local: true },
+  phone:       { obj: phoneGroup,   rest: phoneGroup.position.clone(),   delta: new THREE.Vector3(0, +6, 0), local: true },
+  camN: { obj: cameras.N,   rest: cameras.N.position.clone(),   delta: new THREE.Vector3(0, 0, -4) },
+  camS: { obj: cameras.S,   rest: cameras.S.position.clone(),   delta: new THREE.Vector3(0, 0, +4) },
+  camE: { obj: cameras.E,   rest: cameras.E.position.clone(),   delta: new THREE.Vector3(+4, 0, 0) },
+  camW: { obj: cameras.W,   rest: cameras.W.position.clone(),   delta: new THREE.Vector3(-4, 0, 0) },
+  camT: { obj: cameras.TOP, rest: cameras.TOP.position.clone(), delta: new THREE.Vector3(0, +4, 0) },
+};
+function applyExplode(amount) {
+  for (const k in explodeTargets) {
+    const e = explodeTargets[k];
+    e.obj.position.copy(e.rest).addScaledVector(e.delta, amount);
+  }
+}
+
+function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+function setCameraFire(camKey, on) {
+  const cam = cameras[camKey];
+  cam.userData.firing = on;
+  cam.userData.lens.material = on ? matCamFiring : matCamLens;
+}
+function fireAllCameras(on) {
+  ['N','S','E','W','TOP'].forEach(k => setCameraFire(k, on));
+}
+
+function updateSequence(dt) {
+  if (!STATE.running) return;
+  const phase = PHASES[STATE.phaseIdx];
+  STATE.phaseT += dt;
+  let progress = THREE.MathUtils.clamp(STATE.phaseT / phase.duration, 0, 1);
+  const eased = smoothstep(progress);
+
+  const angle = THREE.MathUtils.lerp(phase.fromAngle, phase.toAngle, eased);
+  trayPivot.rotation.x = angle * Math.PI / 180;
+
+  // Phone slides on the tray based on tilt magnitude
+  // Slide goes toward the LOWER lip:
+  //   tilt +angle → south end up, north end down → wait, depends on rotation convention
+  //   With rotation.x = +angle: in THREE, this rotates +Y toward +Z when angle is positive.
+  //   So the +Z (south) end of the tray goes UP, -Z (north) end goes DOWN.
+  //   Phone slides toward the LOWER end (north, -Z) when tilt is positive.
+  //   Wait, that means at +110° the phone is at the NORTH lip, not south.
+  //
+  //   Let's recompute carefully and just match the visual: if tilt is positive and the south end goes up,
+  //   then phone slides north (to the lower end). Adjust the labels and caps to match.
+
+  // Slide function: when |angle| ≥ 90°, phone is fully against the lower lip
+  const slideMag = Math.min(1, Math.abs(angle) / 90);
+  const slideZ = -Math.sign(angle) * SLIDE_MAX * slideMag;
+  // (negative because positive tilt → south end up → phone slides to north which is -Z)
+  phoneGroup.position.z = slideZ;
+  phoneGroup.position.y = PHONE_T / 2; // sits flat on tray
+
+  // Update display
+  document.getElementById('poseDisplay').textContent = phase.label;
+  document.getElementById('capsDisplay').textContent = phase.caps;
+
+  // Camera firing during CAPTURE_* phases
+  const isCapture = phase.name.startsWith('CAPTURE_');
+  if (isCapture) {
+    // Strobe-fire all cams a few times during the capture window
+    const flashCycle = (STATE.phaseT * 4) % 1; // 4 flashes per second
+    fireAllCameras(flashCycle < 0.4);
+  } else {
+    fireAllCameras(false);
+  }
+
+  // Phase transition
+  if (progress >= 1) {
+    STATE.phaseT = 0;
+    STATE.phaseIdx = (STATE.phaseIdx + 1) % PHASES.length;
+  }
+}
+
+// Recompute correct labels for the +110/-110 captures based on actual rotation direction
+// (positive angle in THREE.js rotates south end up → phone slides to north lip)
+PHASES[1].label = 'TILTING +110° (north lip down)';
+PHASES[1].caps  = 'Phone slides north, lands in north lip';
+PHASES[2].label = 'POSE A — +110° (phone on north lip)';
+PHASES[2].caps  = 'N=back · S=screen · E=left · W=right · Top=SOUTH edge';
+PHASES[4].label = 'TILTING −110° (south lip down)';
+PHASES[4].caps  = 'Phone slides south, lands in south lip';
+PHASES[5].label = 'POSE B — −110° (phone on south lip)';
+PHASES[5].caps  = 'N=screen · S=back · E=right · W=left · Top=NORTH edge';
+
+function updateExplode(dt) {
+  const target = STATE.showExploded ? 1 : 0;
+  STATE.exploded = THREE.MathUtils.lerp(STATE.exploded, target, dt * 4);
+  if (Math.abs(STATE.exploded - target) < 0.005) STATE.exploded = target;
+  applyExplode(STATE.exploded);
+}
+
+function updateCamerasVisibility() {
+  Object.values(cameras).forEach(c => c.visible = STATE.showCameras);
+}
+
+// ===== Buttons =====
+const btnAnim = document.getElementById('btnAnim');
+btnAnim.addEventListener('click', () => {
+  STATE.running = !STATE.running;
+  btnAnim.classList.toggle('active', STATE.running);
+  btnAnim.textContent = STATE.running ? '⏸ Pause Sequence' : '▶ Play Sequence';
+});
+
+const btnExploded = document.getElementById('btnExploded');
+btnExploded.addEventListener('click', () => {
+  STATE.showExploded = !STATE.showExploded;
+  btnExploded.classList.toggle('active', STATE.showExploded);
+  btnExploded.textContent = STATE.showExploded ? '⤡ Reassemble' : '⤢ Exploded View';
+});
+
+const btnCameras = document.getElementById('btnCameras');
+btnCameras.dataset.hidden = 'false';
+btnCameras.addEventListener('click', () => {
+  const hidden = btnCameras.dataset.hidden === 'true';
+  btnCameras.dataset.hidden = (!hidden).toString();
+  STATE.showCameras = hidden;
+  updateCamerasVisibility();
+  btnCameras.classList.toggle('active', hidden);
+  btnCameras.textContent = hidden ? '📷 Hide Cameras' : '📷 Show Cameras';
+});
+
+const btnLabels = document.getElementById('btnLabels');
+btnLabels.addEventListener('click', () => {
+  const hidden = btnLabels.dataset.hidden === 'true';
+  btnLabels.dataset.hidden = (!hidden).toString();
+  btnLabels.classList.toggle('active', hidden);
+  btnLabels.textContent = hidden ? '🏷 Hide Labels' : '🏷 Show Labels';
+});
+
+const btnReset = document.getElementById('btnReset');
+btnReset.addEventListener('click', () => {
+  camera.position.copy(initialCamPos);
+  controls.target.set(0, 11, 0);
+});
+
+// ===== Resize =====
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== Render loop =====
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  updateSequence(dt);
+  updateExplode(dt);
+  controls.update();
+  renderer.render(scene, camera);
+  updateLabels();
+}
+animate();
+</script>
+</body>
+</html>

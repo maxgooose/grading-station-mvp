@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>U-Cradle Flip Mechanism — Phone-Only v1</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+  }
+  #app { position: fixed; inset: 0; }
+  #navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(8, 12, 20, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+    gap: 8px;
+  }
+  #navbar .home {
+    color: #6db9ff; text-decoration: none;
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid rgba(109, 185, 255, 0.3);
+    transition: all 0.2s;
+  }
+  #navbar .home:hover { background: rgba(109, 185, 255, 0.15); }
+  #navbar .title {
+    color: #2d8a4f;
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 8px 12px; border-radius: 6px;
+    background: rgba(45, 138, 79, 0.12);
+    margin-left: 8px;
+  }
+  #info {
+    position: fixed;
+    top: 68px; left: 20px;
+    max-width: 320px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px; line-height: 1.55;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #info h1 {
+    margin: 0 0 4px 0;
+    font-size: 16px; font-weight: 600;
+    color: #6db9ff; letter-spacing: 0.3px;
+  }
+  #info .sub {
+    color: #8fa3b8;
+    font-size: 11px;
+    margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  #info .row { display: flex; justify-content: space-between; padding: 3px 0; }
+  #info .k { color: #8fa3b8; }
+  #info .v { color: #e8eef5; font-weight: 500; }
+  #info .divider {
+    height: 1px;
+    background: rgba(100, 180, 255, 0.15);
+    margin: 10px 0;
+  }
+  #info .blurb {
+    font-size: 11px;
+    color: #8fa3b8;
+    line-height: 1.5;
+  }
+  #stage {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 22, 33, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.25);
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-size: 13px;
+    z-index: 10;
+    pointer-events: none;
+    color: #6db9ff;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: center;
+    min-width: 280px;
+  }
+  #stage .angle {
+    color: #2d8a4f;
+    font-size: 18px;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  #controls {
+    position: fixed;
+    top: 68px; right: 20px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 11px;
+    z-index: 10;
+    color: #8fa3b8;
+    line-height: 1.7;
+    width: 200px;
+  }
+  #controls b { color: #e8eef5; }
+  #controls .hint {
+    font-size: 10px;
+    color: #5a6b7d;
+    margin-bottom: 8px;
+  }
+  button {
+    background: rgba(109, 185, 255, 0.15);
+    border: 1px solid rgba(109, 185, 255, 0.4);
+    color: #6db9ff;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 6px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  button:hover { background: rgba(109, 185, 255, 0.25); }
+  button.active {
+    background: rgba(45, 138, 79, 0.25);
+    border-color: rgba(45, 138, 79, 0.6);
+    color: #4dc06e;
+  }
+  /* Floating part labels rendered as DOM */
+  .label {
+    position: fixed;
+    pointer-events: none;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6db9ff;
+    background: rgba(15, 22, 33, 0.85);
+    border: 1px solid rgba(109, 185, 255, 0.35);
+    border-radius: 4px;
+    padding: 3px 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .label.hidden { opacity: 0; }
+  /* Connector lines from labels to parts */
+  #connectors {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+  }
+</style>
+</head>
+<body>
+<div id="navbar">
+  <a href="README.md" class="home">← Hardware</a>
+  <span class="title">U-Cradle Flip Mechanism — Phone v1</span>
+</div>
+
+<div id="app"></div>
+<svg id="connectors"></svg>
+
+<div id="info">
+  <h1>PHONE U-CRADLE</h1>
+  <div class="sub">MVP v1 / v1.5 flip mechanism</div>
+  <div class="row"><span class="k">Phone size</span><span class="v">15 × 7 × 0.8 cm</span></div>
+  <div class="row"><span class="k">Phone weight</span><span class="v">~200 g</span></div>
+  <div class="row"><span class="k">Axle</span><span class="v">6 mm steel</span></div>
+  <div class="row"><span class="k">Bearings</span><span class="v">608ZZ skate</span></div>
+  <div class="row"><span class="k">Clamp force</span><span class="v">5–8 N</span></div>
+  <div class="row"><span class="k">Spring rate</span><span class="v">~300 N/m</span></div>
+  <div class="row"><span class="k">Drive</span><span class="v">NEMA 17 + TMC2209</span></div>
+  <div class="row"><span class="k">Rotation</span><span class="v">0° ↔ 180°, hard stops</span></div>
+  <div class="row"><span class="k">BOM</span><span class="v">~$80</span></div>
+  <div class="divider"></div>
+  <div class="blurb">
+    Two arms clamp the phone on its <b>short edges</b> (east/west). Spring keeps clamp force on the sliding arm. Stepper rotates the entire assembly — phone rotates with the arms because it's rigidly clamped between them. <b>Faces stay fully exposed</b> to cameras — arms only block thin edge slivers.
+  </div>
+</div>
+
+<div id="controls">
+  <b>VIEW CONTROLS</b><br>
+  <div class="hint">Drag — rotate · Scroll — zoom · Right-drag — pan</div>
+  <button id="btnFlip">▶ Animate Flip</button>
+  <button id="btnExploded">⤢ Exploded View</button>
+  <button id="btnLoad">⇩ Show Loading</button>
+  <button id="btnLabels" class="active">🏷 Hide Labels</button>
+  <button id="btnReset">↺ Reset Camera</button>
+</div>
+
+<div id="stage">
+  <div>Phone Orientation</div>
+  <div class="angle" id="angleDisplay">0° — SCREEN UP</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ===== Scene =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0e14);
+scene.fog = new THREE.Fog(0x0a0e14, 60, 140);
+
+// ===== Camera (units = cm) =====
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 500);
+const initialCamPos = new THREE.Vector3(28, 22, 32);
+camera.position.copy(initialCamPos);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+document.getElementById('app').appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 9, 0);
+controls.minDistance = 12;
+controls.maxDistance = 90;
+controls.maxPolarAngle = Math.PI / 2 - 0.02;
+
+// ===== Lighting =====
+scene.add(new THREE.AmbientLight(0x6080a0, 0.40));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+keyLight.position.set(20, 35, 25);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.left = -25;
+keyLight.shadow.camera.right = 25;
+keyLight.shadow.camera.top = 25;
+keyLight.shadow.camera.bottom = -25;
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 80;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x4080ff, 0.45);
+fillLight.position.set(-15, 18, -12);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xffa060, 0.35);
+rimLight.position.set(-20, 8, 18);
+scene.add(rimLight);
+
+// ===== Materials =====
+const matExtrusion = new THREE.MeshStandardMaterial({ color: 0x2a3038, metalness: 0.7, roughness: 0.45 });
+const matSteel    = new THREE.MeshStandardMaterial({ color: 0xb0bcc8, metalness: 0.92, roughness: 0.18 });
+const matAluminum = new THREE.MeshStandardMaterial({ color: 0x8a96a4, metalness: 0.85, roughness: 0.30 });
+const matBearing  = new THREE.MeshStandardMaterial({ color: 0x3a4250, metalness: 0.85, roughness: 0.35 });
+const matSilicone = new THREE.MeshStandardMaterial({ color: 0x101418, metalness: 0.05, roughness: 0.85 });
+const matStepper  = new THREE.MeshStandardMaterial({ color: 0x1a1f26, metalness: 0.6, roughness: 0.55 });
+const matStepperTrim = new THREE.MeshStandardMaterial({ color: 0x4a5260, metalness: 0.8, roughness: 0.4 });
+const matFloor    = new THREE.MeshStandardMaterial({ color: 0x14181e, metalness: 0.3, roughness: 0.85 });
+const matSpring   = new THREE.MeshStandardMaterial({ color: 0xc4ccd6, metalness: 0.95, roughness: 0.20 });
+const matPhoneBack= new THREE.MeshStandardMaterial({ color: 0x4a5260, metalness: 0.85, roughness: 0.30 });
+const matPhoneSide= new THREE.MeshStandardMaterial({ color: 0x6a7280, metalness: 0.9, roughness: 0.25 });
+const matScreen   = new THREE.MeshStandardMaterial({
+  color: 0x0a1422, metalness: 0.1, roughness: 0.08,
+  emissive: 0x1a3050, emissiveIntensity: 0.45
+});
+const matCameraBump = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.95, roughness: 0.05 });
+
+// ===== Floor + grid =====
+const floorGeo = new THREE.PlaneGeometry(120, 120);
+const floor = new THREE.Mesh(floorGeo, matFloor);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+const grid = new THREE.GridHelper(120, 60, 0x223344, 0x1a2130);
+grid.position.y = 0.01;
+scene.add(grid);
+
+// ===== DIMENSIONS (units = cm) =====
+const PHONE_L = 15;     // long axis (Z)
+const PHONE_W = 7;      // short axis (X)
+const PHONE_T = 0.8;    // thickness (Y)
+const AXLE_Y = 9;       // axle height above floor
+const POST_X = 12;      // post X positions (±)
+const POST_H = 18;      // post height
+const POST_T = 2;       // post cross-section
+const ARM_PLATE_W = 6;  // arm plate depth (Z)
+const ARM_PLATE_H = 4;  // arm plate height (Y)
+const ARM_PLATE_T = 0.5;// arm plate thickness (X)
+const PAD_T = 0.3;
+const AXLE_R = 0.3;     // axle radius (6mm dia)
+
+// ===== ROOT GROUPS =====
+// Posts and floor stay fixed.
+const fixedGroup = new THREE.Group();
+scene.add(fixedGroup);
+
+// The "rotor" = axle + both arms + pads + phone. Rotates about X axis through (0, AXLE_Y, 0).
+const rotor = new THREE.Group();
+rotor.position.set(0, AXLE_Y, 0);
+scene.add(rotor);
+
+// ===== POSTS (vertical 2020-style extrusions) =====
+function makePost(xPos) {
+  const post = new THREE.Mesh(new THREE.BoxGeometry(POST_T, POST_H, POST_T), matExtrusion);
+  post.position.set(xPos, POST_H / 2, 0);
+  post.castShadow = true;
+  post.receiveShadow = true;
+  return post;
+}
+const postWest = makePost(-POST_X);
+const postEast = makePost(+POST_X);
+fixedGroup.add(postWest, postEast);
+
+// Base feet for posts
+function makeFoot(xPos) {
+  const foot = new THREE.Mesh(new THREE.BoxGeometry(POST_T * 2.5, 0.4, POST_T * 2.5), matExtrusion);
+  foot.position.set(xPos, 0.2, 0);
+  foot.castShadow = true;
+  foot.receiveShadow = true;
+  return foot;
+}
+fixedGroup.add(makeFoot(-POST_X), makeFoot(+POST_X));
+
+// Cross-rail at top connecting the two posts (rigidity)
+const topRail = new THREE.Mesh(new THREE.BoxGeometry(POST_X * 2 + POST_T, POST_T, POST_T), matExtrusion);
+topRail.position.set(0, POST_H - POST_T / 2, 0);
+topRail.castShadow = true;
+fixedGroup.add(topRail);
+
+// ===== BEARINGS (608ZZ-style, on inner faces of posts at axle height) =====
+function makeBearing(xPos) {
+  const grp = new THREE.Group();
+  grp.position.set(xPos, AXLE_Y, 0);
+  // Outer race
+  const outer = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.7, 32), matBearing);
+  outer.rotation.z = Math.PI / 2;
+  outer.castShadow = true;
+  grp.add(outer);
+  // Inner race (slightly different shade)
+  const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.72, 24), matSteel);
+  inner.rotation.z = Math.PI / 2;
+  grp.add(inner);
+  return grp;
+}
+const bearingWest = makeBearing(-POST_X + POST_T / 2 + 0.4);
+const bearingEast = makeBearing(+POST_X - POST_T / 2 - 0.4);
+fixedGroup.add(bearingWest, bearingEast);
+
+// ===== AXLE (rotates) =====
+const axleLen = (POST_X * 2) - POST_T - 1.5;
+const axleGeo = new THREE.CylinderGeometry(AXLE_R, AXLE_R, axleLen, 24);
+const axle = new THREE.Mesh(axleGeo, matSteel);
+axle.rotation.z = Math.PI / 2;
+axle.castShadow = true;
+rotor.add(axle);
+
+// ===== ARMS (vertical plates perpendicular to axle, with silicone pads inward) =====
+// The "fixed" arm (east) is bolted to the axle.
+// The "sliding" arm (west) rides on a linear bushing on the axle and is spring-loaded.
+const ARM_GAP_FROM_PHONE = 0.2;   // gap between pad face and phone edge surface
+const armX_FixedEast  = (PHONE_W / 2) + PAD_T + (ARM_PLATE_T / 2) + ARM_GAP_FROM_PHONE;
+const armX_SlideWest  = -armX_FixedEast;
+
+function makeArm(xPos, isSliding) {
+  const grp = new THREE.Group();
+  grp.position.set(xPos, 0, 0);
+
+  // Plate
+  const plate = new THREE.Mesh(
+    new THREE.BoxGeometry(ARM_PLATE_T, ARM_PLATE_H, ARM_PLATE_W),
+    matAluminum
+  );
+  plate.castShadow = true;
+  plate.receiveShadow = true;
+  grp.add(plate);
+
+  // Hub around the axle (the part that grips/slides on the axle)
+  const hub = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.7, 0.7, ARM_PLATE_T + 0.2, 20),
+    isSliding ? matBearing : matAluminum
+  );
+  hub.rotation.z = Math.PI / 2;
+  hub.castShadow = true;
+  grp.add(hub);
+
+  // Silicone pad on the inner face
+  const padDir = (xPos < 0) ? +1 : -1; // pad faces toward center
+  const pad = new THREE.Mesh(
+    new THREE.BoxGeometry(PAD_T, 1.0, 5.0),  // 5cm of grip along phone's long axis
+    matSilicone
+  );
+  pad.position.set(padDir * (ARM_PLATE_T / 2 + PAD_T / 2), 0, 0);
+  pad.castShadow = true;
+  grp.add(pad);
+
+  return grp;
+}
+const armEast  = makeArm(armX_FixedEast,  false); // fixed
+const armWest  = makeArm(armX_SlideWest,  true ); // sliding
+rotor.add(armEast, armWest);
+
+// ===== SPRING (between sliding west arm and west bearing) =====
+// Helical coil along X, around the axle.
+// We model it as a TubeGeometry following a helical curve.
+class HelixCurve extends THREE.Curve {
+  constructor(startX, endX, radius, turns) {
+    super();
+    this.startX = startX;
+    this.endX = endX;
+    this.radius = radius;
+    this.turns = turns;
+  }
+  getPoint(t, target = new THREE.Vector3()) {
+    const x = THREE.MathUtils.lerp(this.startX, this.endX, t);
+    const angle = t * this.turns * Math.PI * 2;
+    const y = Math.cos(angle) * this.radius;
+    const z = Math.sin(angle) * this.radius;
+    return target.set(x, y, z);
+  }
+}
+let springMesh = null;
+function buildSpring(startX, endX) {
+  if (springMesh) {
+    rotor.remove(springMesh);
+    springMesh.geometry.dispose();
+  }
+  const curve = new HelixCurve(startX, endX, 0.55, 12);
+  const geo = new THREE.TubeGeometry(curve, 200, 0.10, 8, false);
+  springMesh = new THREE.Mesh(geo, matSpring);
+  springMesh.castShadow = true;
+  rotor.add(springMesh);
+}
+// Spring sits between the west arm hub (at armX_SlideWest + ARM_PLATE_T/2 toward west)
+// and a stop fixed to the axle near the west bearing.
+const springEastEnd = armX_SlideWest - 0.6;            // attaches to west face of west arm hub
+const springWestEnd = -POST_X + POST_T / 2 + 1.2;      // ends near the inside of west bearing
+buildSpring(springWestEnd, springEastEnd);
+
+// Spring retainer disc near the west bearing (the spring pushes against this stop on the axle)
+const springStop = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.25, 20), matSteel);
+springStop.rotation.z = Math.PI / 2;
+springStop.position.set(springWestEnd - 0.15, 0, 0);
+rotor.add(springStop);
+
+// ===== STEPPER MOTOR (NEMA 17) on the east end =====
+const stepperGroup = new THREE.Group();
+const stepperBodyX = +POST_X + POST_T + 2.4;
+stepperGroup.position.set(stepperBodyX, AXLE_Y, 0);
+fixedGroup.add(stepperGroup);
+
+// Motor body (NEMA 17 = 42x42x39mm body)
+const stepperBody = new THREE.Mesh(new THREE.BoxGeometry(4.0, 4.2, 4.2), matStepper);
+stepperBody.castShadow = true;
+stepperBody.receiveShadow = true;
+stepperGroup.add(stepperBody);
+
+// Motor end caps (the metallic plates on each end)
+const stepperEndW = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4.4, 4.4), matStepperTrim);
+stepperEndW.position.x = -2.0;
+stepperGroup.add(stepperEndW);
+const stepperEndE = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4.4, 4.4), matStepperTrim);
+stepperEndE.position.x = +2.0;
+stepperGroup.add(stepperEndE);
+
+// Motor shaft (5mm)
+const motorShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 2.0, 20), matSteel);
+motorShaft.rotation.z = Math.PI / 2;
+motorShaft.position.x = -3.0;
+stepperGroup.add(motorShaft);
+
+// Flexible coupling between motor shaft and axle
+const coupling = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 1.6, 20), matAluminum);
+coupling.rotation.z = Math.PI / 2;
+coupling.position.set(POST_X + POST_T / 2 + 0.5, AXLE_Y, 0);
+fixedGroup.add(coupling);
+
+// ===== PHONE (rigidly attached to rotor — flips with the cradle) =====
+const phoneGroup = new THREE.Group();
+phoneGroup.position.set(0, 0, 0); // Attached to rotor at its center, which is at (0, AXLE_Y, 0) in world
+rotor.add(phoneGroup);
+
+// Phone body (we render top half = screen, bottom half = back, sides = frame)
+// Y up = screen up
+const phoneCore = new THREE.Mesh(
+  new THREE.BoxGeometry(PHONE_W, PHONE_T, PHONE_L),
+  matPhoneSide
+);
+phoneCore.castShadow = true;
+phoneCore.receiveShadow = true;
+phoneGroup.add(phoneCore);
+
+// Screen face (top surface, slightly inset)
+const screenGeo = new THREE.PlaneGeometry(PHONE_W * 0.86, PHONE_L * 0.92);
+const screen = new THREE.Mesh(screenGeo, matScreen);
+screen.rotation.x = -Math.PI / 2;
+screen.position.y = PHONE_T / 2 + 0.005;
+phoneGroup.add(screen);
+
+// Back face (bottom surface)
+const back = new THREE.Mesh(
+  new THREE.PlaneGeometry(PHONE_W * 0.92, PHONE_L * 0.96),
+  matPhoneBack
+);
+back.rotation.x = Math.PI / 2;
+back.position.y = -PHONE_T / 2 - 0.005;
+phoneGroup.add(back);
+
+// Camera bump on back (gives orientation cue when flipped)
+const camBump = new THREE.Mesh(
+  new THREE.BoxGeometry(2.2, 0.12, 2.2),
+  matCameraBump
+);
+camBump.position.set(-PHONE_W * 0.25, -PHONE_T / 2 - 0.06, -PHONE_L * 0.36);
+phoneGroup.add(camBump);
+
+// Three small lens circles on the bump
+for (let i = 0; i < 3; i++) {
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.08, 18), matCameraBump);
+  lens.rotation.x = Math.PI / 2;
+  lens.position.set(camBump.position.x - 0.6 + i * 0.6, camBump.position.y - 0.06, camBump.position.z);
+  phoneGroup.add(lens);
+}
+
+// ===== LABELS (HTML overlays, positions updated each frame) =====
+const labelDefs = [
+  { id: 'lbl-axle',    text: '6mm Axle',           anchor: new THREE.Vector3(0,    AXLE_Y + 0.1, 0),       offset: { x: 60,  y: -50 } },
+  { id: 'lbl-post-w',  text: 'Post (2020 ext.)',   anchor: new THREE.Vector3(-POST_X, POST_H * 0.6, 0),    offset: { x: -80, y: 0 } },
+  { id: 'lbl-bearing', text: 'Bearing 608ZZ',      anchor: new THREE.Vector3(POST_X - 1, AXLE_Y + 0.7, 0), offset: { x: 75,  y: -25 } },
+  { id: 'lbl-armE',    text: 'Fixed Arm',          anchor: new THREE.Vector3(armX_FixedEast, AXLE_Y + ARM_PLATE_H/2 + 0.6, 0), offset: { x: 60,  y: -45 } },
+  { id: 'lbl-armW',    text: 'Sliding Arm',        anchor: new THREE.Vector3(armX_SlideWest, AXLE_Y + ARM_PLATE_H/2 + 0.6, 0), offset: { x: -75, y: -45 } },
+  { id: 'lbl-padE',    text: 'Silicone Pad',       anchor: new THREE.Vector3(armX_FixedEast - 0.7, AXLE_Y - 0.5, 2.5), offset: { x: 70,  y: 25 } },
+  { id: 'lbl-spring',  text: 'Clamp Spring',       anchor: new THREE.Vector3((springWestEnd + springEastEnd) / 2, AXLE_Y + 0.7, 0), offset: { x: -90, y: -10 } },
+  { id: 'lbl-stepper', text: 'NEMA 17 Stepper',    anchor: new THREE.Vector3(stepperBodyX, AXLE_Y + 2.8, 0), offset: { x: 55,  y: -40 } },
+  { id: 'lbl-coup',    text: 'Coupling',           anchor: new THREE.Vector3(POST_X + 0.6, AXLE_Y + 0.9, 0), offset: { x: 35,  y: -30 } },
+  { id: 'lbl-phone',   text: 'Phone (clamped)',    anchor: new THREE.Vector3(0, AXLE_Y - 0.5, PHONE_L * 0.55), offset: { x: 0, y: 35 } },
+];
+
+const labelEls = {};
+const connectorsSvg = document.getElementById('connectors');
+labelDefs.forEach(def => {
+  const el = document.createElement('div');
+  el.className = 'label';
+  el.textContent = def.text;
+  el.id = def.id;
+  document.body.appendChild(el);
+  labelEls[def.id] = el;
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('stroke', 'rgba(109, 185, 255, 0.45)');
+  line.setAttribute('stroke-width', '1');
+  line.setAttribute('id', def.id + '-line');
+  connectorsSvg.appendChild(line);
+});
+
+function updateLabels() {
+  const showLabels = !document.getElementById('btnLabels').dataset.hidden;
+  labelDefs.forEach(def => {
+    const worldPos = def.anchor.clone();
+    // Anchors that are "inside the rotor" need to follow the rotor rotation.
+    // For simplicity, all anchors are in world coords; the phone label follows the phone via its anchor's own update.
+    if (def.id === 'lbl-phone') {
+      // Use the actual phone position which follows the rotor
+      const phoneWorld = new THREE.Vector3();
+      phoneCore.getWorldPosition(phoneWorld);
+      // Offset slightly south of phone in world
+      worldPos.set(phoneWorld.x, phoneWorld.y - 0.5, phoneWorld.z + PHONE_L * 0.55);
+    }
+    const screenPos = worldPos.clone().project(camera);
+    const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+    const lblX = x + def.offset.x;
+    const lblY = y + def.offset.y;
+    const el = labelEls[def.id];
+    el.style.left = lblX + 'px';
+    el.style.top = lblY + 'px';
+    el.classList.toggle('hidden', !showLabels || screenPos.z > 1);
+
+    const line = document.getElementById(def.id + '-line');
+    line.setAttribute('x1', x);
+    line.setAttribute('y1', y);
+    line.setAttribute('x2', lblX);
+    line.setAttribute('y2', lblY);
+    line.style.opacity = (!showLabels || screenPos.z > 1) ? '0' : '1';
+  });
+}
+
+// ===== ANIMATION STATE =====
+const STATE = {
+  flipping: false,
+  flipDirection: 1, // 1 = forward (0 → 180), -1 = back
+  flipProgress: 0,  // 0 → 1
+  pauseAtEnd: 0,    // countdown after reaching end
+  exploded: false,
+  loadingDemo: false,
+  loadingPhase: 0,  // 0..1 (pulled out), 1..2 (held), 2..3 (released)
+  currentRotation: 0, // radians
+  slidingArmExtraOffset: 0, // for loading demo
+  explodeAmount: 0, // for exploded view
+};
+
+// ===== EXPLODED VIEW: rest positions & explode targets =====
+// We "explode" by spreading parts outward along their natural axes.
+const explodeTargets = {
+  postWest:    { obj: postWest,    rest: postWest.position.clone(),    delta: new THREE.Vector3(-6, 0, 0) },
+  postEast:    { obj: postEast,    rest: postEast.position.clone(),    delta: new THREE.Vector3(+6, 0, 0) },
+  bearingWest: { obj: bearingWest, rest: bearingWest.position.clone(), delta: new THREE.Vector3(-3, 0, 0) },
+  bearingEast: { obj: bearingEast, rest: bearingEast.position.clone(), delta: new THREE.Vector3(+3, 0, 0) },
+  stepper:     { obj: stepperGroup,rest: stepperGroup.position.clone(),delta: new THREE.Vector3(+5, 0, 0) },
+  coupling:    { obj: coupling,    rest: coupling.position.clone(),    delta: new THREE.Vector3(+2, 0, 0) },
+  // Arms within rotor (local positions)
+  armEast:     { obj: armEast,     rest: armEast.position.clone(),     delta: new THREE.Vector3(+4, 0, 0), local: true },
+  armWest:     { obj: armWest,     rest: armWest.position.clone(),     delta: new THREE.Vector3(-4, 0, 0), local: true },
+  phone:       { obj: phoneGroup,  rest: phoneGroup.position.clone(),  delta: new THREE.Vector3(0, +6, 0), local: true },
+};
+function applyExplode(amount) {
+  for (const k in explodeTargets) {
+    const e = explodeTargets[k];
+    e.obj.position.copy(e.rest).addScaledVector(e.delta, amount);
+  }
+}
+
+// ===== Update functions =====
+function updateRotor(dt) {
+  // Flip animation
+  if (STATE.flipping) {
+    if (STATE.pauseAtEnd > 0) {
+      STATE.pauseAtEnd -= dt;
+      if (STATE.pauseAtEnd <= 0) {
+        STATE.flipDirection *= -1;
+        STATE.flipProgress = 0;
+      }
+    } else {
+      const speed = 0.55; // 1/seconds for full 0→1
+      STATE.flipProgress += dt * speed;
+      if (STATE.flipProgress >= 1) {
+        STATE.flipProgress = 1;
+        STATE.pauseAtEnd = 1.0;
+      }
+    }
+    // Easing (smoothstep)
+    const t = STATE.flipProgress;
+    const eased = t * t * (3 - 2 * t);
+    const baseAngle = (STATE.flipDirection > 0) ? 0 : Math.PI;
+    const targetAngle = (STATE.flipDirection > 0) ? Math.PI : 0;
+    STATE.currentRotation = THREE.MathUtils.lerp(baseAngle, targetAngle, eased);
+  }
+  rotor.rotation.x = STATE.currentRotation;
+
+  // Update angle display
+  const deg = Math.round((STATE.currentRotation * 180 / Math.PI) % 360);
+  const display = document.getElementById('angleDisplay');
+  if (deg < 10) {
+    display.textContent = '0° — SCREEN UP';
+    display.style.color = '#2d8a4f';
+  } else if (deg > 170) {
+    display.textContent = '180° — SCREEN DOWN';
+    display.style.color = '#e88040';
+  } else {
+    display.textContent = deg + '° — ROTATING';
+    display.style.color = '#6db9ff';
+  }
+}
+
+function updateLoading(dt) {
+  if (!STATE.loadingDemo) {
+    if (STATE.slidingArmExtraOffset !== 0) {
+      // Snap back smoothly
+      STATE.slidingArmExtraOffset = THREE.MathUtils.lerp(STATE.slidingArmExtraOffset, 0, dt * 6);
+      if (Math.abs(STATE.slidingArmExtraOffset) < 0.01) STATE.slidingArmExtraOffset = 0;
+    }
+  } else {
+    STATE.loadingPhase += dt * 0.4;
+    if (STATE.loadingPhase >= 3) STATE.loadingPhase = 0;
+
+    if (STATE.loadingPhase < 1) {
+      // Pull out
+      STATE.slidingArmExtraOffset = -2.0 * STATE.loadingPhase;
+    } else if (STATE.loadingPhase < 2) {
+      // Hold open
+      STATE.slidingArmExtraOffset = -2.0;
+    } else {
+      // Release back
+      STATE.slidingArmExtraOffset = -2.0 * (3 - STATE.loadingPhase);
+    }
+  }
+  armWest.position.x = explodeTargets.armWest.rest.x + STATE.slidingArmExtraOffset
+    + explodeTargets.armWest.delta.x * STATE.explodeAmount;
+
+  // Rebuild spring to match
+  const newSpringEastEnd = (armX_SlideWest + STATE.slidingArmExtraOffset) - 0.6;
+  buildSpring(springWestEnd, newSpringEastEnd);
+}
+
+function updateExplode(dt) {
+  const target = STATE.exploded ? 1 : 0;
+  STATE.explodeAmount = THREE.MathUtils.lerp(STATE.explodeAmount, target, dt * 4);
+  if (Math.abs(STATE.explodeAmount - target) < 0.005) STATE.explodeAmount = target;
+  applyExplode(STATE.explodeAmount);
+}
+
+// ===== Buttons =====
+const btnFlip = document.getElementById('btnFlip');
+btnFlip.addEventListener('click', () => {
+  STATE.flipping = !STATE.flipping;
+  if (STATE.flipping) {
+    btnFlip.textContent = '⏸ Pause Flip';
+    btnFlip.classList.add('active');
+    STATE.flipProgress = 0;
+    STATE.pauseAtEnd = 0;
+    STATE.flipDirection = STATE.currentRotation < Math.PI / 2 ? 1 : -1;
+  } else {
+    btnFlip.textContent = '▶ Animate Flip';
+    btnFlip.classList.remove('active');
+  }
+});
+
+const btnExploded = document.getElementById('btnExploded');
+btnExploded.addEventListener('click', () => {
+  STATE.exploded = !STATE.exploded;
+  btnExploded.classList.toggle('active', STATE.exploded);
+  btnExploded.textContent = STATE.exploded ? '⤡ Reassemble' : '⤢ Exploded View';
+});
+
+const btnLoad = document.getElementById('btnLoad');
+btnLoad.addEventListener('click', () => {
+  STATE.loadingDemo = !STATE.loadingDemo;
+  STATE.loadingPhase = 0;
+  btnLoad.classList.toggle('active', STATE.loadingDemo);
+  btnLoad.textContent = STATE.loadingDemo ? '⏹ Stop Loading' : '⇩ Show Loading';
+});
+
+const btnLabels = document.getElementById('btnLabels');
+btnLabels.addEventListener('click', () => {
+  const hidden = btnLabels.dataset.hidden === 'true';
+  btnLabels.dataset.hidden = (!hidden).toString();
+  btnLabels.classList.toggle('active', hidden);
+  btnLabels.textContent = hidden ? '🏷 Hide Labels' : '🏷 Show Labels';
+});
+
+const btnReset = document.getElementById('btnReset');
+btnReset.addEventListener('click', () => {
+  camera.position.copy(initialCamPos);
+  controls.target.set(0, 9, 0);
+});
+
+// ===== Resize =====
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== Render loop =====
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  updateRotor(dt);
+  updateLoading(dt);
+  updateExplode(dt);
+  controls.update();
+  renderer.render(scene, camera);
+  updateLabels();
+}
+animate();
+</script>
+</body>
+</html>

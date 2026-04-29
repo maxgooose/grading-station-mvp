@@ -80,7 +80,7 @@ software/grading-model/data/
 | Component | What this criteria forces |
 |---|---|
 | [Software](../software/README.md) | Per-surface, per-defect **instance segmentation** — not whole-device classification. Grading head must apply the "one deep scratch = D" rule as an OR gate. A-class needs rare-class handling. |
-| [Hardware](../hardware/README.md) | Capture must cover **every surface** — screen, back, and all edges. The U-cradle + multi-camera layout is designed for exactly this. |
+| [Hardware](../hardware/README.md) | Capture must cover **every surface** — screen, back, and all edges. MVP v1 achieves this with operator-driven manual flipping between captures; MVP v2 (deferred) automates the flip with the U-cradle. |
 | [Lighting](../lighting/README.md) | Depth ("deep" vs "not deep") is what separates C(amz)/C/D. Dark-field scratch capture is the only way to reliably see scratch geometry; bright-field alone cannot distinguish a surface scratch from a deep gouge. |
 
 ---

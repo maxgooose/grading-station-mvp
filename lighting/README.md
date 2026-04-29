@@ -36,7 +36,10 @@ Neither is better. **They capture different defects.** A real grading station ne
 
 ## The dual-capture plan
 
-Two captures per device, same fixture, same position. Mechanically free — the U-cradle holds the device stationary at each rotation angle.
+Two captures per device, same fixture, same position — bright-field then dark-field, with the LEDs switching between exposures.
+
+- **MVP v1:** the operator flips the device manually between the front-face and back-face capture pairs. Each pair (BF + DF on one face) is mechanically free — same position, lighting just switches.
+- **MVP v2 (deferred):** the U-cradle holds the device stationary through an automated 180° flip. Both pairs are then mechanically free with no operator intervention. See [`../hardware/README.md`](../hardware/README.md).
 
 ```
 same device, same position
