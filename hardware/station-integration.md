@@ -8,11 +8,16 @@ How every previously-designed piece (dark-field lighting, camera, bright-field l
 
 **Status:** First integration pass. Individual components are specced; integration decisions are flagged as **DECIDED** (locked), **RECOMMENDED** (my call, easy to flip), or **OPEN** (needs your input).
 
+**Update (2026-05-04):** Enclosure build strategy revised. We are now building the station with a **foam-board-first** approach — lighting goes in before cameras, and the whole capture enclosure wraps around a larger outer utility/wiring box. The 2020 extrusion frame is dropped for MVP v1. See the [Revised build approach (2026-05-04)](#revised-build-approach-2026-05-04) section below for the full updated sequence.
+
 ---
 
 ## The station, at a glance
 
 A light-tight enclosure (~45 × 45 × 55 cm inside dimensions) containing:
+
+- **Outer utility / wiring box** — a larger rigid box at the base that the foam board capture enclosure sits on top of. Houses PSU, MCU, MOSFET board, wiring, and room for future additions. Keeps electronics out of the light-tight capture volume. `[v1+v2]` **Added 2026-05-04.**
+- **Foam board capture shell** — matte black foam board panels (self-supporting structure, no 2020 frame for v1). Light-tight with felt gaskets, hinged front door with magnetic latch. `[v1+v2]`
 
 - **Feeding mechanism** that transports the device in to the load position and out to the operator / sort area when grading is done. `[v1+v2]` **Mechanism TBD — finalize today.** Candidates: short bidirectional conveyor (in and out through the same opening), pull-out drawer / sliding tray, gravity slide with stop. Includes a **device-present sensor** (IR break-beam or microswitch) that tells the MCU the device has arrived at the load position.
 - **Device load position** at the center.
@@ -34,15 +39,16 @@ Pulled from `lighting/README.md` + additions for the enclosure and control. **MV
 
 | Subsystem | Phase | Line items | Est. cost |
 |---|---|---|---|
-| **Enclosure** | v1 | 2020 extrusion frame + black-painted foamboard panels + hinges + magnetic door latch + flat rest plate for the device | **~$70** |
+| **Capture enclosure (foam board shell)** | v1 | Matte black foam board panels (self-supporting structure, no 2020 frame), black duct tape / hot glue for seams, hinges + magnetic door latch, light-tight felt gaskets, flat black-silicone-padded rest plate for the device. Note: 2020 extrusion frame dropped for v1 per 2026-05-04 revision. | **~$40** |
+| **Outer utility / wiring box** | v1 | Larger rigid box (cardboard, plywood, or plastic bin) that the foam board capture enclosure sits on top of or wraps around. Houses PSU, MCU, MOSFET board, excess wiring, and any bulk items acquired later. Keeps electronics separate from the light-tight capture volume. | **~$15** |
 | **Feeding mechanism** *(finalize today)* | v1 | TBD until mechanism is chosen. Range: ~$20 (gravity slide + microswitch) → ~$60 (pull-out drawer with linear rail + microswitch) → ~$120 (small bidirectional belt conveyor + DC motor + driver + IR break-beam sensor). | **~$20–120** |
 | **Dark-field lighting** | v1 | 4× LED strips, 4× diffusion-free mounts, matte-black felt liner, 4-channel MOSFET driver | **~$50** |
 | **Bright-field lighting** | v1 | Reuse Amazon lightbox LEDs (already have), mount into top of enclosure | **~$0** |
-| **Camera + lens** | v1 | USB machine-vision camera (Arducam / ELP) + 6 mm or 8 mm M12 lens | **~$80** |
+| **Camera + lens** | v1 | USB machine-vision camera (Arducam / ELP) + 6 mm or 8 mm M12 lens — purchased AFTER the foam board shell and lighting are built and verified | **~$80** |
 | **Control** | v1 | ESP32 (or Arduino Uno), 12 V / 24 V PSU, wiring, small OLED status display, start button, door interlock switch | **~$50** |
 | **U-cradle** *(deferred)* | v2 | 2020 extrusion, bearings, axle, waterjet arm plates, spring kit, silicone pads, handle | **~$200** |
 | **Motorized cradle** *(deferred, optional within v2)* | v2 | NEMA 17 stepper + TMC2209 driver + shaft coupling + mount bracket | **~$50** |
-| **Total — MVP v1 (operator manual flip + feeding)** | | | **~$270–370** |
+| **Total — MVP v1 (operator manual flip + feeding)** | | | **~$255–355** |
 | **Total — MVP v2 (manual cradle)** | | | **~$470–570** |
 | **Total — MVP v2 (motorized cradle)** | | | **~$520–620** |
 
@@ -174,6 +180,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 - **Architecture:** fixed camera + dual-capture lighting + feeding mechanism + (eventually) U-cradle with 180° flip. Not robot-arm.
 - **MVP split:** v1 ships **without** the U-cradle — operator manually flips between the two capture passes — but **with** a feeding mechanism (device in / device out). v2 drops the cradle into the same enclosure.
+- **Enclosure structure for v1 (2026-05-04):** foam board shell (self-supporting, no 2020 extrusion frame) sitting on top of a larger outer utility/wiring box. Lighting installed before cameras.
 - **Feeding mechanism is in v1 scope.** Specific mechanism is being finalized today (see OPEN below).
 - **Dual-capture:** bright-field + dark-field per device, per side.
 - **Black everything inside** the enclosure. Mandatory for dark-field contrast.
@@ -189,7 +196,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 | **Lens** | 6 mm M12 | Covers 12.9" iPad at 28 cm. |
 | **Number of dark-field LEDs** | 4 (all 4 sides) | Covers all scratch orientations. ~$20 more than 2, worth it. |
 | **Bright-field source** | Reuse Amazon lightbox LED strip panel | Already own it. Mount as diffused panel inside the enclosure top. |
-| **Enclosure build** | 2020 extrusion frame + black foamboard panels | Cheap, modifiable, light-tight with felt gaskets. **Leave clear airspace and mounting points where the v2 cradle posts will go.** |
+| **Enclosure build** | **Revised (2026-05-04):** matte black foam board shell (no 2020 frame for v1) → lighting first → cameras later. Built to sit on/around a larger outer utility box for wiring. See [Revised build approach](#revised-build-approach-2026-05-04). | Cheaper and faster than the original 2020-frame plan. Foam board is self-supporting for this scale. **Still leave clear airspace and mounting points where the v2 cradle posts will go.** |
 | **MCU** | ESP32 dev board | WiFi for debugging, 3.3 V, plenty of GPIO. Same board carries forward into v2. |
 | **Host** | Laptop (dev) → Raspberry Pi 5 (production) | USB camera + basic inference; no GPU needed for a small classifier |
 
@@ -218,23 +225,33 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 ---
 
-## Build order (once parts are ordered)
+## Revised build approach (2026-05-04)
 
-Minimum-risk sequence — build one subsystem at a time, verify it works before moving on.
+**Decision date: 2026-05-04.** The original 2020-extrusion-frame plan is replaced with a simpler, faster foam-board-first build for MVP v1. The key shifts:
 
-### MVP v1
+- **Foam board is the structure, not just cladding.** No 2020 extrusion frame for v1 — the matte black foam board panels ARE the enclosure. Self-supporting at this scale, cheaper, and faster to iterate on.
+- **Lighting goes in before cameras.** Buy the dark-field LED strips and bright-field panel early. Get the illumination right inside the foam board shell. Only then buy cameras — because the camera specs depend on the actual lighting geometry inside the real enclosure, not on paper estimates.
+- **Everything wraps around a larger outer utility/wiring box.** The foam board capture enclosure sits on top of (or wraps around) a bigger box — cardboard, plywood, or a plastic bin — that houses the PSU, MCU, MOSFET board, excess wiring, and any other bulk items we acquire later. This keeps the electronics out of the light-tight capture volume and gives us room to grow.
 
-0. **Finalize the feeding mechanism design** (gates everything below — see OPEN #1).
-1. **Enclosure skeleton** — 2020 frame, no panels yet. Bare frame to mount everything. **Reserve the central footprint and side-panel pass-throughs the v2 cradle will need** (axle posts, handle exit slot). **Cut the feed-in / feed-out opening(s)** based on the chosen mechanism's geometry.
-2. **Feeding mechanism** — build per the finalized design. Mount the device-present sensor at the load position. Verify the device arrives consistently (same X/Y, same orientation) across 50 trials before moving on.
+### MVP v1 — foam-board-first build sequence
+
+0. **Acquire the outer utility/wiring box first.** Find a rigid box (cardboard, plywood, plastic bin — anything sturdy) large enough to hold the PSU, ESP32, MOSFET board, wiring, and room for future additions. This box sets the footprint everything else builds on. ~$15.
+
+1. **Build the foam board capture shell** — cut and assemble matte black foam board panels into a ~45 × 45 × 55 cm light-tight box. Black duct tape and hot glue for seams. Hinged front door with magnetic latch and felt gaskets for light-tight sealing. This shell sits on top of (or wraps around) the utility box from step 0. **Reserve central footprint and side-panel pass-throughs for the v2 cradle** (axle posts, handle exit slot). **Cut feed-in / feed-out openings** based on the chosen feeding mechanism geometry. ~$40.
+
+2. **Finalize the feeding mechanism design** — pick conveyor vs tray vs drawer vs slide. Build it. Mount the device-present sensor at the load position. Verify the device arrives at the same X/Y/orientation across 50 trials before moving on. ~$20–120.
+
 3. **Device rest plate** at the end of the feeding path — flat black-silicone-padded plate at the load position. Sized for the largest day-1 form factor. (Replaced by the U-cradle in v2.)
-4. **Camera + lens mount** — centered above the rest plate, adjustable height. Verify whole device fits frame in both screen-up and screen-down orientations.
-5. **Panels + light-tight sealing** — black foamboard, felt gaskets on the door **and around the feed openings**.
-6. **Bright-field lighting** — reuse Amazon tent LEDs on top inner surface, diffused.
-7. **Dark-field lighting** — 4 LED strips at grazing angle on 4 sides. **Run the eyeball test inside the enclosure** before wiring MOSFETs.
-8. **Electrical / MCU** — wire LEDs through MOSFETs, wire the feeding mechanism actuator + device-present sensor, test each channel independently, then integrate sequence firmware (including the operator "FLIP DEVICE" prompt and the feed-in / feed-out steps).
-9. **Host software** — capture 4 frames across two operator-flipped passes, save with timestamps, feed to inference.
-10. **End-to-end test** — one device, full cycle (feed in → captures → manual flip → captures → grade → feed out), manual inspection of output grade.
+
+4. **Buy and install lighting** — bright-field first (reuse Amazon tent LEDs, mount diffused panel on inner top surface), then dark-field (4 LED strips at grazing angle on all 4 sides). **Run the eyeball test inside the foam board shell** before wiring MOSFETs — this is the most important verification step. Do NOT buy cameras until this passes. ~$50.
+
+5. **Buy and mount camera + lens** — only after the lighting is verified inside the real enclosure. Use the actual lighting geometry (not paper estimates) to confirm camera height, lens choice, and FOV. Verify the whole device fits in frame in both orientations. ~$80.
+
+6. **Wire electrical / MCU** — mount the ESP32, MOSFET board, and PSU inside the outer utility box. Run wires through a small light-tight pass-through from the utility box into the capture enclosure. Wire LEDs through MOSFETs, wire the feeding mechanism actuator + device-present sensor, test each channel independently, then integrate sequence firmware (including the operator "FLIP DEVICE" prompt and feed-in / feed-out steps). ~$50.
+
+7. **Host software** — capture 4 frames across two operator-flipped passes, save with timestamps, feed to inference.
+
+8. **End-to-end test** — one device, full cycle (feed in → captures → manual flip → captures → grade → feed out), manual inspection of output grade.
 
 ### MVP v2 *(deferred)*
 
@@ -242,6 +259,26 @@ Minimum-risk sequence — build one subsystem at a time, verify it works before 
 2. **Mount cradle inside enclosure** — replaces the v1 rest plate. Verify the manual handle exits through the pre-cut side-panel slot cleanly.
 3. **Camera registration check** — 50 cycles at 0° ↔ 180°, target a few pixels of drift or less.
 4. **Update firmware** — drop the "FLIP DEVICE" prompt; insert the cradle-rotate step. Same lighting / camera / inference path.
+
+---
+
+## Outer utility / wiring box
+
+**Added 2026-05-04.** The foam board capture enclosure is not a standalone box — it sits on top of (or wraps around) a larger, sturdier outer box that holds everything that doesn't need to be inside the light-tight capture volume.
+
+| What lives in the outer box | Why it's here, not in the capture enclosure |
+|---|---|
+| **PSU** (24V / 5A bench supply) | Heat, bulk, doesn't need dark conditions |
+| **ESP32 / MCU** | GPIO access for debugging; status LED visible without opening the capture door |
+| **MOSFET driver board** | Wire routing is cleaner with short runs to the MCU |
+| **Excess wiring, connectors, spares** | Keeps the capture volume clean — no clutter in the camera FOV |
+| **Future additions** (Raspberry Pi, USB hub, etc.) | Room to grow without rebuilding the light-tight shell |
+
+**Physical relationship:**
+- The outer box is the **base**. The foam board capture shell sits on top of it.
+- A small light-tight pass-through (foam grommet or black-caulk-sealed hole) routes LED power wires from the MOSFET board in the outer box up into the capture enclosure.
+- The outer box does **not** need to be light-tight. It's a utility compartment.
+- Suggested starting point: a sturdy cardboard box, ~40 × 30 × 20 cm. Upgrade to plywood later if needed.
 
 ---
 
