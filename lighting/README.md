@@ -10,7 +10,7 @@ How the device is illuminated during capture. This is the most under-valued and 
 
 | File | What it is |
 |---|---|
-| [`lighting-decision-and-plan.md`](lighting-decision-and-plan.md) | **Start here.** Current decision (keep Amazon lightbox, add dark-field rig), the dual-capture plan, the zero-cost eyeball test, open questions. |
+| [`lighting-decision-and-plan.md`](lighting-decision-and-plan.md) | **Start here.** Current decision (lightbox was returned; replace bright-field source + add dark-field rig), the dual-capture plan, the zero-cost eyeball test, open questions. |
 | [`optics-for-hire-scratch-detection.md`](optics-for-hire-scratch-detection.md) | Full technical breakdown of the Optics for Hire blog post — the source of the dark-field idea. Hardware, illumination principle, pipeline, transferable lessons. |
 
 ---
@@ -27,7 +27,7 @@ A phone screen is a mirror. An intact surface bounces light in one direction (sp
 
 | Regime | Camera position | Intact screen looks | Scratch looks | Dents / cracks / paint wear | Our rig |
 |---|---|---|---|---|---|
-| **Bright-field** | In the specular bounce path | Bright | Faint dark line (tiny contrast) | Visible as soft shadows | Amazon photo tent (purchased 2026-04-14) |
+| **Bright-field** | In the specular bounce path | Bright | Faint dark line (tiny contrast) | Visible as soft shadows | Amazon photo tent (purchased 2026-04-14, later returned) |
 | **Dark-field** | Outside the specular bounce path | Black (bounce goes elsewhere) | Bright line (huge contrast — "pops like stars") | Invisible (black background) | To build — grazing-angle LED + black enclosure |
 
 Neither is better. **They capture different defects.** A real grading station needs both.
@@ -44,7 +44,7 @@ Two captures per device, same fixture, same position — bright-field then dark-
 ```
 same device, same position
   │
-  ├──► capture A: bright-field (current lightbox) ──► bright-field defect segmenter
+  ├──► capture A: bright-field (replacement diffused source) ──► bright-field defect segmenter
   │
   └──► capture B: dark-field (new rig)            ──► dark-field scratch segmenter
                                                       │
@@ -62,17 +62,17 @@ same device, same position
 
 ---
 
-## Why keep the Amazon lightbox
+## Lightbox status update
 
-- Solves a real problem: uniform bright-field illumination fixed the Grad-CAM background-shortcut issue in the POC classifier.
-- Excellent for every defect *except* scratches: paint wear, dents, cracks, chips, stains, edge damage, logos, labels, and screen-content legibility.
-- It just doesn't solve the scratch problem. Scratches need dark-field. Don't return the tent — augment it.
+- The Amazon lightbox was purchased on 2026-04-14 and later returned.
+- The project still needs a uniform bright-field source because that lighting condition reduces background shortcut risk in the classifier pipeline.
+- Next action: source a replacement diffused bright-field panel/tent and pair it with the planned dark-field rig.
 
 ---
 
 ## Dark-field rig — hardware to add
 
-Cheap. Prototype-able under $40, or for **free** by draping black fabric inside the existing lightbox during the dark-field pass.
+Cheap. Prototype-able under $40 with a replacement bright-field source plus a dark-field add-on enclosure.
 
 | Part | Est. cost |
 |---|---|
@@ -94,7 +94,7 @@ This is the **single most important next step**. 15 minutes. Definitively answer
 3. Hold the device under the lamp and tilt slowly through angles.
 4. At one specific angle, **every scratch will suddenly glow bright white** on a dark screen. Dramatic and unmistakable.
 5. Take two photos:
-   - One in the Amazon lightbox (bright-field baseline).
+   - One with any temporary diffused bright-field setup (bright-field baseline).
    - One at the magic dark-field angle from step 4 (phone flashlight or lamp + any camera is fine).
 6. Compare side by side. Save both to `software/grading-model/data/lighting-test/`.
 

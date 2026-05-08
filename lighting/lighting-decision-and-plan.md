@@ -7,10 +7,10 @@
 
 ## Current state of the lightbox
 
-- **What it is:** A typical Amazon photo tent (diffused fabric walls, LED strips, soft uniform fill from multiple sides). Purchased 2026-04-14 to fix the Grad-CAM background shortcut.
+- **What it was:** A typical Amazon photo tent (diffused fabric walls, LED strips, soft uniform fill from multiple sides). Purchased 2026-04-14 to fix the Grad-CAM background shortcut, then later returned.
 - **What it does well:** Uniform **bright-field** illumination. Excellent for paint wear, dents, cracks, chips, stains, edge damage, logos, labels, and reading screen content.
 - **What it does badly:** Scratches. A diffused tent lights the device from every angle at once, so there is no "dark zone" for the camera to sit in. Scratches have near-zero contrast against the bright screen surface.
-- **Decision: KEEP the lightbox. Do not return it.** It solves a real problem (bulk defect capture + background shortcut fix). It just does not solve the scratch problem.
+- **Decision update:** The lightbox has already been returned. Replace it with another diffused bright-field source while still adding dark-field for scratch visibility.
 
 ---
 
@@ -41,7 +41,7 @@ Two captures per device per face, same fixture, same position. The bright-field 
 
 | Capture | Lighting | Purpose | Defect classes detected |
 |---|---|---|---|
-| **A — Bright-field** | Current Amazon lightbox | Bulk cosmetic grading | Paint wear, dents, cracks, chips, stains, edge damage, logos |
+| **A — Bright-field** | Replacement diffused bright-field source | Bulk cosmetic grading | Paint wear, dents, cracks, chips, stains, edge damage, logos |
 | **B — Dark-field** | New grazing-angle LED + black enclosure (to build) | Scratch-only grading | Scratches, hairline cracks, fine abrasion |
 
 **Grading head:** rule-based combiner, human-readable, no retraining needed to change thresholds.
@@ -60,9 +60,9 @@ Each model solves one problem it is good at. The grading rule stays legible and 
 
 ## Hardware to add (dark-field rig)
 
-Cheap. Can prototype under $40. Can also prototype **free** by just draping black fabric inside the existing lightbox for the dark-field pass.
+Cheap. Can prototype under $40 using a simple replacement diffused source plus a dark-field add-on.
 
-- 1× LED strip (~$10) — same kind as the existing lightbox
+- 1× LED strip (~$10) — any equivalent strip works
 - Black matte liner or small separate enclosure (~$15) — black felt or black foamboard
 - LED positioned **grazing angle above the device** so specular bounce misses the lens
 - Independent LED switching (MOSFET + GPIO, ~$10) to toggle between bright-field and dark-field passes
@@ -79,7 +79,7 @@ This is the single most important next step. It takes 15 minutes and definitivel
 3. Hold the device under the lamp and tilt slowly through angles.
 4. At one specific angle, **every scratch will suddenly glow bright white** on a dark screen. Dramatic and unmistakable.
 5. Take two photos:
-   - One in the current Amazon lightbox (bright-field baseline).
+   - One in any temporary diffused bright-field setup (bright-field baseline).
    - One at the magic dark-field angle from step 4 (phone flashlight or lamp + hand-held camera is fine).
 6. Compare side by side.
 
@@ -94,13 +94,13 @@ This is the single most important next step. It takes 15 minutes and definitivel
 2. **Confirm the device set's scratch distribution** — are scratches on the front glass, back glass, or both? Dark-field needs to be applied to whichever surface has them.
 3. **Decide on labeling schema for segmentation.** `scratch`, `crack`, `dent`, `paint_wear`, `chip`, `stain` — finalized list before any labeling starts (relabeling is expensive, schema changes late are painful).
 4. **Decide whether to keep cross-polarization anywhere in the station.** It suppresses scratch scatter; it should NOT be on the dark-field capture. If it's on the bright-field capture for glare rejection, that's fine.
-5. **Budget the labeling effort.** ~300 existing images × polygon masks ≈ 20–40 hours in Roboflow/CVAT. Decide whether to relabel all or start fresh with lightbox-only captures.
+5. **Budget the labeling effort.** ~300 existing images × polygon masks ≈ 20–40 hours in Roboflow/CVAT. Decide whether to relabel all or start fresh with replacement-bright-field captures.
 
 ---
 
 ## What the models look like under this plan
 
 - **Current EfficientNet-B0 binary classifier** → retired. Replaced by two segmentation models + rules.
-- **Bright-field defect segmenter** — multi-class instance segmentation on lightbox captures. Candidates: YOLOv8-seg (fast baseline), U-Net (better for thin cracks), SegFormer-B0 (modern alternative).
+- **Bright-field defect segmenter** — multi-class instance segmentation on diffused bright-field captures. Candidates: YOLOv8-seg (fast baseline), U-Net (better for thin cracks), SegFormer-B0 (modern alternative).
 - **Dark-field scratch segmenter** — single-class segmentation on dark-field captures. Candidates: U-Net or SegFormer preferred over YOLOv8-seg, because scratches are thin linear features that YOLO's mask prototypes handle poorly (see `rotberg-yolov8-repo-analysis.md`).
 - **Grading head** — pure Python rules over the combined instance list from both models. Not a neural network.

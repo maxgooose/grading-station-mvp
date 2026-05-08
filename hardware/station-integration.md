@@ -25,7 +25,7 @@ A light-tight enclosure (~45 × 45 × 55 cm inside dimensions) containing:
   - `[v2 — deferred]` **U-cradle** holds the device stationary through an automated 180° flip. Same enclosure, same camera/lighting layout — drops in where the v1 rest plate sits. (Feeding mechanism is unchanged from v1.)
 - **Camera** mounted directly above the device, pointing straight down. `[v1+v2]`
 - **4 LED strips** at screen-plane height on all 4 sides for dark-field. `[v1+v2]`
-- **Bright-field light panel** on the inner top surface (diffused, reused from Amazon tent). `[v1+v2]`
+- **Bright-field light panel** on the inner top surface (diffused; source needs replacement after Amazon tent return). `[v1+v2]`
 - **MOSFET + MCU** in a separate electronics compartment, controlling lighting + camera trigger + feeding mechanism actuator + device-present sensor (+ cradle motor in v2). `[v1+v2]`
 - **Operator loading door** on the front (still needed in v1 for the manual mid-cycle flip). `[v1+v2]`
 
@@ -43,12 +43,12 @@ Pulled from `lighting/README.md` + additions for the enclosure and control. **MV
 | **Outer utility / wiring box** | v1 | Larger rigid box (cardboard, plywood, or plastic bin) that the foam board capture enclosure sits on top of or wraps around. Houses PSU, MCU, MOSFET board, excess wiring, and any bulk items acquired later. Keeps electronics separate from the light-tight capture volume. | **~$15** |
 | **Feeding mechanism** *(finalize today)* | v1 | TBD until mechanism is chosen. Range: ~$20 (gravity slide + microswitch) → ~$60 (pull-out drawer with linear rail + microswitch) → ~$120 (small bidirectional belt conveyor + DC motor + driver + IR break-beam sensor). | **~$20–120** |
 | **Dark-field lighting** | v1 | 4× LED strips, 4× diffusion-free mounts, matte-black felt liner, 4-channel MOSFET driver | **~$50** |
-| **Bright-field lighting** | v1 | Reuse Amazon lightbox LEDs (already have), mount into top of enclosure | **~$0** |
+| **Bright-field lighting** | v1 | Replacement diffused panel/tent + mount into top of enclosure (Amazon lightbox was returned) | **~$25** |
 | **Camera + lens** | v1 | USB machine-vision camera (Arducam / ELP) + 6 mm or 8 mm M12 lens — purchased AFTER the foam board shell and lighting are built and verified | **~$80** |
 | **Control** | v1 | ESP32 (or Arduino Uno), 12 V / 24 V PSU, wiring, small OLED status display, start button, door interlock switch | **~$50** |
 | **U-cradle** *(deferred)* | v2 | 2020 extrusion, bearings, axle, waterjet arm plates, spring kit, silicone pads, handle | **~$200** |
 | **Motorized cradle** *(deferred, optional within v2)* | v2 | NEMA 17 stepper + TMC2209 driver + shaft coupling + mount bracket | **~$50** |
-| **Total — MVP v1 (operator manual flip + feeding)** | | | **~$255–355** |
+| **Total — MVP v1 (operator manual flip + feeding)** | | | **~$280–380** |
 | **Total — MVP v2 (manual cradle)** | | | **~$470–570** |
 | **Total — MVP v2 (motorized cradle)** | | | **~$520–620** |
 
@@ -195,7 +195,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 | **Camera** | Arducam / ELP USB 1080p with M12 lens | Enough resolution for whole-device frame (~150 µm/px on a 6" phone at 28 cm). Industrial cameras are overkill until we know the pipeline works. |
 | **Lens** | 6 mm M12 | Covers 12.9" iPad at 28 cm. |
 | **Number of dark-field LEDs** | 4 (all 4 sides) | Covers all scratch orientations. ~$20 more than 2, worth it. |
-| **Bright-field source** | Reuse Amazon lightbox LED strip panel | Already own it. Mount as diffused panel inside the enclosure top. |
+| **Bright-field source** | Buy a replacement diffused bright-field source | Previous Amazon lightbox was returned; replacement is required before integration. |
 | **Enclosure build** | **Revised (2026-05-04):** matte black foam board shell (no 2020 frame for v1) → lighting first → cameras later. Built to sit on/around a larger outer utility box for wiring. See [Revised build approach](#revised-build-approach-2026-05-04). | Cheaper and faster than the original 2020-frame plan. Foam board is self-supporting for this scale. **Still leave clear airspace and mounting points where the v2 cradle posts will go.** |
 | **MCU** | ESP32 dev board | WiFi for debugging, 3.3 V, plenty of GPIO. Same board carries forward into v2. |
 | **Host** | Laptop (dev) → Raspberry Pi 5 (production) | USB camera + basic inference; no GPU needed for a small classifier |
@@ -219,7 +219,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 4. **Device variety on day 1.** Are we optimizing for phones only, or does day-1 need to handle tablets too? Affects enclosure size, camera lens choice, feeding mechanism width, and (later) cradle pad groove.
 
-5. **Bright-field inside the dark-field enclosure** — can we really reuse the Amazon tent LEDs in this form factor, or do we need to buy a dedicated diffused panel? Depends on how much we can disassemble the tent. ~$25 risk.
+5. **Bright-field source selection after return** — choose replacement diffused panel/tent geometry that fits the enclosure and provides uniform top illumination. Budget ~$25.
 
 6. **Grade feedback UI.** Just show a letter on an OLED? Or a full screen with the annotated image? Full screen = ~$40 extra, better UX, more wiring. (In v1 the same display also drives the "FLIP DEVICE" prompt.)
 
@@ -243,7 +243,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 3. **Device rest plate** at the end of the feeding path — flat black-silicone-padded plate at the load position. Sized for the largest day-1 form factor. (Replaced by the U-cradle in v2.)
 
-4. **Buy and install lighting** — bright-field first (reuse Amazon tent LEDs, mount diffused panel on inner top surface), then dark-field (4 LED strips at grazing angle on all 4 sides). **Run the eyeball test inside the foam board shell** before wiring MOSFETs — this is the most important verification step. Do NOT buy cameras until this passes. ~$50.
+4. **Buy and install lighting** — bright-field first (replacement diffused source mounted on inner top surface), then dark-field (4 LED strips at grazing angle on all 4 sides). **Run the eyeball test inside the foam board shell** before wiring MOSFETs — this is the most important verification step. Do NOT buy cameras until this passes. ~$75.
 
 5. **Buy and mount camera + lens** — only after the lighting is verified inside the real enclosure. Use the actual lighting geometry (not paper estimates) to confirm camera height, lens choice, and FOV. Verify the whole device fits in frame in both orientations. ~$80.
 
