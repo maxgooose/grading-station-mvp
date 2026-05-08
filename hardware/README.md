@@ -126,6 +126,7 @@ These will kill the U-cradle build if skipped (relevant only when v2 starts):
 ## Progress log (MVP v1)
 
 - **2026-05-08 — Procurement milestone:** Purchased **4x IMX323 USB camera modules** (Amazon listing: `https://www.amazon.com/IMX323-Camera-Module-Webcam-Microphone/dp/B071RBFYH6?th=1`) for the station camera bring-up and integration phase.
+- **2026-05-08 — Procurement milestone:** Purchased **1x top camera** — ELP 4K USB/HDMI manual-focus camera (Amazon listing: `https://www.amazon.com/ELP-HDMI-Camera-Manual-Webcam/dp/B0CDGVZWQM?th=1`) for overhead dark-field capture.
 
 ---
 
