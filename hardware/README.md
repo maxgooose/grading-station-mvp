@@ -25,6 +25,8 @@ The physical grading station: enclosure, cameras, lighting, a feeding mechanism 
 | [`power-and-usb.md`](power-and-usb.md) | **USB class** for purchased cameras (USB 2 UVC), **12 V LED + 24 V PSU** wiring, MOSFET/buck sizing worksheet, on-site ELP verification checklist. |
 | [`station-visualization.html`](station-visualization.html) | Step-by-step animated visualization of the full grading station cycle. **Visualizes the MVP v2 end-state** (with the automated flip mechanism). Open in a browser. |
 | [`universal-cellular-3d.html`](universal-cellular-3d.html) | 3D prototype view of the Universal Cellular grading station (turntable + manual operator flip — closer to the MVP v1 capture flow). Open in a browser. |
+| [`shell-v1-3d.html`](shell-v1-3d.html) | **CANONICAL v1 enclosure build.** Interactive 3D model of the as-built shell: a 12"×12"×12" cube on a 24"×12" floor plank (front 12" overhangs as a loading shelf). Explode/door/device/utility-box/v2-cradle toggles. Open in a browser. |
+| [`shell-v1-cut-sheet.html`](shell-v1-cut-sheet.html) | **CANONICAL v1 cut sheet.** Per-panel pencil drawings (P1–P6) with dimensions, cut lines, drill points, and orientation arrows. This is what the physical panels were marked from. Open in a browser. |
 
 ---
 
@@ -130,6 +132,9 @@ These will kill the U-cradle build if skipped (relevant only when v2 starts):
 - **2026-05-08 — Procurement milestone:** Purchased **1x top camera** — ELP 4K USB/HDMI manual-focus camera (Amazon listing: `https://www.amazon.com/ELP-HDMI-Camera-Manual-Webcam/dp/B0CDGVZWQM?th=1`) for overhead dark-field capture.
 - **2026-05-09 — Procurement milestone:** Purchased enclosure panel stock — **5× plank boards, 12" × 12"** and **1× large plank board, 24" wide × 12" tall**. Painted matte black for the foam-board-shell enclosure (gloss kills cross-polarized captures, per the build rules above).
 - **2026-05-09 — Lighting eyeball test PASSED.** Bright-field + dark-field illumination verified inside the foam board shell per the gate in [`station-integration.md`](station-integration.md#revised-build-approach-2026-05-04) (step 4). Bright-field gives uniform top illumination across the load position; dark-field LED strips at grazing angle produce clean shadows with no spill into the camera FOV. Camera mounting / integration is now unblocked.
+- **2026-05-20 — Shell v1 design FINALIZED.** Enclosure dimensions locked to fit the purchased panels exactly: a **12"×12"×12" cube** sitting on the **24"×12" plank laid flat as the floor**, with the front 12" of the floor overhanging as a **loading shelf** (also the future mounting surface for the feeding mechanism). Open-bottom (sits on the outer utility box). Uses all 6 boards, no waste. Canonical references: [`shell-v1-3d.html`](shell-v1-3d.html) (3D build) and [`shell-v1-cut-sheet.html`](shell-v1-cut-sheet.html) (per-panel cut drawings P1–P6). **This supersedes the old ~45×45×55 cm interior figure in [`station-integration.md`](station-integration.md).**
+- **2026-05-20 — Top-camera mount DECIDED.** ELP 4K (CS-mount 2.8–12mm varifocal, 38mm PCB) mounts via its **bracket sitting on TOP** of the roof panel (P2); the lens hangs DOWN through a hole into the box. Lens widest point measured **1.9"** → **⌀2" lens hole** (locked, 0.1" clearance). No light path from above because the bracket base covers the hole. Focus/zoom set through the front door during setup, then locked. Bracket fixing-screw pattern still TBD (depends on physical bracket).
+- **2026-05-21 — Panels MARKED, ready to cut.** All 6 panels drawn in pencil per the cut sheet (P1 floor reference lines, P2 ⌀2" camera hole + bracket footprint, P3 8"×9" door + hinge/latch dots, P4 ⌀1" wire pass-through, P5/P6 future-cut marks left un-cut). **Next physical step: cut P2/P3, drill P4, then assemble** (see Immediate next steps).
 
 ---
 
@@ -137,13 +142,15 @@ These will kill the U-cradle build if skipped (relevant only when v2 starts):
 
 ### MVP v1 (now)
 
-1. **Finalize the feeding mechanism today.** Pick the in / out path (conveyor, tray, drawer, slide, or other), the hand-off geometry to the load position, and the trigger that says "device is in place, start capture." This decision sets the enclosure footprint and door geometry, so it has to happen before the enclosure is built — see [`station-integration.md`](station-integration.md).
-2. Build the **enclosure** (2020 frame + black foamboard panels) — sized to fit the chosen feeding path. See [`station-integration.md`](station-integration.md).
-3. Build the **feeding mechanism** per the finalized design.
-4. Mount the **camera + lens** centered above the load position. Verify the whole device fits in frame for the largest form factor we care about on day 1.
-5. Wire **bright-field + dark-field lighting** with independent MOSFET switching. Run the eyeball test inside the enclosure ([`../lighting/`](../lighting/README.md)).
-6. Wire the full **capture cycle**: feed in → device-present sensor → BF shot → DF shot → prompt operator to flip → door interlock → BF shot → DF shot → grade → feed out.
-7. **Make the load position v2-ready.** Leave physical clearance and mounting points for the U-cradle's axle posts so v2 is a drop-in upgrade, not a rebuild.
+**Where we are:** shell v1 is designed (12" cube + 24"×12" floor shelf), camera hole is decided (⌀2"), and **all 6 panels are marked in pencil per the [cut sheet](shell-v1-cut-sheet.html)** as of 2026-05-21. The build is at the "start cutting" stage.
+
+1. **Cut and drill the panels** per [`shell-v1-cut-sheet.html`](shell-v1-cut-sheet.html): P2 (⌀2" camera hole), P3 (8"×9" door + hinge/latch pilots), P4 (⌀1" wire pass-through). Leave P5/P6 future-cut marks un-cut. P1 (floor) gets reference lines only.
+2. **Assemble the shell** (assembly order is on the cut sheet): floor P1 → walls P4/P5/P6/P3 → roof P2. Tape seams light-tight; felt-gasket the door opening.
+3. **Mount the top camera (ELP 4K)** — bracket on top of P2, lens through the ⌀2" hole. Once the physical bracket is in hand, measure its fixing-screw pattern and finalize those pilot holes (currently TBD on P2). Verify the whole device fits in frame; set + lock focus/zoom through the door.
+4. Wire **bright-field + dark-field lighting** with independent MOSFET switching (lighting eyeball test already PASSED — see progress log).
+5. Wire the full **capture cycle**: device-present sensor → BF shot → DF shot → prompt operator to flip → door interlock → BF shot → DF shot → grade.
+6. **Feeding mechanism — still deferred/OPEN.** Not chosen yet; the left wall (P5) has a future feed-slot marked but un-cut, and the floor shelf is reserved for it. See the OPEN section in [`station-integration.md`](station-integration.md).
+7. **Keep the load position v2-ready.** P6 has the future U-cradle handle-exit marked but un-cut; leave central clearance for the axle posts.
 
 ### MVP v2 (deferred — do not start)
 

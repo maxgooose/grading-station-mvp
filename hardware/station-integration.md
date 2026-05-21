@@ -99,13 +99,15 @@ Coordinate system: **origin at the center of the device when loaded**, **Z up**,
            matte black everywhere
 ```
 
-### Key dimensions (DECIDED)
+### Key dimensions
 
-| Dimension | Value | Why |
+> **AS-BUILT (2026-05-20) supersedes the planning envelope below.** The v1 shell was sized to the panels actually purchased: a **12"×12"×12" cube (≈30×30×30 cm)** on a **24"×12" floor plank** (front 12" overhangs as a loading shelf), open-bottom on the outer utility box. Canonical: [`shell-v1-3d.html`](shell-v1-3d.html) + [`shell-v1-cut-sheet.html`](shell-v1-cut-sheet.html). The 45×45×55 cm figures below were the original planning envelope — kept for context, but the build is the 12" cube. Top camera (ELP 4K) hangs from a bracket on the roof through a ⌀2" lens hole; at ~8" working distance the 2.8mm wide end covers the full device.
+
+| Dimension | Original planning value | Why |
 |---|---|---|
-| Inside width × depth | 45 × 45 cm | Clearance for 12.9" iPad Pro + cradle arms + 4 LED strips |
-| Inside height | 55 cm | Camera working distance (25–35 cm) + cradle + base clearance |
-| Camera height above device | 28 cm | Matches 6–8 mm M12 lens FOV for whole-device frame |
+| Inside width × depth | 45 × 45 cm *(as-built: 30 × 30 cm)* | Clearance for 12.9" iPad Pro + cradle arms + 4 LED strips |
+| Inside height | 55 cm *(as-built: 30 cm — tight for v2 cradle, fine for v1)* | Camera working distance (25–35 cm) + cradle + base clearance |
+| Camera height above device | 28 cm *(as-built: ~20 cm, lens hangs from roof)* | Matches lens FOV for whole-device frame |
 | LED strip height above device surface | ~5 mm | At screen plane; grazing 10–15° angle |
 | LED strip distance from device edge | 4 cm | Bright scatter without appearing in frame |
 
