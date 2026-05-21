@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shell v1 — Cut Sheet (per-panel pencil drawings)</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+  }
+  #navbar {
+    position: sticky; top: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(8, 12, 20, 0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+    display: flex; align-items: center;
+    padding: 0 20px; z-index: 100; gap: 8px;
+  }
+  #navbar .home {
+    color: #6db9ff; text-decoration: none;
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid rgba(109, 185, 255, 0.3);
+  }
+  #navbar .home:hover { background: rgba(109, 185, 255, 0.15); }
+  #navbar .sep { color: #3a4858; margin: 0 6px; }
+  #navbar a.nav-link {
+    color: #8fa3b8; text-decoration: none;
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.8px; padding: 8px 12px;
+    border-radius: 6px;
+  }
+  #navbar a.nav-link:hover { color: #e8eef5; background: rgba(255,255,255,0.04); }
+  #navbar .title {
+    color: #4dc06e; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 8px 12px; border-radius: 6px;
+    background: rgba(45, 138, 79, 0.18);
+    margin-left: 8px;
+  }
+  .container {
+    max-width: 1300px; margin: 0 auto;
+    padding: 30px 24px 60px;
+  }
+  h1.page-title {
+    font-size: 24px; font-weight: 700;
+    color: #6db9ff; margin: 0 0 6px 0;
+    letter-spacing: 0.3px;
+  }
+  .page-sub {
+    color: #8fa3b8; font-size: 13px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .page-sub b { color: #e8eef5; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    background: rgba(15, 22, 33, 0.7);
+    border: 1px solid rgba(100, 180, 255, 0.18);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 32px;
+    font-size: 12px;
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; color: #8fa3b8; }
+  .legend .swatch { display: inline-block; }
+  .panel-card {
+    background: rgba(15, 22, 33, 0.7);
+    border: 1px solid rgba(100, 180, 255, 0.18);
+    border-radius: 14px;
+    padding: 22px 26px 28px;
+    margin-bottom: 28px;
+  }
+  .panel-card h2 {
+    margin: 0 0 4px 0;
+    font-size: 18px; font-weight: 700;
+    color: #4dc06e;
+    letter-spacing: 0.4px;
+  }
+  .panel-card .role {
+    color: #e8eef5; font-size: 14px; font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .panel-card .meta {
+    color: #8fa3b8; font-size: 12px;
+    margin-bottom: 16px;
+  }
+  .panel-card .meta b { color: #e8eef5; }
+  .panel-row {
+    display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+    gap: 28px; align-items: flex-start;
+  }
+  @media (max-width: 900px) { .panel-row { grid-template-columns: 1fr; } }
+  .drawing {
+    background: #f4ede0;
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  }
+  .drawing svg { display: block; width: 100%; height: auto; }
+  .notes {
+    color: #c8d4e2;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .notes ol {
+    padding-left: 18px; margin: 6px 0 14px 0;
+  }
+  .notes ol li { margin-bottom: 6px; }
+  .notes .tag {
+    display: inline-block;
+    background: rgba(255, 85, 85, 0.18);
+    color: #ff6e6e;
+    border: 1px solid rgba(255, 85, 85, 0.4);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-right: 4px;
+  }
+  .notes .tag.future {
+    background: rgba(140, 140, 140, 0.16);
+    color: #b6b6b6;
+    border-color: rgba(140, 140, 140, 0.35);
+  }
+  .notes .tag.info {
+    background: rgba(109, 185, 255, 0.15);
+    color: #6db9ff;
+    border-color: rgba(109, 185, 255, 0.35);
+  }
+  .order {
+    background: rgba(45, 138, 79, 0.12);
+    border-left: 3px solid #4dc06e;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 0 0 30px 0;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c8d4e2;
+  }
+  .order b { color: #4dc06e; }
+  /* SVG style */
+  .grid-line { stroke: #d0c5a8; stroke-width: 0.6; }
+  .grid-major { stroke: #b8a87a; stroke-width: 1; }
+  .panel-edge { fill: none; stroke: #2a2a2a; stroke-width: 3; }
+  .cut-line { fill: none; stroke: #d12020; stroke-width: 2.4; stroke-dasharray: 8 4; }
+  .drill { fill: #d12020; stroke: #6a1010; stroke-width: 1; }
+  .future-line { fill: none; stroke: #999; stroke-width: 1.6; stroke-dasharray: 4 4; }
+  .ref-line { fill: none; stroke: #4070a0; stroke-width: 1.2; stroke-dasharray: 2 3; }
+  .dim-line { stroke: #4d4d4d; stroke-width: 1; }
+  .dim-arrow { fill: #4d4d4d; }
+  .dim-text { fill: #1a1a1a; font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 600; }
+  .label-text { fill: #1a1a1a; font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .panel-id-text { fill: #1a1a1a; font-family: -apple-system, sans-serif; font-size: 22px; font-weight: 800; }
+  .arrow-text { fill: #1a4080; font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .future-text { fill: #555; font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .crosshair { stroke: #d12020; stroke-width: 1; }
+</style>
+</head>
+<body>
+<div id="navbar">
+  <a href="README.md" class="home">← Hardware</a>
+  <span class="sep">|</span>
+  <a href="shell-v1-3d.html" class="nav-link">Shell v1 — 3D View</a>
+  <a href="station-integration.md" class="nav-link">Station Integration</a>
+  <span class="title">Cut Sheet — Pencil Drawings</span>
+</div>
+
+<div class="container">
+  <h1 class="page-title">Shell v1 — Per-Panel Cut Sheet</h1>
+  <div class="page-sub">
+    Each of the 6 panels you bought, rendered flat with dimensions, cut lines, and drill points. Mark these onto the real planks <b>in pencil first</b>, double-check measurements, then cut. The 1" grid behind each drawing matches a real ruler — you can count squares to measure.
+  </div>
+
+  <div class="legend">
+    <div class="item"><svg class="swatch" width="28" height="14"><line x1="2" y1="7" x2="26" y2="7" class="panel-edge"/></svg> Panel edge (don't cut)</div>
+    <div class="item"><svg class="swatch" width="28" height="14"><line x1="2" y1="7" x2="26" y2="7" class="cut-line"/></svg> <b style="color:#ff6e6e">Cut here</b></div>
+    <div class="item"><svg class="swatch" width="14" height="14"><circle cx="7" cy="7" r="3" class="drill"/></svg> <b style="color:#ff6e6e">Drill here</b></div>
+    <div class="item"><svg class="swatch" width="28" height="14"><line x1="2" y1="7" x2="26" y2="7" class="future-line"/></svg> Future cut (do NOT cut now)</div>
+    <div class="item"><svg class="swatch" width="28" height="14"><line x1="2" y1="7" x2="26" y2="7" class="ref-line"/></svg> Reference line (pencil only)</div>
+  </div>
+
+  <div class="order">
+    <b>Suggested execution order:</b> mark all 6 panels in pencil first → measure twice → cut <b>P3</b> (door) and <b>P2</b> (camera hole) → drill <b>P4</b> (wire pass-through) → leave <b>P5</b> &amp; <b>P6</b> intact for now → assemble. Floor (<b>P1</b>) gets reference marks only, no cuts.
+  </div>
+
+  <!-- ================ P1 — FLOOR ================ -->
+  <div class="panel-card">
+    <h2>P1 — FLOOR</h2>
+    <div class="role">24" × 12" plank — laid flat, no cuts</div>
+    <div class="meta"><b>Stock:</b> the 24"×12" board · <b>Cuts:</b> none · <b>Reference marks only</b></div>
+    <div class="panel-row">
+      <div class="drawing">
+        <svg viewBox="0 0 720 380" preserveAspectRatio="xMidYMid meet">
+          <!-- 1" grid for a 24w x 12h panel. Scale: 25px per inch. -->
+          <!-- Drawing origin: panel top-left at (60, 60). Panel: 600w x 300h -->
+          <defs>
+            <pattern id="grid1" x="60" y="60" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" class="grid-line"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="60" width="600" height="300" fill="url(#grid1)"/>
+          <!-- Major grid lines every 6" -->
+          <g class="grid-major">
+            <line x1="210" y1="60" x2="210" y2="360"/>
+            <line x1="360" y1="60" x2="360" y2="360"/>
+            <line x1="510" y1="60" x2="510" y2="360"/>
+            <line x1="60" y1="210" x2="660" y2="210"/>
+          </g>
+          <!-- Panel edge -->
+          <rect x="60" y="60" width="600" height="300" class="panel-edge"/>
+
+          <!-- Cube footprint (where the walls land): rear 12x12 = right half of the floor as drawn -->
+          <!-- We'll show the FLOOR with the "back wall side" at the TOP of the drawing. -->
+          <!-- Actually for clarity: top of drawing = back of station (back wall lands at top). Bottom of drawing = front/operator. Cube occupies top 12" (=300px height ÷ 2... wait, panel is 24w x 12h so the cube footprint is half of it. Let me restructure: panel drawn 24 wide × 12 deep, with depth = 300px. We need a 12×12 cube footprint = 300×300. That's the FULL HEIGHT. So the cube occupies the LEFT or RIGHT half of the 24"×12" panel (along the long axis). -->
+          <!-- Rear/cube zone: x=60..360 (left half = 12"). Shelf zone: x=360..660 (right half = 12"). -->
+          <!-- Wait, we want consistency with the 3D view. Let me put the cube on LEFT and shelf on RIGHT, with "FRONT" at the right. -->
+          <rect x="60" y="60" width="300" height="300" class="ref-line"/>
+          <text x="210" y="200" text-anchor="middle" class="arrow-text">CUBE FOOTPRINT</text>
+          <text x="210" y="218" text-anchor="middle" class="arrow-text">(walls land here)</text>
+          <text x="210" y="240" text-anchor="middle" class="label-text" style="font-size:9px;">12" × 12"</text>
+
+          <!-- Shelf zone label -->
+          <text x="510" y="200" text-anchor="middle" class="arrow-text">LOADING SHELF</text>
+          <text x="510" y="218" text-anchor="middle" class="arrow-text">(front overhang)</text>
+          <text x="510" y="240" text-anchor="middle" class="label-text" style="font-size:9px;">12" × 12"</text>
+
+          <!-- Wall landing strips (pencil marks for where walls glue) -->
+          <!-- Back wall = top edge of cube zone -->
+          <line x1="60" y1="60" x2="360" y2="60" class="ref-line" stroke-width="2"/>
+          <!-- Front wall = right edge of cube zone (the wall facing the shelf) -->
+          <line x1="360" y1="60" x2="360" y2="360" class="ref-line" stroke-width="2"/>
+          <!-- Left wall = bottom edge of cube zone -->
+          <line x1="60" y1="360" x2="360" y2="360" class="ref-line" stroke-width="2"/>
+          <!-- Right wall = left edge of cube zone... wait, we need a different layout -->
+
+          <!-- Orientation arrows -->
+          <g transform="translate(40, 210)">
+            <line x1="0" y1="0" x2="0" y2="-30" stroke="#1a4080" stroke-width="2"/>
+            <polygon points="-5,-30 5,-30 0,-40" fill="#1a4080"/>
+            <text x="-8" y="10" text-anchor="middle" class="arrow-text" transform="rotate(-90, -8, 10)">BACK</text>
+          </g>
+          <g transform="translate(680, 210)">
+            <line x1="0" y1="0" x2="0" y2="30" stroke="#1a4080" stroke-width="2"/>
+            <polygon points="-5,30 5,30 0,40" fill="#1a4080"/>
+            <text x="14" y="10" text-anchor="middle" class="arrow-text" transform="rotate(90, 14, 10)">FRONT (operator)</text>
+          </g>
+
+          <!-- Outer dimensions: 24" wide, 12" deep -->
+          <line x1="60" y1="35" x2="660" y2="35" class="dim-line"/>
+          <line x1="60" y1="30" x2="60" y2="40" class="dim-line"/>
+          <line x1="660" y1="30" x2="660" y2="40" class="dim-line"/>
+          <text x="360" y="28" text-anchor="middle" class="dim-text">24"</text>
+
+          <line x1="685" y1="60" x2="685" y2="360" class="dim-line"/>
+          <line x1="680" y1="60" x2="690" y2="60" class="dim-line"/>
+          <line x1="680" y1="360" x2="690" y2="360" class="dim-line"/>
+          <text x="700" y="215" text-anchor="middle" class="dim-text" transform="rotate(90, 700, 215)">12"</text>
+
+          <!-- Internal dimensions -->
+          <line x1="60" y1="375" x2="360" y2="375" class="dim-line"/>
+          <line x1="60" y1="370" x2="60" y2="380" class="dim-line"/>
+          <line x1="360" y1="370" x2="360" y2="380" class="dim-line"/>
+          <text x="210" y="375" text-anchor="middle" class="dim-text">12" (cube zone)</text>
+
+          <line x1="360" y1="375" x2="660" y2="375" class="dim-line"/>
+          <line x1="360" y1="370" x2="360" y2="380" class="dim-line"/>
+          <line x1="660" y1="370" x2="660" y2="380" class="dim-line"/>
+          <text x="510" y="375" text-anchor="middle" class="dim-text">12" (shelf)</text>
+
+          <!-- Panel ID badge -->
+          <g transform="translate(75, 75)">
+            <rect x="0" y="0" width="40" height="26" fill="#4dc06e" rx="4"/>
+            <text x="20" y="18" text-anchor="middle" class="panel-id-text" fill="#0a2418" font-size="16">P1</text>
+          </g>
+        </svg>
+      </div>
+      <div class="notes">
+        <p><span class="tag info">No cuts</span> The 24"×12" plank is your floor. Don't cut it — just draw the reference lines onto it so you know exactly where the 4 walls will glue/screw down.</p>
+        <ol>
+          <li><b>Find the midpoint of the long edge</b> — measure 12" from one short edge. Mark across the full width: this is the dividing line between the cube footprint and the loading shelf.</li>
+          <li><b>Pick which 12"×12" half is the cube footprint.</b> Mark <b>BACK</b>, <b>FRONT</b> arrows on the plank so you don't get disoriented. (Front = where the shelf points / where the operator stands.)</li>
+          <li><b>Draw the wall landing lines</b> — the 4 edges of the 12"×12" cube footprint. The walls glue/screw down along these lines. Use a square to keep them at 90°.</li>
+          <li>Done. Set this plank aside.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================ P2 — ROOF ================ -->
+  <div class="panel-card">
+    <h2>P2 — ROOF</h2>
+    <div class="role">12" × 12" — lens pass-through hole + bracket footprint on top</div>
+    <div class="meta"><b>Stock:</b> one 12"×12" square · <b>Cuts:</b> 1× ⌀2" lens hole (locked — measured 1.9" lens + 0.1" clearance) + bracket fixing screws (TBD per bracket) · <b>Light-tightness strategy:</b> camera bracket sits on TOP of panel, lens points DOWN through hole. Bracket base covers/seals the hole from above.</div>
+    <div class="panel-row">
+      <div class="drawing">
+        <svg viewBox="0 0 420 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid2" x="60" y="60" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" class="grid-line"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="60" width="300" height="300" fill="url(#grid2)"/>
+          <g class="grid-major">
+            <line x1="210" y1="60" x2="210" y2="360"/>
+            <line x1="60" y1="210" x2="360" y2="210"/>
+          </g>
+          <rect x="60" y="60" width="300" height="300" class="panel-edge"/>
+
+          <!-- Crosshair at center (red, pencil-this-first) -->
+          <line x1="200" y1="210" x2="220" y2="210" class="crosshair"/>
+          <line x1="210" y1="200" x2="210" y2="220" class="crosshair"/>
+
+          <!-- Bracket footprint (placeholder ~3" × 2" rectangle, dashed gray) - sits ON TOP of panel -->
+          <!-- 3"×2" = 75×50 px at 25px/inch -->
+          <rect x="172.5" y="185" width="75" height="50" class="ref-line"/>
+          <text x="210" y="180" text-anchor="middle" class="arrow-text" style="font-size:9px;">BRACKET BASE footprint (sits on top — TBD measure)</text>
+
+          <!-- Lens pass-through hole ⌀2" = 50px diameter, radius 25px -->
+          <circle cx="210" cy="210" r="25" class="cut-line"/>
+          <text x="210" y="216" text-anchor="middle" class="dim-text" style="fill:#d12020;font-size:11px;">⌀ 2"</text>
+          <text x="210" y="232" text-anchor="middle" class="dim-text" style="font-size:9px;fill:#d12020;">(measured lens 1.9" + clearance)</text>
+
+          <!-- Bracket fixing screws (placeholder positions at bracket base corners) -->
+          <circle cx="180" cy="195" r="2.5" class="drill"/>
+          <circle cx="240" cy="195" r="2.5" class="drill"/>
+          <circle cx="180" cy="225" r="2.5" class="drill"/>
+          <circle cx="240" cy="225" r="2.5" class="drill"/>
+          <text x="135" y="195" class="label-text" style="font-size:8px;">bracket</text>
+          <text x="135" y="206" class="label-text" style="font-size:8px;">screws</text>
+          <text x="135" y="217" class="label-text" style="font-size:8px;">(TBD)</text>
+
+          <!-- Hole diameter dimension -->
+          <line x1="185" y1="275" x2="235" y2="275" class="dim-line"/>
+          <line x1="185" y1="270" x2="185" y2="280" class="dim-line"/>
+          <line x1="235" y1="270" x2="235" y2="280" class="dim-line"/>
+          <text x="210" y="290" text-anchor="middle" class="dim-text" style="fill:#d12020;">⌀2" lens hole (LOCKED)</text>
+          <text x="210" y="303" text-anchor="middle" class="dim-text" style="font-size:9px;">measure your lens widest point + 3mm</text>
+
+          <!-- Front arrow -->
+          <g transform="translate(210, 380)">
+            <polygon points="-6,-8 6,-8 0,0" fill="#1a4080"/>
+            <text x="0" y="14" text-anchor="middle" class="arrow-text">FRONT EDGE</text>
+          </g>
+
+          <!-- Outer dims -->
+          <line x1="60" y1="40" x2="360" y2="40" class="dim-line"/>
+          <line x1="60" y1="35" x2="60" y2="45" class="dim-line"/>
+          <line x1="360" y1="35" x2="360" y2="45" class="dim-line"/>
+          <text x="210" y="34" text-anchor="middle" class="dim-text">12"</text>
+
+          <line x1="40" y1="60" x2="40" y2="360" class="dim-line"/>
+          <line x1="35" y1="60" x2="45" y2="60" class="dim-line"/>
+          <line x1="35" y1="360" x2="45" y2="360" class="dim-line"/>
+          <text x="25" y="215" text-anchor="middle" class="dim-text" transform="rotate(-90, 25, 215)">12"</text>
+
+          <!-- Distance from edges to center (6") -->
+          <line x1="60" y1="395" x2="210" y2="395" class="dim-line"/>
+          <line x1="60" y1="390" x2="60" y2="400" class="dim-line"/>
+          <line x1="210" y1="390" x2="210" y2="400" class="dim-line"/>
+          <text x="135" y="408" text-anchor="middle" class="dim-text">6"</text>
+
+          <line x1="210" y1="395" x2="360" y2="395" class="dim-line"/>
+          <line x1="360" y1="390" x2="360" y2="400" class="dim-line"/>
+          <text x="285" y="408" text-anchor="middle" class="dim-text">6"</text>
+
+          <!-- Panel ID -->
+          <g transform="translate(75, 75)">
+            <rect x="0" y="0" width="40" height="26" fill="#4dc06e" rx="4"/>
+            <text x="20" y="18" text-anchor="middle" class="panel-id-text" fill="#0a2418" font-size="16">P2</text>
+          </g>
+        </svg>
+      </div>
+      <div class="notes">
+        <p><span class="tag info">Mount strategy</span> Camera bracket sits on <b>TOP</b> of P2; lens hangs DOWN through a ⌀2" hole into the box. Light-tightness comes from the bracket base footprint being larger than the hole + foam gasket beneath.</p>
+        <p><span class="tag">Cut</span> 1× ⌀2" lens pass-through hole (placeholder — confirm by measuring) · <span class="tag">Drill</span> bracket fixing screws (count + spacing TBD per your bracket)</p>
+        <ol>
+          <li><b>Measure your camera + bracket first.</b> Three things to write down before drilling:
+            <ul style="margin-top:4px;">
+              <li><b>Lens body widest diameter</b> (across the zoom-ring area) → defines the hole size. Add 3mm slack.</li>
+              <li><b>Bracket base footprint</b> (L × W). Must be wider than the hole on all sides.</li>
+              <li><b>Bracket mounting holes</b> — does the base have screw holes for fixing to the panel? Count them, measure spacing.</li>
+            </ul>
+          </li>
+          <li><b>Find center.</b> Draw the two diagonals corner-to-corner — they intersect at (6", 6"). Mark with a red dot.</li>
+          <li><b>Mark the lens hole.</b> Set a compass to (lens widest / 2 + 1.5mm). Default placeholder = ⌀2" (50mm).</li>
+          <li><b>Mark the bracket footprint</b> as a pencil rectangle centered on the hole. Confirm it covers the hole entirely with at least 5mm overlap on every side.</li>
+          <li><b>Mark the bracket fixing screws</b> at the bracket's measured screw spacing. Drill pilots matching your screw thread (typically M3 wood screws).</li>
+          <li><b>Mark FRONT edge</b> on the panel with an arrow (so the bracket points correctly when mounted).</li>
+          <li>Cut the ⌀2" hole (use a 50mm hole saw or jigsaw + sanding). Drill the bracket pilot holes.</li>
+          <li>Apply a black foam-tape ring around the hole on top of the panel BEFORE bolting the bracket down — when compressed, this seals any leak between the bracket base and the panel.</li>
+        </ol>
+        <p style="background:rgba(109,185,255,0.08);border-left:2px solid #6db9ff;padding:8px 10px;margin-top:10px;font-size:12px;"><b>Why this works:</b> the bracket body sits directly on the panel, completely covering the lens hole from above. The lens passes down through the hole, and the bracket's metal base + a foam gasket beneath it stops light from sneaking in around the lens barrel. Focus + zoom are adjusted by reaching in through the front door during setup, then locked with the lens's lock screws.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================ P3 — FRONT WALL (DOOR) ================ -->
+  <div class="panel-card">
+    <h2>P3 — FRONT WALL</h2>
+    <div class="role">12" × 12" — door hatch + hinge/latch marks</div>
+    <div class="meta"><b>Stock:</b> one 12"×12" square · <b>Cuts:</b> 8" × 9" door hatch · <b>Drill:</b> hinge &amp; latch pilots</div>
+    <div class="panel-row">
+      <div class="drawing">
+        <svg viewBox="0 0 420 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid3" x="60" y="60" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" class="grid-line"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="60" width="300" height="300" fill="url(#grid3)"/>
+          <g class="grid-major">
+            <line x1="210" y1="60" x2="210" y2="360"/>
+            <line x1="60" y1="210" x2="360" y2="210"/>
+          </g>
+          <rect x="60" y="60" width="300" height="300" class="panel-edge"/>
+
+          <!-- Arrowhead defs -->
+          <defs>
+            <marker id="arr-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d12020"/></marker>
+            <marker id="arr-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 10 0 L 0 5 L 10 10 z" fill="#d12020"/></marker>
+          </defs>
+
+          <!-- Faint door cut path (so user sees what they'll connect) -->
+          <rect x="110" y="97.5" width="200" height="225" class="cut-line" opacity="0.55"/>
+
+          <!-- BIG corner dots — the ones the user marks first and connects -->
+          <circle cx="110" cy="97.5" r="6" fill="#d12020" stroke="#5a0a0a" stroke-width="1.5"/>
+          <circle cx="310" cy="97.5" r="6" fill="#d12020" stroke="#5a0a0a" stroke-width="1.5"/>
+          <circle cx="110" cy="322.5" r="6" fill="#d12020" stroke="#5a0a0a" stroke-width="1.5"/>
+          <circle cx="310" cy="322.5" r="6" fill="#d12020" stroke="#5a0a0a" stroke-width="1.5"/>
+
+          <!-- DIMENSION ARROWS from each panel edge to nearest door corner -->
+          <!-- TOP: from top edge down to top of door, label "1.5"" -->
+          <line x1="85" y1="60" x2="85" y2="97.5" stroke="#d12020" stroke-width="2" marker-start="url(#arr-start)" marker-end="url(#arr-end)"/>
+          <rect x="68" y="71" width="34" height="16" fill="#f4ede0" stroke="none"/>
+          <text x="85" y="83" text-anchor="middle" fill="#d12020" font-size="13" font-weight="700">1.5"</text>
+
+          <!-- BOTTOM: from bottom of door down to bottom edge, label "1.5"" -->
+          <line x1="85" y1="322.5" x2="85" y2="360" stroke="#d12020" stroke-width="2" marker-start="url(#arr-start)" marker-end="url(#arr-end)"/>
+          <rect x="68" y="333" width="34" height="16" fill="#f4ede0" stroke="none"/>
+          <text x="85" y="345" text-anchor="middle" fill="#d12020" font-size="13" font-weight="700">1.5"</text>
+
+          <!-- LEFT: from left panel edge in to left of door, label "2"" — placed below the latch zone -->
+          <line x1="60" y1="270" x2="110" y2="270" stroke="#d12020" stroke-width="2" marker-start="url(#arr-start)" marker-end="url(#arr-end)"/>
+          <rect x="70" y="255" width="30" height="16" fill="#f4ede0" stroke="none"/>
+          <text x="85" y="267" text-anchor="middle" fill="#d12020" font-size="13" font-weight="700">2"</text>
+
+          <!-- RIGHT: from right of door out to right panel edge, label "2"" — placed below the mid-hinge -->
+          <line x1="310" y1="270" x2="360" y2="270" stroke="#d12020" stroke-width="2" marker-start="url(#arr-start)" marker-end="url(#arr-end)"/>
+          <rect x="320" y="255" width="30" height="16" fill="#f4ede0" stroke="none"/>
+          <text x="335" y="267" text-anchor="middle" fill="#d12020" font-size="13" font-weight="700">2"</text>
+
+          <!-- Hinge dots: 3 on RIGHT edge of door — visually placed BUT with arrows from top of door showing distance -->
+          <circle cx="310" cy="122.5" r="4" fill="#d12020" stroke="#5a0a0a" stroke-width="1"/>
+          <circle cx="310" cy="210" r="4" fill="#d12020" stroke="#5a0a0a" stroke-width="1"/>
+          <circle cx="310" cy="297.5" r="4" fill="#d12020" stroke="#5a0a0a" stroke-width="1"/>
+          <!-- Latch dot: LEFT edge mid-height -->
+          <circle cx="110" cy="210" r="4" fill="#d12020" stroke="#5a0a0a" stroke-width="1"/>
+
+          <!-- Arrow showing 1" from top-right corner DOWN to top hinge -->
+          <line x1="328" y1="97.5" x2="328" y2="122.5" stroke="#d12020" stroke-width="1.5" marker-start="url(#arr-start)" marker-end="url(#arr-end)"/>
+          <rect x="332" y="103" width="22" height="14" fill="#f4ede0" stroke="none"/>
+          <text x="343" y="113" text-anchor="middle" fill="#d12020" font-size="11" font-weight="700">1"</text>
+
+          <!-- Arrow showing 1" from bottom hinge UP from bottom-right corner -->
+          <line x1="328" y1="297.5" x2="328" y2="322.5" stroke="#d12020" stroke-width="1.5" marker-start="url(#arr-start)" marker-end="url(#arr-end)"/>
+          <rect x="332" y="303" width="22" height="14" fill="#f4ede0" stroke="none"/>
+          <text x="343" y="313" text-anchor="middle" fill="#d12020" font-size="11" font-weight="700">1"</text>
+
+          <!-- Mid-hinge & latch are at door mid-height = (97.5+322.5)/2 = 210. Just label them. -->
+          <text x="338" y="214" fill="#5a0a0a" font-size="10" font-weight="600">mid</text>
+          <text x="78" y="200" fill="#5a0a0a" font-size="10" font-weight="600">latch</text>
+          <text x="78" y="214" fill="#5a0a0a" font-size="10" font-weight="600">mid</text>
+
+          <!-- Labels for the hinges -->
+          <text x="338" y="126" fill="#5a0a0a" font-size="10" font-weight="600">hinge</text>
+          <text x="338" y="301" fill="#5a0a0a" font-size="10" font-weight="600">hinge</text>
+          <text x="338" y="202" fill="#5a0a0a" font-size="10" font-weight="600">hinge</text>
+
+          <!-- TOP / BOTTOM labels -->
+          <text x="210" y="55" text-anchor="middle" class="arrow-text">↑ TOP EDGE ↑</text>
+          <text x="210" y="412" text-anchor="middle" class="arrow-text">↓ BOTTOM EDGE ↓</text>
+        </svg>
+      </div>
+      <div class="notes">
+        <p><b>Mimic the 4 red corner dots onto your plank using the arrows from each edge.</b></p>
+        <ol style="margin-top:8px;">
+          <li>Mark <b>TOP</b> and <b>BOTTOM</b> edges with marker.</li>
+          <li>Use the 4 arrows as a recipe — each one says how far in from one edge to mark a dot:
+            <ul>
+              <li>From TOP edge, 1.5" down → 2 dots (one on each side)</li>
+              <li>From BOTTOM edge, 1.5" up → 2 dots</li>
+              <li>From LEFT edge, 2" in → 2 dots</li>
+              <li>From RIGHT edge, 2" in → 2 dots</li>
+            </ul>
+            Where the perpendicular ticks intersect = the 4 corner dots of the door.
+          </li>
+          <li>Connect the 4 corner dots with a ruler.</li>
+          <li>Mark the 3 hinge dots on the right line of the door (1" from top corner, mid, 1" from bottom corner) and the 1 latch dot on the left line at mid-height.</li>
+          <li>Cut along the 4 connected lines. Drill the small dots.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================ P4 — BACK WALL ================ -->
+  <div class="panel-card">
+    <h2>P4 — BACK WALL</h2>
+    <div class="role">12" × 12" — wire pass-through hole (small)</div>
+    <div class="meta"><b>Stock:</b> one 12"×12" square · <b>Cuts:</b> 1× ⌀1" wire pass-through near bottom edge</div>
+    <div class="panel-row">
+      <div class="drawing">
+        <svg viewBox="0 0 420 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid4" x="60" y="60" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" class="grid-line"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="60" width="300" height="300" fill="url(#grid4)"/>
+          <g class="grid-major">
+            <line x1="210" y1="60" x2="210" y2="360"/>
+            <line x1="60" y1="210" x2="360" y2="210"/>
+          </g>
+          <rect x="60" y="60" width="300" height="300" class="panel-edge"/>
+
+          <!-- Wire pass-through: ⌀1", centered horizontally, 1.5" up from bottom edge -->
+          <!-- 25px/inch. Hole radius = 12.5px. Center at x=210, y=360-37.5 = 322.5 -->
+          <circle cx="210" cy="322.5" r="12.5" class="cut-line"/>
+
+          <!-- Dims for hole -->
+          <line x1="197" y1="345" x2="223" y2="345" class="dim-line"/>
+          <text x="210" y="360" text-anchor="middle" class="dim-text">⌀ 1"</text>
+
+          <line x1="380" y1="322.5" x2="380" y2="360" class="dim-line"/>
+          <line x1="375" y1="322.5" x2="385" y2="322.5" class="dim-line"/>
+          <line x1="375" y1="360" x2="385" y2="360" class="dim-line"/>
+          <text x="395" y="345" text-anchor="middle" class="dim-text" transform="rotate(90, 395, 345)">1.5"</text>
+
+          <line x1="60" y1="385" x2="210" y2="385" class="dim-line"/>
+          <line x1="60" y1="380" x2="60" y2="390" class="dim-line"/>
+          <line x1="210" y1="380" x2="210" y2="390" class="dim-line"/>
+          <text x="135" y="398" text-anchor="middle" class="dim-text">6"</text>
+
+          <!-- TOP / BOTTOM labels -->
+          <text x="210" y="55" text-anchor="middle" class="arrow-text">↑ TOP EDGE ↑</text>
+          <text x="210" y="412" text-anchor="middle" class="arrow-text">↓ BOTTOM EDGE ↓</text>
+
+          <text x="290" y="320" class="label-text" style="font-size:9px;">wire pass-through</text>
+          <text x="290" y="332" class="label-text" style="font-size:9px;">(to utility box)</text>
+
+          <g transform="translate(75, 75)">
+            <rect x="0" y="0" width="40" height="26" fill="#4dc06e" rx="4"/>
+            <text x="20" y="18" text-anchor="middle" class="panel-id-text" fill="#0a2418" font-size="16">P4</text>
+          </g>
+        </svg>
+      </div>
+      <div class="notes">
+        <p><span class="tag">Cut</span> 1× ⌀1" hole at the bottom-center for LED + sensor wires running down into the utility box.</p>
+        <ol>
+          <li><b>Mark TOP and BOTTOM</b> on the panel.</li>
+          <li><b>Find the hole center:</b> 6" from the left edge (= center horizontally), 1.5" up from the bottom edge.</li>
+          <li><b>Mark the circle:</b> 0.5" radius around that center point (= ⌀1" hole).</li>
+          <li>Cut the hole. After assembly you'll seal it light-tight with foam-tape gasket around the wire bundle.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================ P5 — LEFT WALL ================ -->
+  <div class="panel-card">
+    <h2>P5 — LEFT WALL</h2>
+    <div class="role">12" × 12" — no cuts now; mark future feed-in slot only</div>
+    <div class="meta"><b>Stock:</b> one 12"×12" square · <b>Cuts now:</b> none · <b>Pencil-only:</b> future 4"×4" feed-in slot (don't cut yet)</div>
+    <div class="panel-row">
+      <div class="drawing">
+        <svg viewBox="0 0 420 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid5" x="60" y="60" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" class="grid-line"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="60" width="300" height="300" fill="url(#grid5)"/>
+          <g class="grid-major">
+            <line x1="210" y1="60" x2="210" y2="360"/>
+            <line x1="60" y1="210" x2="360" y2="210"/>
+          </g>
+          <rect x="60" y="60" width="300" height="300" class="panel-edge"/>
+
+          <!-- Future feed slot: 4" x 4", centered, but biased toward FRONT edge (so feeding mech enters near the door side) -->
+          <!-- 25px/inch. 4" = 100px. Centered vertically (y=160..260). Front-biased: closer to FRONT edge. Since the wall is "left wall" of the cube, when assembled, one edge faces FRONT (door side) and one faces BACK. Bias toward FRONT: position x=185..285 (so it's offset toward the right, which we'll label as FRONT). -->
+          <rect x="185" y="160" width="100" height="100" class="future-line"/>
+
+          <text x="235" y="195" text-anchor="middle" class="future-text">FUTURE</text>
+          <text x="235" y="210" text-anchor="middle" class="future-text">FEED-IN</text>
+          <text x="235" y="225" text-anchor="middle" class="future-text">SLOT</text>
+          <text x="235" y="245" text-anchor="middle" class="future-text" style="font-size:9px;">4" × 4"</text>
+
+          <!-- Dims -->
+          <line x1="185" y1="145" x2="285" y2="145" class="dim-line"/>
+          <line x1="185" y1="140" x2="185" y2="150" class="dim-line"/>
+          <line x1="285" y1="140" x2="285" y2="150" class="dim-line"/>
+          <text x="235" y="139" text-anchor="middle" class="dim-text" style="fill:#666;">4"</text>
+
+          <line x1="305" y1="160" x2="305" y2="260" class="dim-line"/>
+          <line x1="300" y1="160" x2="310" y2="160" class="dim-line"/>
+          <line x1="300" y1="260" x2="310" y2="260" class="dim-line"/>
+          <text x="320" y="215" text-anchor="middle" class="dim-text" style="fill:#666;" transform="rotate(90, 320, 215)">4"</text>
+
+          <text x="210" y="55" text-anchor="middle" class="arrow-text">↑ TOP EDGE ↑</text>
+          <text x="210" y="412" text-anchor="middle" class="arrow-text">↓ BOTTOM EDGE ↓</text>
+
+          <!-- Front/back edge labels -->
+          <g transform="translate(40, 210)">
+            <text x="0" y="0" text-anchor="middle" class="arrow-text" transform="rotate(-90, 0, 0)">BACK EDGE</text>
+          </g>
+          <g transform="translate(380, 210)">
+            <text x="0" y="0" text-anchor="middle" class="arrow-text" transform="rotate(90, 0, 0)">FRONT EDGE (door side)</text>
+          </g>
+
+          <g transform="translate(75, 75)">
+            <rect x="0" y="0" width="40" height="26" fill="#4dc06e" rx="4"/>
+            <text x="20" y="18" text-anchor="middle" class="panel-id-text" fill="#0a2418" font-size="16">P5</text>
+          </g>
+        </svg>
+      </div>
+      <div class="notes">
+        <p><span class="tag future">Do not cut</span> Just pencil the rectangle so when you're ready to add a feeding mechanism, the cut location is already planned.</p>
+        <ol>
+          <li><b>Mark TOP/BOTTOM and FRONT/BACK edges</b> on the panel — orientation matters.</li>
+          <li><b>Mark a 4"×4" rectangle</b> centered vertically (8" zone, 2" margin top & bottom), biased toward the FRONT edge so the feeding mech enters near where the operator stands. From the FRONT edge: 1" in to the near side of the rectangle; the rectangle extends 4" further toward the back.</li>
+          <li><b>Draw it as a dashed light-pencil rectangle</b> — visible enough to find later, light enough that you remember not to cut it now.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================ P6 — RIGHT WALL ================ -->
+  <div class="panel-card">
+    <h2>P6 — RIGHT WALL</h2>
+    <div class="role">12" × 12" — no cuts now; mark future cradle handle exit only</div>
+    <div class="meta"><b>Stock:</b> one 12"×12" square · <b>Cuts now:</b> none · <b>Pencil-only:</b> future ⌀1.5" cradle handle exit (don't cut yet)</div>
+    <div class="panel-row">
+      <div class="drawing">
+        <svg viewBox="0 0 420 420" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid6" x="60" y="60" width="25" height="25" patternUnits="userSpaceOnUse">
+              <path d="M 25 0 L 0 0 0 25" fill="none" class="grid-line"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="60" width="300" height="300" fill="url(#grid6)"/>
+          <g class="grid-major">
+            <line x1="210" y1="60" x2="210" y2="360"/>
+            <line x1="60" y1="210" x2="360" y2="210"/>
+          </g>
+          <rect x="60" y="60" width="300" height="300" class="panel-edge"/>
+
+          <!-- Future cradle handle exit: ⌀1.5" at center of the wall (matches the U-cradle axle height = mid-height of the box) -->
+          <circle cx="210" cy="210" r="18.75" class="future-line"/>
+          <text x="210" y="170" text-anchor="middle" class="future-text">FUTURE</text>
+          <text x="210" y="185" text-anchor="middle" class="future-text">CRADLE HANDLE</text>
+          <text x="210" y="252" text-anchor="middle" class="future-text" style="font-size:9px;">⌀ 1.5"</text>
+
+          <!-- Center crosshair -->
+          <line x1="205" y1="210" x2="215" y2="210" stroke="#999" stroke-width="1"/>
+          <line x1="210" y1="205" x2="210" y2="215" stroke="#999" stroke-width="1"/>
+
+          <!-- Dims -->
+          <line x1="60" y1="395" x2="210" y2="395" class="dim-line"/>
+          <line x1="60" y1="390" x2="60" y2="400" class="dim-line"/>
+          <line x1="210" y1="390" x2="210" y2="400" class="dim-line"/>
+          <text x="135" y="408" text-anchor="middle" class="dim-text">6"</text>
+
+          <line x1="380" y1="60" x2="380" y2="210" class="dim-line"/>
+          <line x1="375" y1="60" x2="385" y2="60" class="dim-line"/>
+          <line x1="375" y1="210" x2="385" y2="210" class="dim-line"/>
+          <text x="395" y="135" text-anchor="middle" class="dim-text" transform="rotate(90, 395, 135)">6"</text>
+
+          <text x="210" y="55" text-anchor="middle" class="arrow-text">↑ TOP EDGE ↑</text>
+          <text x="210" y="412" text-anchor="middle" class="arrow-text">↓ BOTTOM EDGE ↓</text>
+
+          <g transform="translate(40, 210)">
+            <text x="0" y="0" text-anchor="middle" class="arrow-text" transform="rotate(-90, 0, 0)">FRONT EDGE (door side)</text>
+          </g>
+          <g transform="translate(380, 210)">
+            <text x="0" y="0" text-anchor="middle" class="arrow-text" transform="rotate(90, 0, 0)">BACK EDGE</text>
+          </g>
+
+          <g transform="translate(75, 75)">
+            <rect x="0" y="0" width="40" height="26" fill="#4dc06e" rx="4"/>
+            <text x="20" y="18" text-anchor="middle" class="panel-id-text" fill="#0a2418" font-size="16">P6</text>
+          </g>
+        </svg>
+      </div>
+      <div class="notes">
+        <p><span class="tag future">Do not cut</span> Just pencil the circle so the v2 U-cradle handle has a planned exit point.</p>
+        <ol>
+          <li><b>Mark TOP/BOTTOM and FRONT/BACK edges</b> on the panel.</li>
+          <li><b>Mark the circle center</b> at exactly (6", 6") — the geometric center of the panel.</li>
+          <li><b>Draw a light-pencil circle</b> at 0.75" radius (= ⌀1.5" hole). Lightly enough that it reads "future" and not "cut me now."</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== Assembly summary =========== -->
+  <div class="panel-card" style="border-color: rgba(45, 138, 79, 0.4); background: rgba(45, 138, 79, 0.06);">
+    <h2 style="color: #4dc06e;">ASSEMBLY ORDER (after cutting)</h2>
+    <div class="notes">
+      <ol>
+        <li>Lay <b>P1 (floor)</b> flat — the reference lines you drew on it are your alignment guides.</li>
+        <li>Glue/screw the 4 walls onto P1, standing them up along the cube-footprint reference lines:
+          <ul style="margin-top: 4px;">
+            <li><b>P4 (back)</b> first — sets the rear plane</li>
+            <li><b>P5 (left)</b> and <b>P6 (right)</b> butted against P4's left/right ends</li>
+            <li><b>P3 (front)</b> last — closes the cube</li>
+          </ul>
+        </li>
+        <li>Glue/screw <b>P2 (roof)</b> on top, with the FRONT arrow pointing toward P3 (the door wall).</li>
+        <li>Reinstall the door piece (cut out from P3) into its opening with the 3 hinges on the right and the latch on the left.</li>
+        <li>Tape every internal seam with matte-black duct tape (light-tightness).</li>
+        <li>Add black felt gasket strip around the inside of the door opening.</li>
+        <li>Run wires from the LED strips and any sensors through P4's wire pass-through, down into the utility box that the floor sits on.</li>
+      </ol>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

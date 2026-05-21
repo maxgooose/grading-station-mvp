@@ -243,7 +243,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 3. **Device rest plate** at the end of the feeding path — flat black-silicone-padded plate at the load position. Sized for the largest day-1 form factor. (Replaced by the U-cradle in v2.)
 
-4. **Buy and install lighting** — bright-field first (replacement diffused source mounted on inner top surface), then dark-field (4 LED strips at grazing angle on all 4 sides). **Run the eyeball test inside the foam board shell** before wiring MOSFETs — this is the most important verification step. Do NOT buy cameras until this passes. ~$75.
+4. **Buy and install lighting** — bright-field first (replacement diffused source mounted on inner top surface), then dark-field (4 LED strips at grazing angle on all 4 sides). **Run the eyeball test inside the foam board shell** before wiring MOSFETs — this is the most important verification step. Do NOT buy cameras until this passes. ~$75. **Status (2026-05-09): PASSED.** Bright-field uniform across load position; dark-field grazing strips give clean shadows with no FOV spill. Camera mounting unblocked.
 
 5. **Buy and mount camera + lens** — only after the lighting is verified inside the real enclosure. Use the actual lighting geometry (not paper estimates) to confirm camera height, lens choice, and FOV. Verify the whole device fits in frame in both orientations. ~$80.
 
@@ -300,6 +300,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 ## Related docs
 
+- [`power-and-usb.md`](power-and-usb.md) — USB 2 camera class, 12 V LED / 24 V PSU wiring, buck and MOSFET sizing worksheet, ELP on-site verification checklist.
 - `cradle-build-spec.md` — the flip-mechanism detail (MVP v2; currently absent from working tree, to be reinstated when v2 starts)
 - [`../lighting/README.md`](../lighting/README.md) — lighting theory + eyeball test
 - [`../lighting/dark-field-setup.html`](../lighting/dark-field-setup.html) — lighting visualization

@@ -22,6 +22,7 @@ The physical grading station: enclosure, cameras, lighting, a feeding mechanism 
 | **`cradle-build-spec.md`** *(MVP v2 — currently absent from working tree)* | Canonical flip-mechanism spec. Full build doc for the pivoting U-cradle: concept, axle stackup, BOM, tools, 4-phase build sequence, critical details, tuning targets, gotchas. To be reinstated when MVP v2 starts. |
 | `cradle_build_spec.docx` *(MVP v2 — currently absent from working tree)* | Original Word source (contains Figures 1 and 2, referenced from the markdown). |
 | [`station-integration.md`](station-integration.md) | How the enclosure, camera, lighting, control, and (eventually) the cradle fit together. v1-vs-v2 split called out inline. |
+| [`power-and-usb.md`](power-and-usb.md) | **USB class** for purchased cameras (USB 2 UVC), **12 V LED + 24 V PSU** wiring, MOSFET/buck sizing worksheet, on-site ELP verification checklist. |
 | [`station-visualization.html`](station-visualization.html) | Step-by-step animated visualization of the full grading station cycle. **Visualizes the MVP v2 end-state** (with the automated flip mechanism). Open in a browser. |
 | [`universal-cellular-3d.html`](universal-cellular-3d.html) | 3D prototype view of the Universal Cellular grading station (turntable + manual operator flip — closer to the MVP v1 capture flow). Open in a browser. |
 
@@ -127,6 +128,8 @@ These will kill the U-cradle build if skipped (relevant only when v2 starts):
 
 - **2026-05-08 — Procurement milestone:** Purchased **4x IMX323 USB camera modules** (Amazon listing: `https://www.amazon.com/IMX323-Camera-Module-Webcam-Microphone/dp/B071RBFYH6?th=1`) for the station camera bring-up and integration phase.
 - **2026-05-08 — Procurement milestone:** Purchased **1x top camera** — ELP 4K USB/HDMI manual-focus camera (Amazon listing: `https://www.amazon.com/ELP-HDMI-Camera-Manual-Webcam/dp/B0CDGVZWQM?th=1`) for overhead dark-field capture.
+- **2026-05-09 — Procurement milestone:** Purchased enclosure panel stock — **5× plank boards, 12" × 12"** and **1× large plank board, 24" wide × 12" tall**. Painted matte black for the foam-board-shell enclosure (gloss kills cross-polarized captures, per the build rules above).
+- **2026-05-09 — Lighting eyeball test PASSED.** Bright-field + dark-field illumination verified inside the foam board shell per the gate in [`station-integration.md`](station-integration.md#revised-build-approach-2026-05-04) (step 4). Bright-field gives uniform top illumination across the load position; dark-field LED strips at grazing angle produce clean shadows with no spill into the camera FOV. Camera mounting / integration is now unblocked.
 
 ---
 

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shell v1 — 12&quot; Cube Enclosure (as-built panels)</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; overflow: hidden;
+    background: #0a0e14;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8eef5;
+  }
+  #app { position: fixed; inset: 0; }
+  #navbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(8, 12, 20, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+    display: flex; align-items: center;
+    padding: 0 20px; z-index: 100; gap: 8px;
+  }
+  #navbar .home {
+    color: #6db9ff; text-decoration: none;
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid rgba(109, 185, 255, 0.3);
+  }
+  #navbar .home:hover { background: rgba(109, 185, 255, 0.15); }
+  #navbar .sep { color: #3a4858; margin: 0 6px; }
+  #navbar .title {
+    color: #4dc06e; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 8px 12px; border-radius: 6px;
+    background: rgba(45, 138, 79, 0.18);
+    margin-left: 8px;
+  }
+  #info {
+    position: fixed; top: 68px; left: 20px;
+    max-width: 320px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px; line-height: 1.55;
+    z-index: 10;
+  }
+  #info h1 {
+    margin: 0 0 4px 0; font-size: 16px; font-weight: 600;
+    color: #6db9ff; letter-spacing: 0.3px;
+  }
+  #info .sub {
+    color: #8fa3b8; font-size: 11px;
+    margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  #info .row { display: flex; justify-content: space-between; padding: 3px 0; }
+  #info .k { color: #8fa3b8; }
+  #info .v { color: #e8eef5; font-weight: 500; }
+  #info .divider { height: 1px; background: rgba(100, 180, 255, 0.15); margin: 10px 0; }
+  #info .blurb { font-size: 11px; color: #8fa3b8; line-height: 1.5; }
+  #controls {
+    position: fixed; top: 68px; right: 20px;
+    background: rgba(15, 22, 33, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 11px; z-index: 10;
+    color: #8fa3b8; line-height: 1.7; width: 240px;
+  }
+  #controls b { color: #e8eef5; }
+  #controls .hint { font-size: 10px; color: #5a6b7d; margin-bottom: 8px; }
+  button {
+    background: rgba(109, 185, 255, 0.15);
+    border: 1px solid rgba(109, 185, 255, 0.4);
+    color: #6db9ff; padding: 7px 12px; border-radius: 6px;
+    font-size: 11px; cursor: pointer; font-family: inherit;
+    margin-top: 6px; width: 100%;
+    text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    transition: all 0.15s;
+  }
+  button:hover { background: rgba(109, 185, 255, 0.25); }
+  button.active {
+    background: rgba(45, 138, 79, 0.25);
+    border-color: rgba(45, 138, 79, 0.6);
+    color: #4dc06e;
+  }
+  #legend {
+    position: fixed; bottom: 20px; left: 20px;
+    background: rgba(15, 22, 33, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 180, 255, 0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 11px; z-index: 10;
+    color: #8fa3b8; line-height: 1.7;
+  }
+  #legend .item { display: flex; align-items: center; gap: 8px; }
+  #legend .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+<div id="navbar">
+  <a href="README.md" class="home">← Hardware</a>
+  <span class="sep">|</span>
+  <a href="station-integration.md" class="nav-link" style="color:#8fa3b8;text-decoration:none;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;padding:8px 12px;border-radius:6px;">Station Integration</a>
+  <a href="universal-cellular-3d.html" class="nav-link" style="color:#8fa3b8;text-decoration:none;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;padding:8px 12px;border-radius:6px;">Station Vision (v2 end-state)</a>
+  <span class="title">Shell v1 — As-Built (CURRENT)</span>
+</div>
+
+<div id="app"></div>
+
+<div id="info">
+  <h1>SHELL v1 — AS BUILT</h1>
+  <div class="sub">12&quot; cube on 24&quot;×12&quot; floor plank</div>
+  <div class="row"><span class="k">Interior</span><span class="v">12&quot; × 12&quot; × 12&quot;</span></div>
+  <div class="row"><span class="k">Floor (footprint)</span><span class="v">24&quot; × 12&quot;</span></div>
+  <div class="row"><span class="k">Loading shelf</span><span class="v">12&quot; × 12&quot; (front overhang)</span></div>
+  <div class="row"><span class="k">Door opening</span><span class="v">8&quot; × 9&quot;</span></div>
+  <div class="row"><span class="k">Camera hole</span><span class="v">⌀ 1.5&quot; (top, centered)</span></div>
+  <div class="divider"></div>
+  <div class="row"><span class="k">Boards used</span><span class="v">6 / 6</span></div>
+  <div class="row"><span class="k">— floor</span><span class="v">1× 24&quot;×12&quot;</span></div>
+  <div class="row"><span class="k">— walls</span><span class="v">4× 12&quot;×12&quot;</span></div>
+  <div class="row"><span class="k">— roof</span><span class="v">1× 12&quot;×12&quot;</span></div>
+  <div class="divider"></div>
+  <div class="blurb">Front-wall hatch is the operator door (v1 manual flip). 12&quot; front overhang doubles as the loading shelf and the future mounting surface for the feeding mechanism. Sits on the outer utility box.</div>
+</div>
+
+<div id="controls">
+  <div class="hint">Drag to orbit · Scroll to zoom · Right-drag to pan</div>
+  <button id="btn-explode">Explode panels</button>
+  <button id="btn-door">Open door</button>
+  <button id="btn-device">Show device</button>
+  <button id="btn-utility">Show utility box</button>
+  <button id="btn-cradle">Show v2 cradle envelope</button>
+  <button id="btn-reset">Reset view</button>
+</div>
+
+<div id="legend">
+  <div class="item"><span class="sw" style="background:#222;"></span>Matte black panels</div>
+  <div class="item"><span class="sw" style="background:#6db9ff;"></span>Door hatch</div>
+  <div class="item"><span class="sw" style="background:#ffaa55;"></span>Camera hole</div>
+  <div class="item"><span class="sw" style="background:#4dc06e;"></span>Device (12.9&quot; iPad outline)</div>
+  <div class="item"><span class="sw" style="background:#8a6cb0;opacity:0.5;"></span>Utility box (cardboard)</div>
+  <div class="item"><span class="sw" style="background:#ff5599;opacity:0.4;"></span>v2 cradle swept envelope</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Units: inches. Scene scale 1:1 (each Three.js unit = 1 inch).
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0e14);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(28, 22, 32);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.getElementById('app').appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 6, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+
+// Lighting
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+const key = new THREE.DirectionalLight(0xffffff, 0.8);
+key.position.set(15, 25, 18);
+scene.add(key);
+const fill = new THREE.DirectionalLight(0x6db9ff, 0.25);
+fill.position.set(-18, 8, -10);
+scene.add(fill);
+
+// Ground reference grid
+const grid = new THREE.GridHelper(60, 30, 0x1a2230, 0x121821);
+grid.position.y = -0.01;
+scene.add(grid);
+
+// --- Constants -------------------------------------------------
+const T = 0.4;       // panel thickness (visual; real foam-board / plank is ~0.25–0.5")
+const W = 12;        // cube width (X)
+const D = 12;        // cube depth (Z)
+const H = 12;        // cube height (Y)
+const SHELF = 12;    // floor overhang in front
+const FLOOR_W = W;
+const FLOOR_D = D + SHELF; // 24"
+
+// Cube footprint: x ∈ [-6, +6], z ∈ [-6, +6] (rear half of floor)
+// Floor: x ∈ [-6, +6], z ∈ [-6, +18]  (shelf extends positive-Z = front toward operator)
+// In Three convention here: +Z is "front" (toward camera at start), -Z is "back wall"
+
+const matPanel = new THREE.MeshStandardMaterial({
+  color: 0x1a1a1a, roughness: 0.95, metalness: 0.0,
+  side: THREE.DoubleSide,
+});
+const matPanelEdge = new THREE.LineBasicMaterial({ color: 0x3a4858 });
+
+function panel(w, h, d) {
+  // Returns a Group containing a box mesh + edge wireframe
+  const g = new THREE.Group();
+  const geo = new THREE.BoxGeometry(w, h, d);
+  const mesh = new THREE.Mesh(geo, matPanel);
+  g.add(mesh);
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), matPanelEdge);
+  g.add(edges);
+  g.userData.mesh = mesh;
+  return g;
+}
+
+// --- Panels ----------------------------------------------------
+// Floor (24" × 12") — laid flat at y=0
+const floor = panel(FLOOR_W, T, FLOOR_D);
+// Floor center: shifted in +Z so cube sits on rear (negative-Z) half
+floor.position.set(0, -T/2, (FLOOR_D - D)/2); // = (0, -T/2, 6)
+floor.userData.home = floor.position.clone();
+scene.add(floor);
+
+// Left wall (12 × 12)
+const left = panel(T, H, D);
+left.position.set(-W/2 - T/2, H/2, 0);
+left.userData.home = left.position.clone();
+scene.add(left);
+
+// Right wall (12 × 12)
+const right = panel(T, H, D);
+right.position.set(W/2 + T/2, H/2, 0);
+right.userData.home = right.position.clone();
+scene.add(right);
+
+// Back wall (12 × 12) — at -Z
+const back = panel(W, H, T);
+back.position.set(0, H/2, -D/2 - T/2);
+back.userData.home = back.position.clone();
+scene.add(back);
+
+// Roof (12 × 12) — at top, with camera hole
+const roofShape = new THREE.Shape();
+roofShape.moveTo(-W/2, -D/2);
+roofShape.lineTo( W/2, -D/2);
+roofShape.lineTo( W/2,  D/2);
+roofShape.lineTo(-W/2,  D/2);
+roofShape.lineTo(-W/2, -D/2);
+const camHole = new THREE.Path();
+camHole.absarc(0, 0, 0.75, 0, Math.PI * 2, false); // 1.5" diameter hole
+roofShape.holes.push(camHole);
+const roofGeo = new THREE.ExtrudeGeometry(roofShape, { depth: T, bevelEnabled: false });
+roofGeo.rotateX(-Math.PI/2);
+roofGeo.translate(0, T/2, 0);
+const roof = new THREE.Group();
+const roofMesh = new THREE.Mesh(roofGeo, matPanel);
+roof.add(roofMesh);
+const roofEdges = new THREE.LineSegments(new THREE.EdgesGeometry(roofGeo), matPanelEdge);
+roof.add(roofEdges);
+roof.position.set(0, H, 0);
+roof.userData.home = roof.position.clone();
+roof.userData.mesh = roofMesh;
+scene.add(roof);
+
+// Front wall (12 × 12) with door cutout
+const frontShape = new THREE.Shape();
+frontShape.moveTo(-W/2, 0);
+frontShape.lineTo( W/2, 0);
+frontShape.lineTo( W/2, H);
+frontShape.lineTo(-W/2, H);
+frontShape.lineTo(-W/2, 0);
+// Door hole: 8" wide × 9" tall, centered horizontally, bottom at y=1.5
+const doorHole = new THREE.Path();
+const dW = 8, dH = 9, dY0 = 1.5;
+doorHole.moveTo(-dW/2,  dY0);
+doorHole.lineTo( dW/2,  dY0);
+doorHole.lineTo( dW/2,  dY0 + dH);
+doorHole.lineTo(-dW/2,  dY0 + dH);
+doorHole.lineTo(-dW/2,  dY0);
+frontShape.holes.push(doorHole);
+const frontGeo = new THREE.ExtrudeGeometry(frontShape, { depth: T, bevelEnabled: false });
+frontGeo.translate(0, 0, -T/2);
+const front = new THREE.Group();
+const frontMesh = new THREE.Mesh(frontGeo, matPanel);
+front.add(frontMesh);
+const frontEdges = new THREE.LineSegments(new THREE.EdgesGeometry(frontGeo), matPanelEdge);
+front.add(frontEdges);
+front.position.set(0, 0, D/2 + T/2);
+front.userData.home = front.position.clone();
+front.userData.mesh = frontMesh;
+scene.add(front);
+
+// Door hatch (hinged on right side of opening, swings outward)
+const doorMat = new THREE.MeshStandardMaterial({
+  color: 0x1a1a1a, roughness: 0.85, metalness: 0.0,
+  emissive: 0x0a1828, emissiveIntensity: 0.4,
+});
+const doorGroup = new THREE.Group();
+const doorGeo = new THREE.BoxGeometry(dW, dH, T*0.9);
+const doorMesh = new THREE.Mesh(doorGeo, doorMat);
+// Position door so its right edge is at the hinge, then translate group to hinge location
+doorMesh.position.set(-dW/2, 0, 0); // door extends from hinge (x=0) leftward
+const doorEdges = new THREE.LineSegments(new THREE.EdgesGeometry(doorGeo), new THREE.LineBasicMaterial({ color: 0x6db9ff }));
+doorEdges.position.copy(doorMesh.position);
+doorGroup.add(doorMesh);
+doorGroup.add(doorEdges);
+// Hinge axis at right edge of opening: x = +dW/2, y = dY0 + dH/2, z = front face
+doorGroup.position.set(dW/2, dY0 + dH/2, D/2 + T + 0.01);
+scene.add(doorGroup);
+
+// Camera ring on roof (visual cue for the hole)
+const ringGeo = new THREE.RingGeometry(0.7, 0.95, 32);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0xffaa55, side: THREE.DoubleSide });
+const camRing = new THREE.Mesh(ringGeo, ringMat);
+camRing.rotation.x = -Math.PI/2;
+camRing.position.set(0, H + T + 0.02, 0);
+scene.add(camRing);
+
+// Camera body stub (just visual — small box above the hole)
+const camBodyGeo = new THREE.BoxGeometry(2.2, 1.5, 2.2);
+const camBodyMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.6, metalness: 0.5 });
+const camBody = new THREE.Mesh(camBodyGeo, camBodyMat);
+camBody.position.set(0, H + T + 1.0, 0);
+scene.add(camBody);
+const camLensGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.8, 24);
+const camLens = new THREE.Mesh(camLensGeo, new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3, metalness: 0.7 }));
+camLens.position.set(0, H + T + 0.4, 0);
+scene.add(camLens);
+
+// Device placeholder (12.9" iPad outline, 11" × 8.5")
+const deviceGroup = new THREE.Group();
+const devGeo = new THREE.BoxGeometry(11, 0.3, 8.5);
+const devMat = new THREE.MeshStandardMaterial({ color: 0x4dc06e, roughness: 0.4, metalness: 0.3, emissive: 0x153d22, emissiveIntensity: 0.5 });
+const devMesh = new THREE.Mesh(devGeo, devMat);
+devMesh.position.set(0, 0.15, 0);
+deviceGroup.add(devMesh);
+const devEdges = new THREE.LineSegments(new THREE.EdgesGeometry(devGeo), new THREE.LineBasicMaterial({ color: 0x4dc06e }));
+devEdges.position.copy(devMesh.position);
+deviceGroup.add(devEdges);
+deviceGroup.position.set(0, 0, 0); // centered on cube floor
+deviceGroup.visible = false;
+scene.add(deviceGroup);
+
+// Utility box (outer wireframe under floor)
+const utilGroup = new THREE.Group();
+const utilGeo = new THREE.BoxGeometry(28, 10, 26);
+const utilMat = new THREE.MeshStandardMaterial({
+  color: 0x8a6cb0, roughness: 0.9, transparent: true, opacity: 0.25, side: THREE.DoubleSide
+});
+const utilMesh = new THREE.Mesh(utilGeo, utilMat);
+utilGroup.add(utilMesh);
+const utilEdges = new THREE.LineSegments(new THREE.EdgesGeometry(utilGeo), new THREE.LineBasicMaterial({ color: 0x8a6cb0 }));
+utilGroup.add(utilEdges);
+utilGroup.position.set(0, -5 - T, FLOOR_D/2 - D/2); // below the floor, centered under it
+utilGroup.visible = false;
+scene.add(utilGroup);
+
+// v2 cradle swept envelope (cylinder showing rotation clearance needed)
+const cradleGroup = new THREE.Group();
+const cradleR = 5.5; // device half-length (11/2)
+const cradleGeo = new THREE.CylinderGeometry(cradleR, cradleR, 1.0, 48, 1, true);
+const cradleMat = new THREE.MeshBasicMaterial({ color: 0xff5599, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+const cradleMesh = new THREE.Mesh(cradleGeo, cradleMat);
+cradleMesh.rotation.z = Math.PI/2; // axis along X (device pivots in YZ plane)
+cradleMesh.position.set(0, H/2, 0);
+cradleGroup.add(cradleMesh);
+// Outline circles at each end
+for (const xPos of [-0.5, 0.5]) {
+  const circGeo = new THREE.TorusGeometry(cradleR, 0.05, 8, 48);
+  const circ = new THREE.Mesh(circGeo, new THREE.MeshBasicMaterial({ color: 0xff5599 }));
+  circ.rotation.y = Math.PI/2;
+  circ.position.set(xPos, H/2, 0);
+  cradleGroup.add(circ);
+}
+cradleGroup.visible = false;
+scene.add(cradleGroup);
+
+// Dimension labels on the floor shelf area
+function makeLabel(text, x, y, z, color = 0x6db9ff) {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = 'rgba(15,22,33,0.92)';
+  ctx.fillRect(0, 0, 256, 64);
+  ctx.strokeStyle = '#6db9ff';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, 254, 62);
+  ctx.fillStyle = '#6db9ff';
+  ctx.font = 'bold 24px -apple-system, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, 128, 32);
+  const tex = new THREE.CanvasTexture(c);
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+  spr.scale.set(4, 1, 1);
+  spr.position.set(x, y, z);
+  return spr;
+}
+
+const lblShelf = makeLabel('LOADING SHELF (12")', 0, 0.8, FLOOR_D/2);
+const lblFloor = makeLabel('24"× 12" FLOOR PLANK', 0, 0.4, FLOOR_D/2 - 4);
+const lblCube = makeLabel('12"×12"×12" CUBE', -W, H + 6, 0);
+const lblDoor = makeLabel('8" × 9" DOOR', 0, dY0 + dH/2, D/2 + 2);
+const lblCam = makeLabel('CAMERA HOLE ⌀1.5"', 0, H + 4, 0);
+scene.add(lblShelf, lblFloor, lblCube, lblDoor, lblCam);
+
+// --- Interactions ---------------------------------------------
+const state = { exploded: false, doorOpen: false, deviceShown: false, utilityShown: false, cradleShown: false };
+
+function lerpVec(target, dest, k = 0.12) {
+  target.x += (dest.x - target.x) * k;
+  target.y += (dest.y - target.y) * k;
+  target.z += (dest.z - target.z) * k;
+}
+
+const explodeTargets = new Map();
+function setExploded(on) {
+  state.exploded = on;
+  const off = on ? 1 : 0;
+  // Each panel slides outward along its outward normal
+  explodeTargets.set(floor, new THREE.Vector3(floor.userData.home.x, floor.userData.home.y - 4*off, floor.userData.home.z));
+  explodeTargets.set(left, new THREE.Vector3(left.userData.home.x - 5*off, left.userData.home.y, left.userData.home.z));
+  explodeTargets.set(right, new THREE.Vector3(right.userData.home.x + 5*off, right.userData.home.y, right.userData.home.z));
+  explodeTargets.set(back, new THREE.Vector3(back.userData.home.x, back.userData.home.y, back.userData.home.z - 5*off));
+  explodeTargets.set(front, new THREE.Vector3(front.userData.home.x, front.userData.home.y, front.userData.home.z + 5*off));
+  explodeTargets.set(roof, new THREE.Vector3(roof.userData.home.x, roof.userData.home.y + 5*off, roof.userData.home.z));
+}
+
+let doorAngle = 0;
+let doorTarget = 0;
+function setDoor(on) {
+  state.doorOpen = on;
+  doorTarget = on ? -Math.PI * 0.6 : 0; // swing outward (negative Y rotation)
+}
+
+function setDevice(on) { state.deviceShown = on; deviceGroup.visible = on; }
+function setUtility(on) { state.utilityShown = on; utilGroup.visible = on; }
+function setCradle(on) { state.cradleShown = on; cradleGroup.visible = on; }
+
+document.getElementById('btn-explode').addEventListener('click', (e) => {
+  setExploded(!state.exploded);
+  e.target.classList.toggle('active', state.exploded);
+});
+document.getElementById('btn-door').addEventListener('click', (e) => {
+  setDoor(!state.doorOpen);
+  e.target.classList.toggle('active', state.doorOpen);
+});
+document.getElementById('btn-device').addEventListener('click', (e) => {
+  setDevice(!state.deviceShown);
+  e.target.classList.toggle('active', state.deviceShown);
+});
+document.getElementById('btn-utility').addEventListener('click', (e) => {
+  setUtility(!state.utilityShown);
+  e.target.classList.toggle('active', state.utilityShown);
+});
+document.getElementById('btn-cradle').addEventListener('click', (e) => {
+  setCradle(!state.cradleShown);
+  e.target.classList.toggle('active', state.cradleShown);
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  camera.position.set(28, 22, 32);
+  controls.target.set(0, 6, 0);
+});
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// --- Animate ---
+function animate() {
+  requestAnimationFrame(animate);
+  // Lerp panels toward explode targets
+  for (const [panel, dest] of explodeTargets) {
+    lerpVec(panel.position, dest);
+  }
+  // Door
+  doorAngle += (doorTarget - doorAngle) * 0.12;
+  doorGroup.rotation.y = doorAngle;
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
