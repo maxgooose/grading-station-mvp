@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MVP v1 — Parts Order (simplified, plug-and-play lighting)</title>
+<style>
+  :root{
+    --ink:#1a1d21; --muted:#5b636c; --line:#e3e7eb; --bg:#f6f7f9;
+    --head:#11151a; --accent:#2563eb; --accent2:#0891b2;
+    --have:#ecfdf5; --have-line:#86efac; --total:#fff7ed; --total-line:#fdba74;
+    --tip:#eff6ff; --tip-line:#bfdbfe;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 24px 64px;}
+  header{background:var(--head);color:#fff;border-radius:14px;padding:26px 28px;margin-bottom:24px;}
+  header h1{margin:0 0 6px;font-size:22px;letter-spacing:.2px;}
+  header .sub{color:#aab4bf;font-size:14px;}
+  header .meta{margin-top:14px;font-size:12.5px;color:#8b95a0;}
+  .callout{border:1px solid var(--line);background:#fff;border-radius:12px;padding:16px 18px;margin:0 0 24px;}
+  .callout h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+  .callout ul{margin:0;padding-left:18px;} .callout li{margin:3px 0;}
+  .tip{background:var(--tip);border-color:var(--tip-line);}
+  .tip h3{color:#1d4ed8;}
+  section{margin:0 0 26px;}
+  h2{font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:10px;}
+  h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+  h2.df .dot{background:var(--accent2);}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:#fafbfc;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+  tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even){background:#fcfcfd;}
+  .item{font-weight:600;}
+  .spec{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:#374151;}
+  .qty{text-align:center;white-space:nowrap;}
+  .price{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .note{color:var(--muted);font-size:13px;}
+  .have{background:var(--have);border-color:var(--have-line);}
+  .have h3{color:#047857;}
+  .total{background:var(--total);border:1px solid var(--total-line);border-radius:12px;
+    padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin:8px 0 26px;}
+  .total .label{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:#9a3412;}
+  .total .amt{font-size:24px;font-weight:700;color:#7c2d12;font-variant-numeric:tabular-nums;}
+  pre{background:#11151a;color:#d7dde3;border-radius:12px;padding:18px;overflow:auto;
+    font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px;margin-top:8px;}
+  @media print{body{background:#fff;}.wrap{padding:0;}header{background:#11151a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>MVP v1 — Final Parts Order</h1>
+    <div class="sub">Simplified, plug-and-play lighting (no relay, no custom wiring) + camera connectivity + door hardware.</div>
+    <div class="meta">Grading station · 12&Prime; cube enclosure · host = Windows PC · prepared 2026-05-21</div>
+  </header>
+
+  <div class="callout">
+    <h3>Already have — don't buy</h3>
+    <ul>
+      <li><b>Cameras (5):</b> 4&times; IMX323 + 1&times; ELP 4K — all terminate in <b>USB-A</b> at the host and ship with their own cables. PC sits close, so no extensions needed.</li>
+      <li><b>The box:</b> wood shell + panels (cut/marked), painted matte black.</li>
+    </ul>
+  </div>
+
+  <section>
+    <h2><span class="dot"></span>Lighting <span style="font-weight:400;color:var(--muted);font-size:13px;">(plug-and-play — each comes with its own plug + dimmer)</span></h2>
+    <table>
+      <thead><tr><th>Item</th><th>Spec / search term</th><th class="qty">Qty</th><th class="price">Est.</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="item">Dimmable LED panel / light bar</td>
+          <td class="spec">"dimmable LED under-cabinet light bar" — frosted face, knob/inline dimmer (not remote-only), ~5000K</td>
+          <td class="qty">1</td><td class="price">$15–25</td>
+          <td class="note"><b>Bright-field.</b> Self-diffused — no separate diffuser. Mounts on the roof; lens through a notch or beside it.</td>
+        </tr>
+        <tr>
+          <td class="item">Dimmable LED strip kit</td>
+          <td class="spec">"dimmable LED strip light kit" — white, includes power adapter + inline dimmer</td>
+          <td class="qty">1</td><td class="price">$15–20</td>
+          <td class="note"><b>Dark-field.</b> Bare strip, run grazing along a side (low, ~4 cm from the device, angled 10–15&deg; in). Kit is long — route it along 1–2 sides to start.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Cameras &harr; PC</h2>
+    <table>
+      <thead><tr><th>Item</th><th>Spec / search term</th><th class="qty">Qty</th><th class="price">Est.</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="item">Powered USB hub, 7-port</td>
+          <td class="spec">"powered USB hub 7 port" — USB-A, with its own power brick</td>
+          <td class="qty">1</td><td class="price">$25–35</td>
+          <td class="note">All 5 cameras are USB-A and come with their cables. Plug the hub into a <b>rear</b> PC port; capture one camera at a time (they share USB 2.0 bandwidth).</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="df"><span class="dot"></span>Door <span style="font-weight:400;color:var(--muted);font-size:13px;">(thin wood)</span></h2>
+    <table>
+      <thead><tr><th>Item</th><th>Spec / search term</th><th class="qty">Qty</th><th class="price">Est.</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="item">Mini piano hinge (or 2 butt hinges)</td><td class="spec">"mini piano hinge" / "small butt hinge"</td><td class="qty">1</td><td class="price">$8</td><td class="note">Pre-drill; use screws shorter than the panel thickness.</td></tr>
+        <tr><td class="item">Knob / pull</td><td class="spec">"small cabinet knob"</td><td class="qty">1</td><td class="price">$4</td><td class="note">—</td></tr>
+        <tr><td class="item">Magnetic catch</td><td class="spec">"magnetic cabinet door catch"</td><td class="qty">1</td><td class="price">$5</td><td class="note">Holds the door light-tight against the gasket.</td></tr>
+        <tr><td class="item">Foam gasket tape</td><td class="spec">"foam weatherstrip tape"</td><td class="qty">1</td><td class="price">$8</td><td class="note">Light-tight seal around the door opening.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="total"><span class="label">Estimated total</span><span class="amt">≈ $90</span></div>
+
+  <div class="callout tip">
+    <h3>How the lights are controlled</h3>
+    <ul>
+      <li>Each light is <b>plug-and-play</b> — its own power plug + dimmer knob. <b>No relay, no 12V adapter, no fuse, no wiring.</b></li>
+      <li>You switch <b>bright-field &harr; dark-field by hand</b> between the two shots — you're already opening the door to flip the phone, so it costs nothing.</li>
+      <li><b>Optional later:</b> a ~$10 USB relay lets the PC switch them automatically. It drops in with zero rework when you want it.</li>
+    </ul>
+  </div>
+
+  <section>
+    <h2><span class="dot"></span>Where the lights go</h2>
+    <pre>
+ ROOF  ===[ bright-field: dimmable LED panel/bar (self-diffused) ]===
+                    |  camera lens (round 2" hole)
+                    v      ~8" working distance
+   DF \                                              &lt;- dark-field strip,
+     -------------[  PHONE, screen up  ]-------------    grazing along a side, BARE
+ FLOOR/SHELF         ^ low, ~4cm from device edge, angled 10-15 deg in
+    </pre>
+  </section>
+
+  <div class="callout">
+    <h3>Build notes</h3>
+    <ul>
+      <li>Inside of the box must be <b>matte black everywhere</b> — mandatory for dark-field contrast.</li>
+      <li>Bright-field panel = self-diffused, so <b>no separate diffuser</b>. Dark-field strip stays bare, on small black foam blocks to set the grazing angle.</li>
+      <li>If a light <b>flickers</b> in captures, nudge its dimmer off the lowest settings (cheap PWM dimmers can flicker at low brightness).</li>
+      <li>Cameras: plug the hub into a <b>rear</b> PC port; grab one camera at a time (5 cameras share USB 2.0 bandwidth).</li>
+      <li>Door (thin wood): pre-drill, short screws, and black-out any shiny hinge/knob.</li>
+    </ul>
+  </div>
+
+  <footer>
+    MVP v1 parts order (simplified). Prices are rough single-unit estimates; search terms given instead of links. Open in a browser, or Print &rarr; Save as PDF for a Word-style copy.
+  </footer>
+
+</div>
+</body>
+</html>
