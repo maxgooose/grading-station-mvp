@@ -119,7 +119,8 @@
   <div class="row"><span class="k">Floor (footprint)</span><span class="v">24&quot; × 12&quot;</span></div>
   <div class="row"><span class="k">Loading shelf</span><span class="v">12&quot; × 12&quot; (front overhang)</span></div>
   <div class="row"><span class="k">Door opening</span><span class="v">8&quot; × 9&quot;</span></div>
-  <div class="row"><span class="k">Camera hole</span><span class="v">⌀ 1.5&quot; (top, centered)</span></div>
+  <div class="row"><span class="k">Camera hole</span><span class="v">⌀ 2&quot; (top, centered)</span></div>
+  <div class="row"><span class="k">Wire pass-through</span><span class="v">⌀ 1&quot; (back, 1.5&quot; up)</span></div>
   <div class="divider"></div>
   <div class="row"><span class="k">Boards used</span><span class="v">6 / 6</span></div>
   <div class="row"><span class="k">— floor</span><span class="v">1× 24&quot;×12&quot;</span></div>
@@ -243,10 +244,26 @@ right.position.set(W/2 + T/2, H/2, 0);
 right.userData.home = right.position.clone();
 scene.add(right);
 
-// Back wall (12 × 12) — at -Z
-const back = panel(W, H, T);
-back.position.set(0, H/2, -D/2 - T/2);
+// Back wall (12 × 12) — at -Z, with ⌀1" wire pass-through (centered horizontally, 1.5" up from bottom)
+const backShape = new THREE.Shape();
+backShape.moveTo(-W/2, 0);
+backShape.lineTo( W/2, 0);
+backShape.lineTo( W/2, H);
+backShape.lineTo(-W/2, H);
+backShape.lineTo(-W/2, 0);
+const wireHole = new THREE.Path();
+wireHole.absarc(0, 1.5, 0.5, 0, Math.PI * 2, false); // ⌀1" hole at (x=0, y=1.5")
+backShape.holes.push(wireHole);
+const backGeo = new THREE.ExtrudeGeometry(backShape, { depth: T, bevelEnabled: false });
+backGeo.translate(0, 0, -T/2);
+const back = new THREE.Group();
+const backMesh = new THREE.Mesh(backGeo, matPanel);
+back.add(backMesh);
+const backEdges = new THREE.LineSegments(new THREE.EdgesGeometry(backGeo), matPanelEdge);
+back.add(backEdges);
+back.position.set(0, 0, -D/2 - T/2);
 back.userData.home = back.position.clone();
+back.userData.mesh = backMesh;
 scene.add(back);
 
 // Roof (12 × 12) — at top, with camera hole
@@ -257,7 +274,7 @@ roofShape.lineTo( W/2,  D/2);
 roofShape.lineTo(-W/2,  D/2);
 roofShape.lineTo(-W/2, -D/2);
 const camHole = new THREE.Path();
-camHole.absarc(0, 0, 0.75, 0, Math.PI * 2, false); // 1.5" diameter hole
+camHole.absarc(0, 0, 1.0, 0, Math.PI * 2, false); // 2" diameter hole (locked: lens 1.9" + clearance)
 roofShape.holes.push(camHole);
 const roofGeo = new THREE.ExtrudeGeometry(roofShape, { depth: T, bevelEnabled: false });
 roofGeo.rotateX(-Math.PI/2);
@@ -319,7 +336,7 @@ doorGroup.position.set(dW/2, dY0 + dH/2, D/2 + T + 0.01);
 scene.add(doorGroup);
 
 // Camera ring on roof (visual cue for the hole)
-const ringGeo = new THREE.RingGeometry(0.7, 0.95, 32);
+const ringGeo = new THREE.RingGeometry(0.95, 1.2, 32);
 const ringMat = new THREE.MeshBasicMaterial({ color: 0xffaa55, side: THREE.DoubleSide });
 const camRing = new THREE.Mesh(ringGeo, ringMat);
 camRing.rotation.x = -Math.PI/2;
@@ -410,8 +427,9 @@ const lblShelf = makeLabel('LOADING SHELF (12")', 0, 0.8, FLOOR_D/2);
 const lblFloor = makeLabel('24"× 12" FLOOR PLANK', 0, 0.4, FLOOR_D/2 - 4);
 const lblCube = makeLabel('12"×12"×12" CUBE', -W, H + 6, 0);
 const lblDoor = makeLabel('8" × 9" DOOR', 0, dY0 + dH/2, D/2 + 2);
-const lblCam = makeLabel('CAMERA HOLE ⌀1.5"', 0, H + 4, 0);
-scene.add(lblShelf, lblFloor, lblCube, lblDoor, lblCam);
+const lblCam = makeLabel('CAMERA HOLE ⌀2"', 0, H + 4, 0);
+const lblWire = makeLabel('WIRE ⌀1"', 0, 1.5, -D/2 - 2);
+scene.add(lblShelf, lblFloor, lblCube, lblDoor, lblCam, lblWire);
 
 // --- Interactions ---------------------------------------------
 const state = { exploded: false, doorOpen: false, deviceShown: false, utilityShown: false, cradleShown: false };
