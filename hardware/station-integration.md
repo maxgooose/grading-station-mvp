@@ -42,8 +42,8 @@ Pulled from `lighting/README.md` + additions for the enclosure and control. **MV
 | **Capture enclosure (wooden-plank shell)** | v1 | Matte black wooden panels (5–6 thin 12"×12" + one thick 24"×12" floor plank, no 2020 frame), wood glue + brad nails/screws for seams, hinges + magnetic door latch, light-tight felt gaskets, flat black-silicone-padded rest plate for the device. Note: 2020 extrusion frame dropped for v1 per 2026-05-04 revision; panels already purchased. | **(panels purchased)** |
 | **Outer utility / wiring box** | v1 | Larger rigid box (cardboard, plywood, or plastic bin) that the wooden-plank capture enclosure sits on top of or wraps around. Houses PSU, MCU, MOSFET board, excess wiring, and any bulk items acquired later. Keeps electronics separate from the light-tight capture volume. | **~$15** |
 | **Feeding mechanism** *(finalize today)* | v1 | TBD until mechanism is chosen. Range: ~$20 (gravity slide + microswitch) → ~$60 (pull-out drawer with linear rail + microswitch) → ~$120 (small bidirectional belt conveyor + DC motor + driver + IR break-beam sensor). | **~$20–120** |
-| **Dark-field lighting** | v1 | 4× LED strips, 4× diffusion-free mounts, matte-black felt liner, 4-channel MOSFET driver | **~$50** |
-| **Bright-field lighting** | v1 | Replacement diffused panel/tent + mount into top of enclosure (Amazon lightbox was returned) | **~$25** |
+| **Dark-field lighting** | v1 | ~~4× LED strips + 4-channel MOSFET driver~~ **SUPERSEDED 2026-06-08 → plug-and-play:** 1× 12 V dimmable white strip kit cut into 3 bare wall segments (back/left/right), grazing 12–15°, manual switch | **~$20** |
+| **Bright-field lighting** | v1 | ~~Replacement diffused panel/tent~~ **SUPERSEDED → plug-and-play:** 2× 12" under-cabinet LED bar (5000 K, CRI 90+, flicker-free, linkable), flanking the lens on the roof | **~$25** |
 | **Camera + lens** | v1 | USB machine-vision camera (Arducam / ELP) + 6 mm or 8 mm M12 lens — purchased AFTER the wooden-plank shell and lighting are built and verified | **~$80** |
 | **Control** | v1 | ESP32 (or Arduino Uno), 12 V / 24 V PSU, wiring, small OLED status display, start button, door interlock switch | **~$50** |
 | **U-cradle** *(deferred)* | v2 | 2020 extrusion, bearings, axle, waterjet arm plates, spring kit, silicone pads, handle | **~$200** |
@@ -158,7 +158,7 @@ Coordinate system: **origin at the center of the device when loaded**, **Z up**,
 
 **Single MCU (ESP32 recommended).** Handles:
 
-- 4-channel MOSFET driver for LED banks (bright-field, dark-field × N, independent) `[v1+v2]`
+- ~~4-channel MOSFET driver for LED banks~~ **SUPERSEDED for v1 (2026-06-08):** lighting is plug-and-play, switched **by hand** between shots — no MOSFET, no PSU, no firmware for lighting. MOSFET is the optional auto-switch upgrade. `[v1.5/v2]`
 - Camera trigger (GPIO pulse if camera supports hardware trigger; otherwise USB command from host PC) `[v1+v2]`
 - Door interlock switch (GPIO, fail-safe: no capture if door open) `[v1+v2]`
 - Start button + small OLED status display (also drives the "FLIP DEVICE" prompt in v1) `[v1+v2]`
@@ -196,8 +196,8 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 | **Cradle drive** *(v2)* | Manual handle when v2 starts | Simpler; spec already exists. Motorize later — same axle, same stops. ~$50 swap. |
 | **Camera** | Arducam / ELP USB 1080p with M12 lens | Enough resolution for whole-device frame (~150 µm/px on a 6" phone at 28 cm). Industrial cameras are overkill until we know the pipeline works. |
 | **Lens** | 6 mm M12 | Covers 12.9" iPad at 28 cm. |
-| **Number of dark-field LEDs** | 4 (all 4 sides) | Covers all scratch orientations. ~$20 more than 2, worth it. |
-| **Bright-field source** | Buy a replacement diffused bright-field source | Previous Amazon lightbox was returned; replacement is required before integration. |
+| **Number of dark-field LEDs** | 3 walls (back/left/right); optional 4th on the door | Back covers the N–S scratch axis, left+right cover E–W → both orientations from one strip kit. Add the door strip only if blind-spot testing shows a gap. |
+| **Bright-field source** | 2× 12" under-cabinet LED bar (5000 K, CRI 90+, flicker-free), flanking the lens | Self-diffused; two bars avoid a central hotspot in the down-looking lens. Replaces the returned Amazon tent. |
 | **Enclosure build** | **Revised (2026-05-04):** matte black wooden-plank shell (no 2020 frame for v1) → lighting first → cameras later. Built to sit on/around a larger outer utility box for wiring. See [Revised build approach](#revised-build-approach-2026-05-04). | Cheaper and faster than the original 2020-frame plan. Pre-cut planks are rigid and self-supporting at this scale. **Still leave clear airspace and mounting points where the v2 cradle posts will go.** |
 | **MCU** | ESP32 dev board | WiFi for debugging, 3.3 V, plenty of GPIO. Same board carries forward into v2. |
 | **Host** | Laptop (dev) → Raspberry Pi 5 (production) | USB camera + basic inference; no GPU needed for a small classifier |
@@ -221,7 +221,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 4. **Device variety on day 1.** Are we optimizing for phones only, or does day-1 need to handle tablets too? Affects enclosure size, camera lens choice, feeding mechanism width, and (later) cradle pad groove.
 
-5. **Bright-field source selection after return** — choose replacement diffused panel/tent geometry that fits the enclosure and provides uniform top illumination. Budget ~$25.
+5. ~~**Bright-field source selection after return**~~ ✅ **Resolved 2026-06-08:** 2× 12" under-cabinet LED bar (5000 K, CRI 90+, flicker-free, linkable), flanking the lens for uniform top fill with no central hotspot. See [`v1-parts-order.html`](v1-parts-order.html).
 
 6. **Grade feedback UI.** Just show a letter on an OLED? Or a full screen with the annotated image? Full screen = ~$40 extra, better UX, more wiring. (In v1 the same display also drives the "FLIP DEVICE" prompt.)
 
