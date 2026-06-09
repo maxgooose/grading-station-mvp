@@ -71,6 +71,20 @@ Two off-the-shelf lights, each with its own plug + dimmer. **No MOSFET, no PSU, 
 
 ---
 
+## Lighting for the 5-camera layout
+
+5 cameras (1 overhead + 4 side edge cams, mid-panel ~4" up — [`../hardware/camera-placement.md`](../hardware/camera-placement.md)) split the lighting into **three states**:
+
+| State | Lights | Captures |
+|---|---|---|
+| A — Bright-field | Roof bars | Top camera (flat face) |
+| B — Edge bright-field | Wall strips, diffused | 4 side cams (edges + corners) |
+| C — Dark-field | Wall strips, bare grazing | Top camera only (scratches) |
+
+Key points: **dark-field is top-camera-only** (its geometry is defined for the overhead lens), and the side cams need state **B** because a top-down bright-field underlights the vertical sidewalls. The grazing strips sit **low (~5 mm)** below the **high (~4")** side cams, so there's no collision or shadowing. All switching stays manual for v1.
+
+---
+
 ## ZERO-COST EYEBALL TEST — ✅ PASSED 2026-05-09
 
 **Done.** Bright-field + dark-field were verified inside the wooden-plank shell (see the hardware/README progress log): bright-field uniform across the load position; dark-field grazing strips give clean shadows with no spill into the camera FOV → the dual-capture theory holds for our device set. The procedure below is kept as the historical record **and** as the re-test recipe once the real purchased lights are mounted — now with an added flicker/banding check (see the verification step in the parts order).

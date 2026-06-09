@@ -1,6 +1,6 @@
 # Grading Project
 
-Automated cosmetic grading station for used mobile devices. Fixed-camera enclosure + dual-capture lighting (bright-field + dark-field) + segmentation models → B/C (POC) or Universal + Blueberry (production) grade.
+Automated cosmetic grading station for used mobile devices. Multi-camera enclosure (1 overhead ELP 4K + 4 side edge cameras) + dual-capture lighting (bright-field + dark-field) + segmentation models → B/C (POC) or Universal + Blueberry (production) grade.
 
 **MVP scope:**
 - **MVP v1 (current focus):** wooden-plank capture enclosure (no 2020 extrusion frame), outer utility/wiring box at the base, dual-capture lighting (installed before cameras), segmentation pipeline, **feeding mechanism (device in → captures → device out)**. O the feeding mechanism handles entry and exit only. Feeding-mechanism design is being finalized (mechanism TBD — conveyor, tray, drawer, etc.). Full build sequence in [`hardware/station-integration.md`](hardware/station-integration.md#revised-build-approach-2026-05-04).
@@ -16,7 +16,7 @@ Every component lives in its own folder with a single `README.md` as the main do
 |---|---|---|
 | [`grading-criteria/`](grading-criteria/README.md) | The label schemas the model must output: Universal (A, B, C(amz), C, D) and Blueberry (later). The source of truth for every downstream decision. | [`grading-criteria/README.md`](grading-criteria/README.md) |
 | [`software/`](software/README.md) | ML/CV pipeline. Current POC (EfficientNet-B0 binary classifier) and the next-arch dual-capture segmentation plan. | [`software/README.md`](software/README.md) |
-| [`hardware/`](hardware/README.md) | Physical station: camera layout, cycle timing, BOM. Pivoting U-cradle flip mechanism is specced but **scoped to MVP v2 (deferred)**. | [`hardware/README.md`](hardware/README.md) |
+| [`hardware/`](hardware/README.md) | Physical station: 5-camera layout ([`camera-placement.md`](hardware/camera-placement.md)), cycle timing, BOM. Pivoting U-cradle flip mechanism is specced but **scoped to MVP v2 (deferred)**. | [`hardware/README.md`](hardware/README.md) |
 | [`lighting/`](lighting/README.md) | Illumination strategy: bright-field + dark-field dual capture. The most under-valued component of the whole station. | [`lighting/README.md`](lighting/README.md) |
 | [`research/`](research/README.md) | Competitor teardowns, patents, related open-source work, datasets. What was ruled in, what was ruled out. | [`research/README.md`](research/README.md) |
 

@@ -62,6 +62,18 @@ same device, same position
 
 ---
 
+## Lighting × the 5 cameras
+
+The station has **5 cameras** (1 overhead ELP 4K + 4 side ELP IMX323, mid-panel ~4" up the walls — see [`../hardware/camera-placement.md`](../hardware/camera-placement.md)). That adds two things to the lighting:
+
+- **Dark-field is a top-camera-only capture.** Its geometry (specular bounce misses the lens) is defined for the overhead lens; the side cams stay idle during the DF shot — the grazing strips sit in their frames and don't help edges anyway.
+- **A third state — edge bright-field — for the side cams.** Top-down bright-field leaves the vertical sidewalls underlit, and the sidewalls are what the side cams inspect. Fix: during the side pass, switch the **wall strips on (undimmed, lightly diffused)** so each wall cross-lights the *opposite* sidewall. Free with manual hand-switching.
+- **No collision:** the FOV math puts the side cams high (~4") while the grazing strips sit low (~5 mm) — bodies don't block the strips or shadow the device.
+
+Capture states per face: **A** roof bars → top (face) · **B** wall strips diffused → 4 side (edges) · **C** wall strips bare/grazing → top (scratches).
+
+---
+
 ## Lightbox status update
 
 - The Amazon lightbox was purchased on 2026-04-14 and later returned.

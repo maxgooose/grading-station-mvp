@@ -23,13 +23,14 @@ A light-tight enclosure (~45 × 45 × 55 cm inside dimensions) containing:
 - **Device load position** at the center.
   - `[v1]` Device sits on a flat, padded rest plate at the end of the feeding path. After the front-face capture pair, the operator opens the door, manually flips the device, closes the door, second capture pair runs.
   - `[v2 — deferred]` **U-cradle** holds the device stationary through an automated 180° flip. Same enclosure, same camera/lighting layout — drops in where the v1 rest plate sits. (Feeding mechanism is unchanged from v1.)
-- **Camera** mounted directly above the device, pointing straight down. `[v1+v2]`
+- **Top camera (ELP 4K)** — lens only, through the ⌀2" roof hole, pointing straight down at the flat face. `[v1+v2]`
+- **4 side cameras (ELP IMX323, 3.6 mm)** — inside the box, mid-panel on each wall, ~4" up and angled ~40–50° down, framing the 4 device edges + corners. Full geometry/mount math in [`camera-placement.md`](camera-placement.md). `[v1+v2]`
 - **4 LED strips** at screen-plane height on all 4 sides for dark-field. `[v1+v2]`
-- **Bright-field light panel** on the inner top surface (diffused; source needs replacement after Amazon tent return). `[v1+v2]`
+- **Bright-field source** — 2× 12" under-cabinet LED bar (5000 K, CRI 90+, flicker-free) flanking the lens on the inner roof; self-diffused (replaces the returned Amazon tent). `[v1+v2]`
 - **MOSFET + MCU** in a separate electronics compartment, controlling lighting + camera trigger + feeding mechanism actuator + device-present sensor (+ cradle motor in v2). `[v1+v2]`
 - **Operator loading door** on the front (still needed in v1 for the manual mid-cycle flip). `[v1+v2]`
 
-One device in → 4 captures (bright-field + dark-field on each face) → grade out. In v1 the operator flips the device between the two pairs; in v2 the cradle does it. The feeding mechanism handles the entry and exit in both phases.
+One device in → multi-camera capture on each face (top camera: bright-field + dark-field; 4 side cams: edge bright-field) → grade out. Full capture sequence (3 lighting states × which cameras shoot) is in [`camera-placement.md`](camera-placement.md). In v1 the operator flips the device between faces; in v2 the cradle does it. The feeding mechanism handles entry and exit in both phases.
 
 ---
 
@@ -194,8 +195,8 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 |---|---|---|
 | **Flip mechanism** | **Operator manual flip in v1**, U-cradle in v2 (deferred) | v1 ships in days, not weeks. Cradle is a known-good upgrade — design v1 around its eventual footprint. |
 | **Cradle drive** *(v2)* | Manual handle when v2 starts | Simpler; spec already exists. Motorize later — same axle, same stops. ~$50 swap. |
-| **Camera** | Arducam / ELP USB 1080p with M12 lens | Enough resolution for whole-device frame (~150 µm/px on a 6" phone at 28 cm). Industrial cameras are overkill until we know the pipeline works. |
-| **Lens** | 6 mm M12 | Covers 12.9" iPad at 28 cm. |
+| **Camera** | **As-built:** 1× ELP 4K (top, lens through roof) + 4× ELP IMX323 3.6 mm (side edge cams) | 5-camera layout supersedes the single-camera plan — see [`camera-placement.md`](camera-placement.md). |
+| **Lens** | Top: ELP 4K varifocal; sides: fixed 3.6 mm (~73° HFOV) | 3.6 mm fits a 160 mm phone edge + corners from ~4" up; math in camera-placement.md. |
 | **Number of dark-field LEDs** | 3 walls (back/left/right); optional 4th on the door | Back covers the N–S scratch axis, left+right cover E–W → both orientations from one strip kit. Add the door strip only if blind-spot testing shows a gap. |
 | **Bright-field source** | 2× 12" under-cabinet LED bar (5000 K, CRI 90+, flicker-free), flanking the lens | Self-diffused; two bars avoid a central hotspot in the down-looking lens. Replaces the returned Amazon tent. |
 | **Enclosure build** | **Revised (2026-05-04):** matte black wooden-plank shell (no 2020 frame for v1) → lighting first → cameras later. Built to sit on/around a larger outer utility box for wiring. See [Revised build approach](#revised-build-approach-2026-05-04). | Cheaper and faster than the original 2020-frame plan. Pre-cut planks are rigid and self-supporting at this scale. **Still leave clear airspace and mounting points where the v2 cradle posts will go.** |
@@ -302,6 +303,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 ## Related docs
 
+- [`camera-placement.md`](camera-placement.md) — the 5-camera layout (top + 4 side edge cams): FOV math, mount heights/angles, corner coverage, lighting interaction.
 - [`power-and-usb.md`](power-and-usb.md) — USB 2 camera class, 12 V LED / 24 V PSU wiring, buck and MOSFET sizing worksheet, ELP on-site verification checklist.
 - `cradle-build-spec.md` — the flip-mechanism detail (MVP v2; currently absent from working tree, to be reinstated when v2 starts)
 - [`../lighting/README.md`](../lighting/README.md) — lighting theory + eyeball test
