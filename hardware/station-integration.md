@@ -187,6 +187,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 - **Dual-capture:** bright-field + dark-field per device, per side.
 - **Black everything inside** the enclosure. Mandatory for dark-field contrast.
 - **Operator places device on the feeder; does not reach into the enclosure to load.** V1 still requires the operator to open the door for the mid-cycle manual flip — that's the only hands-in-enclosure step.
+- **Load position / stage (2026-06-10):** device centered on the **top camera's optical axis** (the installed camera is the datum — trace from live preview), **landscape** (long axis parallel to the door), **max envelope 7.0"×3.5" (phones only)**, screen-up first pass. Why: 16:9 sensor over a ~2:1 phone gives ~50 µm/px in landscape vs ~88 portrait; equal wall distances let the 4 edge cams share one lens/focus recipe; the long edge faces the longer ~4.4" wall distance (worst-case edge-cam FOV ~72° vs ~99°); phone feeds long-axis-first through the future P5 slot. See [`README.md`](README.md) progress log.
 
 ### RECOMMENDED (my call, flip if you want)
 
@@ -219,7 +220,7 @@ MCU and host PC communicate over serial (USB CDC on the ESP32). MCU orchestrates
 
 3. **Budget envelope.** v1 lands at ~$270–370 depending on feeding mechanism. v2 adds the cradle for another ~$200–250. Does that match the target?
 
-4. **Device variety on day 1.** Are we optimizing for phones only, or does day-1 need to handle tablets too? Affects enclosure size, camera lens choice, feeding mechanism width, and (later) cradle pad groove.
+4. ~~**Device variety on day 1.** Are we optimizing for phones only, or does day-1 need to handle tablets too?~~ **Resolved 2026-06-10: phones only for v1**, max envelope 7.0"×3.5". Settled by shell physics — a 12.9" iPad (11"×8.5") inside the as-built 12" interior leaves the edge cameras ~0.5" of working distance. Tablets would need a bigger shell, i.e. a v2+ decision.
 
 5. **Bright-field source selection after return** — choose replacement diffused panel/tent geometry that fits the enclosure and provides uniform top illumination. Budget ~$25.
 
