@@ -1,7 +1,7 @@
 # Lighting Strategy — Current Decision & Plan
 
-**Date:** 2026-04-15
-**Status:** Plan agreed, eyeball test pending before any hardware change.
+**Date:** 2026-04-15 · **Updated:** 2026-06-08 (purchase decision locked)
+**Status:** Eyeball test **PASSED 2026-05-09** (inside the wooden-plank shell). Lighting for v1 is **plug-and-play, manually switched** — the 12 V / MOSFET / PSU rig described below is **superseded** (kept only as the optional auto-switch upgrade). Buy list locked; see [`../hardware/v1-parts-order.html`](../hardware/v1-parts-order.html).
 
 ---
 
@@ -58,21 +58,36 @@ Each model solves one problem it is good at. The grading rule stays legible and 
 
 ---
 
-## Hardware to add (dark-field rig)
+## Hardware to buy — LOCKED 2026-06-08 (plug-and-play, manual switching)
 
-Cheap. Can prototype under $40 using a simple replacement diffused source plus a dark-field add-on.
+Two off-the-shelf lights, each with its own plug + dimmer. **No MOSFET, no PSU, no wiring for v1** — the operator switches bright-field ↔ dark-field by hand between the two shots (they're already opening the door to flip the phone). Full buy list + links: [`../hardware/v1-parts-order.html`](../hardware/v1-parts-order.html). Canonical geometry: [`../hardware/shell-v1-lighting-camera-3d.html`](../hardware/shell-v1-lighting-camera-3d.html).
 
-- 1× LED strip (~$10) — any equivalent strip works
-- Black matte liner or small separate enclosure (~$15) — black felt or black foamboard
-- LED positioned **grazing angle above the device** so specular bounce misses the lens
-- Independent LED switching (MOSFET + GPIO, ~$10) to toggle between bright-field and dark-field passes
-- Optional: separate small enclosure instead of re-lining the existing tent
+- **Bright-field** — 2× 12" under-cabinet LED bar, 5000 K, **CRI 90+, flicker-free**, linkable (e.g. Amazon `B0FX521RMC`), ~$20–30. The two bars **flank the central ⌀2" lens hole** so the screen-mirror reflection lands beside the lens, not in it.
+- **Dark-field** — one **12 V DC** white LED strip, cut into **3 segments → back + left + right walls**, mounted **bare** (no diffuser) on small black-foam blocks, ~5 mm above the screen plane, 3–6 cm from the device edge, tilted **12–15° grazing**. All three on together. Budget consumer kit ~$20, or the vision-grade Waveform FilmGrade flicker-free system ~$60–80. Prefer 12 V DC (not 5 V USB) so a later ~$10 USB relay can auto-switch it.
+
+> **Flicker is the #1 machine-vision risk.** The ELP 4K is rolling-shutter — PWM *dimming* causes rolling-bar banding. Run the LEDs **undimmed at full brightness on a clean DC supply and set brightness with the camera's exposure**; only dim with a **flicker-free** dimmer; always confirm with a test capture.
+
+**Optional auto-switch upgrade (v1.5/v2):** a 4-channel MOSFET + GPIO (~$10) on a 12 V supply replaces the manual switch. This is the only surviving piece of the old MOSFET plan.
 
 ---
 
-## ZERO-COST EYEBALL TEST (run before any hardware change)
+## Lighting for the 5-camera layout
 
-This is the single most important next step. It takes 15 minutes and definitively answers "does dark-field even work for our device set" before spending a dollar.
+5 cameras (1 overhead + 4 corner-mounted edge cams, lens center ~0.75" up — corner layout confirmed 2026-06-11, see [`../hardware/README.md`](../hardware/README.md)) split the lighting into **three states**:
+
+| State | Lights | Captures |
+|---|---|---|
+| A — Bright-field | Roof bars | Top camera (flat face) |
+| B — Edge bright-field | Wall strips, diffused | 4 side cams (edges + corners) |
+| C — Dark-field | Wall strips, bare grazing | Top camera only (scratches) |
+
+Key points: **dark-field is top-camera-only** (its geometry is defined for the overhead lens), and the side cams need state **B** because a top-down bright-field underlights the vertical sidewalls. The corner cams sit **low (lens ~0.75")** — the same band as the grazing strips — so strips are placed **after** the cameras are mounted, out of all 5 camera FOVs (the old "strips low, cams high ~4" — no collision" note belonged to the superseded mid-wall layout). All switching stays manual for v1.
+
+---
+
+## ZERO-COST EYEBALL TEST — ✅ PASSED 2026-05-09
+
+**Done.** Bright-field + dark-field were verified inside the wooden-plank shell (see the hardware/README progress log): bright-field uniform across the load position; dark-field grazing strips give clean shadows with no spill into the camera FOV → the dual-capture theory holds for our device set. The procedure below is kept as the historical record **and** as the re-test recipe once the real purchased lights are mounted — now with an added flicker/banding check (see the verification step in the parts order).
 
 1. Find the worst-scratched device in the current dataset.
 2. Turn off all room lights except one lamp.
@@ -90,7 +105,7 @@ This is the single most important next step. It takes 15 minutes and definitivel
 
 ## Open questions for next session
 
-1. **Run the eyeball test** and save both images to `data/lighting-test/` for reference.
+1. ~~**Run the eyeball test**~~ ✅ **Done 2026-05-09 (PASSED).** Re-run with the real purchased lights once mounted — add a flicker/banding check — and save both images to `software/grading-model/data/lighting-test/`.
 2. **Confirm the device set's scratch distribution** — are scratches on the front glass, back glass, or both? Dark-field needs to be applied to whichever surface has them.
 3. **Decide on labeling schema for segmentation.** `scratch`, `crack`, `dent`, `paint_wear`, `chip`, `stain` — finalized list before any labeling starts (relabeling is expensive, schema changes late are painful).
 4. **Decide whether to keep cross-polarization anywhere in the station.** It suppresses scratch scatter; it should NOT be on the dark-field capture. If it's on the bright-field capture for glare rejection, that's fine.

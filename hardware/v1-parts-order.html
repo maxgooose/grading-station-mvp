@@ -57,7 +57,7 @@
   <header>
     <h1>MVP v1 — Final Parts Order</h1>
     <div class="sub">Simplified, plug-and-play lighting (no relay, no custom wiring) + camera connectivity + door hardware.</div>
-    <div class="meta">Grading station · 12&Prime; cube enclosure · host = Windows PC · prepared 2026-05-21</div>
+    <div class="meta">Grading station · 12&Prime; cube enclosure · host = Windows PC · prepared 2026-05-21 · lighting locked 2026-06-08</div>
   </header>
 
   <div class="callout">
@@ -74,16 +74,16 @@
       <thead><tr><th>Item</th><th>Spec / search term</th><th class="qty">Qty</th><th class="price">Est.</th><th>Notes</th></tr></thead>
       <tbody>
         <tr>
-          <td class="item">Dimmable LED panel / light bar</td>
-          <td class="spec">"dimmable LED under-cabinet light bar" — frosted face, knob/inline dimmer (not remote-only), ~5000K</td>
-          <td class="qty">1</td><td class="price">$15–25</td>
-          <td class="note"><b>Bright-field.</b> Self-diffused — no separate diffuser. Mounts on the roof; lens through a notch or beside it.</td>
+          <td class="item">Under-cabinet LED bar &times;2 (bright-field)</td>
+          <td class="spec">12&Prime; under-cabinet LED, 5000K, <b>CRI 90+, flicker-free</b>, linkable, built-in/inline dimmer (not remote-only) — e.g. <a href="https://www.amazon.com/Lighting-Hardwired-2700K-5000K-Dimmable-Linkable/dp/B0FX521RMC">Amazon B0FX521RMC</a></td>
+          <td class="qty">2</td><td class="price">$20–30</td>
+          <td class="note"><b>Bright-field.</b> Self-diffused — no separate diffuser. Mount the two bars on the roof <b>flanking the &empty;2&Prime; lens hole</b> (one each side) so the screen-mirror reflection lands beside the lens, not in it. Set to 5000K; CRI 90+ for accurate paint-wear/stain rendering. CRI~80 fallback: Litever B0972H742R.</td>
         </tr>
         <tr>
-          <td class="item">Dimmable LED strip kit</td>
-          <td class="spec">"dimmable LED strip light kit" — white, includes power adapter + inline dimmer</td>
-          <td class="qty">1</td><td class="price">$15–20</td>
-          <td class="note"><b>Dark-field.</b> Bare strip, run grazing along a side (low, ~4 cm from the device, angled 10–15&deg; in). Kit is long — route it along 1–2 sides to start.</td>
+          <td class="item">12V white LED strip kit (dark-field)</td>
+          <td class="spec"><b>12&nbsp;V DC</b> white strip + regulated adapter — budget: <a href="https://www.amazon.com/LEDupdates-Flexible-Cabinet-Lighting-Included/dp/B07VVMTQ5T">LEDupdates 12V CRI95</a> + adapter; vision-grade flicker-free: <a href="https://store.waveformlighting.com/products/filmgrade-flicker-free-dimmer-for-led-strip">Waveform FilmGrade</a> system</td>
+          <td class="qty">1 kit</td><td class="price">$20 (or $60–80)</td>
+          <td class="note"><b>Dark-field.</b> Bare strip (no diffuser) on small black-foam blocks, ~5&nbsp;mm above the screen plane, 3–6&nbsp;cm from the device edge, angled <b>12–15&deg;</b> in. Cut into <b>3 segments &rarr; back + left + right walls</b> (back covers N–S scratches, left+right cover E–W). One kit does all three; keep spare for an optional 4th door strip. Prefer 12&nbsp;V DC (not 5&nbsp;V USB) for a later USB-relay auto-switch.</td>
         </tr>
       </tbody>
     </table>
@@ -131,12 +131,12 @@
   <section>
     <h2><span class="dot"></span>Where the lights go</h2>
     <pre>
- ROOF  ===[ bright-field: dimmable LED panel/bar (self-diffused) ]===
+ ROOF ==[ BF bar ]===( lens )===[ BF bar ]==   two bright-field bars flank the lens
                     |  camera lens (round 2" hole)
                     v      ~8" working distance
-   DF \                                              &lt;- dark-field strip,
-     -------------[  PHONE, screen up  ]-------------    grazing along a side, BARE
- FLOOR/SHELF         ^ low, ~4cm from device edge, angled 10-15 deg in
+   DF \                                          / DF   dark-field: 3 BARE strips
+     -------------[  PHONE, screen up  ]-------------    (back + left + right walls),
+ FLOOR/SHELF         ^ low, ~4cm from edge, grazing 12-15 deg in
     </pre>
   </section>
 
@@ -145,7 +145,7 @@
     <ul>
       <li>Inside of the box must be <b>matte black everywhere</b> — mandatory for dark-field contrast.</li>
       <li>Bright-field panel = self-diffused, so <b>no separate diffuser</b>. Dark-field strip stays bare, on small black foam blocks to set the grazing angle.</li>
-      <li>If a light <b>flickers</b> in captures, nudge its dimmer off the lowest settings (cheap PWM dimmers can flicker at low brightness).</li>
+      <li><b>Flicker = the #1 risk.</b> The ELP 4K is rolling-shutter, so PWM <i>dimming</i> makes rolling-bar banding that wrecks scratch detection. <b>Run the LEDs undimmed at full brightness on DC and set brightness with the camera's exposure</b> — not the dimmer. Only dim with a flicker-free dimmer. Always confirm with a test capture before locking settings.</li>
       <li>Cameras: plug the hub into a <b>rear</b> PC port; grab one camera at a time (5 cameras share USB 2.0 bandwidth).</li>
       <li>Door (thin wood): pre-drill, short screws, and black-out any shiny hinge/knob.</li>
     </ul>
